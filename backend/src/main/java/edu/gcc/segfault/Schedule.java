@@ -9,13 +9,11 @@ public class Schedule {
 
 
     public void addCourse(Course toAdd){
-        if (toAdd == null) return;
-        courses.remove(toAdd);
+
     }
 
     public void removeCourse(Course toRemove){
-        if (toRemove == null) return;
-        courses.remove(toRemove);
+
     }
 
     public boolean checkConflicts(Course toCheck){
