@@ -1,0 +1,183 @@
+Index: backend/src/main/java/edu/gcc/segfault/Search.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package edu.gcc.segfault;\r\n\r\nimport java.util.ArrayList;\r\nimport java.util.Stack;\r\n\r\npublic class Search {\r\n    private ArrayList<Course> originalResults;\r\n    private Stack<ArrayList<Course>> history;\r\n    private ArrayList<Filter> activeFilters;\r\n    private ArrayList<String> searchKeywords;\r\n\r\n    public ArrayList<Course> fetchQuery(){\r\n        return new ArrayList<>();\r\n    }\r\n\r\n    public boolean applyFilters(){\r\n        return false;\r\n    }\r\n    public ArrayList<Course> getResults(){\r\n        return new ArrayList<>();\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/src/main/java/edu/gcc/segfault/Search.java b/backend/src/main/java/edu/gcc/segfault/Search.java
+--- a/backend/src/main/java/edu/gcc/segfault/Search.java	(revision c791594b53f230746fa78952f729eb3d6939b825)
++++ b/backend/src/main/java/edu/gcc/segfault/Search.java	(date 1771868832808)
+@@ -2,6 +2,8 @@
+ 
+ import java.util.ArrayList;
+ import java.util.Stack;
++//import com.fasterxml.jackson.databind.JsonNode; only if using node stuff
++
+ 
+ public class Search {
+     private ArrayList<Course> originalResults;
+Index: .idea/.gitignore
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.gitignore b/.idea/.gitignore
+new file mode 100644
+--- /dev/null	(date 1771267093418)
++++ b/.idea/.gitignore	(date 1771267093418)
+@@ -0,0 +1,3 @@
++# Default ignored files
++/shelf/
++/workspace.xml
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+new file mode 100644
+--- /dev/null	(date 1771428841807)
++++ b/.idea/gradle.xml	(date 1771428841807)
+@@ -0,0 +1,16 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="GradleMigrationSettings" migrationVersion="1" />
++  <component name="GradleSettings">
++    <option name="linkedExternalProjectsSettings">
++      <GradleProjectSettings>
++        <option name="externalProjectPath" value="$PROJECT_DIR$/backend" />
++        <option name="modules">
++          <set>
++            <option value="$PROJECT_DIR$/backend" />
++          </set>
++        </option>
++      </GradleProjectSettings>
++    </option>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+new file mode 100644
+--- /dev/null	(date 1771285166474)
++++ b/.idea/misc.xml	(date 1771285166474)
+@@ -0,0 +1,7 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ExternalStorageConfigurationManager" enabled="true" />
++  <component name="ProjectRootManager" version="2" project-jdk-name="temurin-21" project-jdk-type="JavaSDK">
++    <output url="file://$PROJECT_DIR$/out" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/modules.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/modules.xml b/.idea/modules.xml
+new file mode 100644
+--- /dev/null	(date 1771285166422)
++++ b/.idea/modules.xml	(date 1771285166422)
+@@ -0,0 +1,8 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="ProjectModuleManager">
++    <modules>
++      <module fileurl="file://$PROJECT_DIR$/.idea/SWE-Segfault-Squad2.iml" filepath="$PROJECT_DIR$/.idea/SWE-Segfault-Squad2.iml" />
++    </modules>
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/SWE-Segfault-Squad2.iml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/SWE-Segfault-Squad2.iml b/.idea/SWE-Segfault-Squad2.iml
+new file mode 100644
+--- /dev/null	(date 1771285166395)
++++ b/.idea/SWE-Segfault-Squad2.iml	(date 1771285166395)
+@@ -0,0 +1,9 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module type="JAVA_MODULE" version="4">
++  <component name="NewModuleRootManager" inherit-compiler-output="true">
++    <exclude-output />
++    <content url="file://$MODULE_DIR$" />
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++  </component>
++</module>
+\ No newline at end of file
+Index: backend/build.gradle
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>plugins {\r\n    id 'java'\r\n}\r\n\r\ngroup = 'org.example'\r\nversion = '1.0-SNAPSHOT'\r\n\r\nrepositories {\r\n    mavenCentral()\r\n}\r\n\r\ndependencies {\r\n    testImplementation platform('org.junit:junit-bom:5.10.0')\r\n    testImplementation 'org.junit.jupiter:junit-jupiter'\r\n}\r\n\r\njava {\r\n    toolchain {\r\n        languageVersion = JavaLanguageVersion.of(21)\r\n    }\r\n}\r\n\r\ntest {\r\n    useJUnitPlatform()\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/backend/build.gradle b/backend/build.gradle
+--- a/backend/build.gradle	(revision c791594b53f230746fa78952f729eb3d6939b825)
++++ b/backend/build.gradle	(date 1771868832840)
+@@ -12,6 +12,8 @@
+ dependencies {
+     testImplementation platform('org.junit:junit-bom:5.10.0')
+     testImplementation 'org.junit.jupiter:junit-jupiter'
++    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
++
+ }
+ 
+ java {
+Index: .idea/vcs.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/vcs.xml b/.idea/vcs.xml
+new file mode 100644
+--- /dev/null	(date 1771285166581)
++++ b/.idea/vcs.xml	(date 1771285166581)
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="VcsDirectoryMappings">
++    <mapping directory="" vcs="Git" />
++  </component>
++</project>
+\ No newline at end of file
+Index: .idea/jarRepositories.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/jarRepositories.xml b/.idea/jarRepositories.xml
+new file mode 100644
+--- /dev/null	(date 1771285166565)
++++ b/.idea/jarRepositories.xml	(date 1771285166565)
+@@ -0,0 +1,20 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="RemoteRepositoriesConfiguration">
++    <remote-repository>
++      <option name="id" value="central" />
++      <option name="name" value="Maven Central repository" />
++      <option name="url" value="https://repo1.maven.org/maven2" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="jboss.community" />
++      <option name="name" value="JBoss Community repository" />
++      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
++    </remote-repository>
++    <remote-repository>
++      <option name="id" value="MavenRepo" />
++      <option name="name" value="MavenRepo" />
++      <option name="url" value="https://repo.maven.apache.org/maven2/" />
++    </remote-repository>
++  </component>
++</project>
+\ No newline at end of file
