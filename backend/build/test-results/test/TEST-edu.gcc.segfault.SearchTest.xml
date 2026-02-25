@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="edu.gcc.segfault.SearchTest" tests="8" skipped="0" failures="0" errors="0" timestamp="2026-02-25T17:58:49.170Z" hostname="HAROLD" time="0.434">
+  <properties/>
+  <testcase name="fetchQueryMatchByProfessor()" classname="edu.gcc.segfault.SearchTest" time="0.263"/>
+  <testcase name="fetchQueryEmptyKeywords()" classname="edu.gcc.segfault.SearchTest" time="0.035"/>
+  <testcase name="fetchQueryNoMatch()" classname="edu.gcc.segfault.SearchTest" time="0.024"/>
+  <testcase name="fetchQueryMatchByDepartment()" classname="edu.gcc.segfault.SearchTest" time="0.019"/>
+  <testcase name="fetchQueryCaseInsensitive()" classname="edu.gcc.segfault.SearchTest" time="0.025"/>
+  <testcase name="fetchQueryMatchBySubject()" classname="edu.gcc.segfault.SearchTest" time="0.023"/>
+  <testcase name="fetchQueryMultipleKeywords()" classname="edu.gcc.segfault.SearchTest" time="0.019"/>
+  <testcase name="fetchQueryMatchByName()" classname="edu.gcc.segfault.SearchTest" time="0.018"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

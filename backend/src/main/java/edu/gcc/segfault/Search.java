@@ -2,8 +2,6 @@ package edu.gcc.segfault;
 
 import java.util.ArrayList;
 import java.util.Stack;
-//import com.fasterxml.jackson.databind.JsonNode; only if using node stuff
-
 
 public class Search {
     private ArrayList<Course> originalResults;
@@ -22,7 +20,7 @@ public class Search {
      * @param searchKeywords
      * @return an ArrayList of courses that have a similarity to the searchKeywords ArrayList
      */
-    public ArrayList<Course> fetchQuery(ArrayList<String> searchKeywords){
+    public ArrayList<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
         //stub code return new ArrayList<>();
 
         //Course code
@@ -30,7 +28,9 @@ public class Search {
         //Prof name
         //Dept
 
-        ArrayList<Course> allCourses = Main.getCourses();
+        Main search = new Main();
+        search.run();
+        ArrayList<Course> allCourses = search.getCourses();
 
         ArrayList<Course> query = new ArrayList<>();
 
