@@ -21,9 +21,9 @@ public class Schedule {
             for(String d: c.getDays()){
                 for(String d2: toCheck.getDays()){
                     if(d.equals(d2)){
-//                        if(c.getStartTime <= toCheck.getStartTime && c.getEndTime >= toCheck.getStartTime){
-//                            break;
-//                        }
+                        if(!c.getStartTime().isAfter(toCheck.getStartTime()) && c.getEndTime().isAfter(toCheck.getStartTime())){
+
+                        }
                     }
                 }
             }
