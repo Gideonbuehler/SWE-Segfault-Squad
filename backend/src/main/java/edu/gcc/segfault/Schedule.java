@@ -19,6 +19,20 @@ public class Schedule {
     }
 
     public boolean checkConflicts(Course toCheck){
+        for(Course c: courses){
+            for(String d: c.getDays()){
+                for(String d2: toCheck.getDays()){
+                    if(d.equals(d2)){
+                        if(!c.getStartTime().isAfter(toCheck.getStartTime()) && c.getEndTime().isAfter(toCheck.getStartTime())){
+
+                        }
+                    }
+                }
+            }
+        }
+
+
+
         return false;
     }
 
