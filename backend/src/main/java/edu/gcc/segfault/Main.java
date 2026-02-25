@@ -10,6 +10,12 @@ import java.util.ArrayList;
 public class Main {
     private static ArrayList<Course> courses;
 
+    // runs the parser
+    public static void main(String[] args) throws Exception {
+        Main main = new Main();
+        main.run();
+    }
+
     public void run() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(new File("data_wolfe.json"));
