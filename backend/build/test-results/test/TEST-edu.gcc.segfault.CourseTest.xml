@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="edu.gcc.segfault.CourseTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-02-25T21:14:57.565Z" hostname="HAROLD" time="0.849">
+  <properties/>
+  <testcase name="getStartTime()" classname="edu.gcc.segfault.CourseTest" time="0.443"/>
+  <testcase name="getCourseCode()" classname="edu.gcc.segfault.CourseTest" time="0.068"/>
+  <testcase name="getCourseName()" classname="edu.gcc.segfault.CourseTest" time="0.05"/>
+  <testcase name="isOpen()" classname="edu.gcc.segfault.CourseTest" time="0.047"/>
+  <testcase name="getProfessor()" classname="edu.gcc.segfault.CourseTest" time="0.029"/>
+  <testcase name="getTotalSeats()" classname="edu.gcc.segfault.CourseTest" time="0.018"/>
+  <testcase name="getSemester()" classname="edu.gcc.segfault.CourseTest" time="0.018"/>
+  <testcase name="getEndTime()" classname="edu.gcc.segfault.CourseTest" time="0.019"/>
+  <testcase name="getLocation()" classname="edu.gcc.segfault.CourseTest" time="0.02"/>
+  <testcase name="getDays()" classname="edu.gcc.segfault.CourseTest" time="0.026"/>
+  <testcase name="isLab()" classname="edu.gcc.segfault.CourseTest" time="0.023"/>
+  <testcase name="getDepartment()" classname="edu.gcc.segfault.CourseTest" time="0.018"/>
+  <testcase name="getOpenSeats()" classname="edu.gcc.segfault.CourseTest" time="0.015"/>
+  <testcase name="getCredits()" classname="edu.gcc.segfault.CourseTest" time="0.025"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

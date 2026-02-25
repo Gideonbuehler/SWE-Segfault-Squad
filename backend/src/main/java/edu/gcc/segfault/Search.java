@@ -28,9 +28,12 @@ public class Search {
         //Prof name
         //Dept
 
-        Main search = new Main();
-        search.run();
-        ArrayList<Course> allCourses = search.getCourses();
+
+//        uncomment these lines and comment line 36, to run the SearchTest alone instead of having the gradle build do it.
+//        Main search = new Main();
+//        search.run();
+//        ArrayList<Course> allCourses = search.getCourses();
+        ArrayList<Course> allCourses = Main.getCourses();
 
         ArrayList<Course> query = new ArrayList<>();
 

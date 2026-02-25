@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="edu.gcc.segfault.MainTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-02-25T21:14:58.430Z" hostname="HAROLD" time="0.356">
+  <properties/>
+  <testcase name="fromJsonParsesTimesWhenPresent()" classname="edu.gcc.segfault.MainTest" time="0.018"/>
+  <testcase name="fromJsonParsesMWFSchedule()" classname="edu.gcc.segfault.MainTest" time="0.02"/>
+  <testcase name="fromJsonParsesCourseName()" classname="edu.gcc.segfault.MainTest" time="0.013"/>
+  <testcase name="fromJsonParsesSubjectNumberSection()" classname="edu.gcc.segfault.MainTest" time="0.014"/>
+  <testcase name="fromJsonReturnsNullForNullNode()" classname="edu.gcc.segfault.MainTest" time="0.012"/>
+  <testcase name="fromJsonParsesCredits()" classname="edu.gcc.segfault.MainTest" time="0.015"/>
+  <testcase name="fromJsonParsesOpenAndLab()" classname="edu.gcc.segfault.MainTest" time="0.013"/>
+  <testcase name="getCoursesIsNullBeforeRun()" classname="edu.gcc.segfault.MainTest" time="0.116"/>
+  <testcase name="fromJsonParsesSeats()" classname="edu.gcc.segfault.MainTest" time="0.014"/>
+  <testcase name="loadAllPopulatesCourseList()" classname="edu.gcc.segfault.MainTest" time="0.048"/>
+  <testcase name="fromJsonParsesSemester()" classname="edu.gcc.segfault.MainTest" time="0.012"/>
+  <testcase name="fromJsonParsesLocation()" classname="edu.gcc.segfault.MainTest" time="0.011"/>
+  <testcase name="fromJsonHandlesEmptyTimes()" classname="edu.gcc.segfault.MainTest" time="0.012"/>
+  <testcase name="fromJsonParsesFaculty()" classname="edu.gcc.segfault.MainTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
