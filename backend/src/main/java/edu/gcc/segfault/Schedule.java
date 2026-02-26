@@ -14,7 +14,9 @@ public class Schedule {
         calendar = new Calendar();
     }
     public void addCourse(Course toAdd){
-        courses.add(toAdd);
+        if(checkConflicts(toAdd)) {
+            courses.add(toAdd);
+        }
     }
 
     public void removeCourse(Course toRemove){
