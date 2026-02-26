@@ -21,6 +21,9 @@ public class Main {
         courses = loadAll(root);
     }
 
+    public static void main(String[] args) {
+
+    }
     private static ArrayList<Course> loadAll(JsonNode root) {
         // Create arraylist for courses
         ArrayList<Course> courseList = new ArrayList<>();
@@ -96,4 +99,5 @@ public class Main {
     public static ArrayList<Course> getCourses() {
         return courses;
     }
+
 }
