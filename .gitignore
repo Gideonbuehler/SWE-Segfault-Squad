@@ -1,7 +1,7 @@
 # IntelliJ
- .idea/
- *.iml
 
+ *.iml
+**/.idea/
  # OS
  .DS_Store
  Thumbs.db
