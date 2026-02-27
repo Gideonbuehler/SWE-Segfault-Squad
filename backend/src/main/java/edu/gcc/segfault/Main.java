@@ -100,4 +100,5 @@ public class Main {
     public static ArrayList<Course> getCourses() {
         return courses;
     }
+
 }
