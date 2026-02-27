@@ -6,6 +6,12 @@ import java.util.ArrayList;
 
 public class Controller {
     public static User user = new User();
+
+    static {
+        ArrayList<String> tempMinors = new ArrayList<>();
+        tempMinors.add("Buisiness");
+        user.setProfile(new Profile("Freshman", "Computer Science", tempMinors, null));
+    }
     public static void routeManager (Javalin app){
         // routes for search pages
         app.get("/searchResults", ctx -> ctx.json(user.getLastSearchResults()));
