@@ -8,12 +8,14 @@ public class Block {
     private LocalTime startTime;
     private LocalTime endTime;
 
+    // Default block
     public Block() {
         this.course = null;
         this.startTime = null;
         this.endTime = null;
     }
 
+    // Block with course info
     public Block(Course course) {
         this.course = course;
         this.startTime = course.getStartTime();
@@ -46,6 +48,8 @@ public class Block {
     }
 
 
+    // Equals and hashCode overriden to ease comparison of Blocks
+    // (especially useful in removeTimeBlock)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

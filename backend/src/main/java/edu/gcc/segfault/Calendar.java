@@ -4,9 +4,10 @@ import java.util.ArrayList;
 
 public class Calendar {
 
+    // The blocks representing courses in the Calendar
     private ArrayList<Block> blocks;
 
-
+    // Default
     public Calendar() {
         blocks = new ArrayList<Block>();
     }
@@ -15,6 +16,7 @@ public class Calendar {
     public ArrayList<Block> getBlocks() {
         return blocks;
     }
+
 
     public boolean addTimeBlock(Course course){
         Block newBlock = new Block();

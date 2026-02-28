@@ -100,6 +100,8 @@ public class Course {
     }
 
 
+    // Equals and hashCode overriden to ease comparison of Blocks
+    // (especially useful in Block.equals() override)
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Course course)) return false;
