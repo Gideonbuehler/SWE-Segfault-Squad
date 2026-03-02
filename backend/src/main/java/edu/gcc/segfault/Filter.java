@@ -16,7 +16,7 @@ public class Filter {
      * This method retrieves the most recent search query (top of the stack named history in the Search class) and parses it over the filters specified by the user.
      * This generates a new list which is returned and show to the suer, as well as pushed to the top of the history stack.
      * @param courses
-     * @return
+     * @return TRUE if filters apply successfully ? FALSE if it fails/the filters applied are the same as last time
      */
     public boolean applyFilters(ArrayList<Course> courses){
 
