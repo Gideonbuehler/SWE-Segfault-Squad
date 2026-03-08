@@ -37,10 +37,19 @@ public class Controller {
             }
         });
         //update minors one at a time?
-//        app.post("/profile/{minors}", ctx -> {
-//            String change = ctx.pathParam("minors");
-//            user.getProfile().updateMinors();
-//        })
+        app.post("/profile/{minors}", ctx -> {
+            String change = ctx.pathParam("minors");
+            if(user.getProfile().addMinor(change)){
+                ctx.status(201);
+            }
+
+        });
+        app.delete("/profile/{minor}", ctx -> {
+            String change = ctx.pathParam("minor");
+            if(user.getProfile().deleteMinor(change)){
+                ctx.status(201);
+            }
+        });
         //update graduation year
         app.post("/profile/{year}", ctx -> {
             String change = ctx.pathParam("year");
@@ -64,7 +73,7 @@ public class Controller {
 
         //routes for calendar
         //Need to get the calendar from the schedule?
-        app.get("/calendar", ctx -> ctx.json(user.getSchedule()));
+        app.get("/calendar", ctx -> ctx.json(user.getSchedule().getCalendar()));
 
         //routes for schedule
         app.get("/mySchedule", ctx -> ctx.json(user.getSchedule()));

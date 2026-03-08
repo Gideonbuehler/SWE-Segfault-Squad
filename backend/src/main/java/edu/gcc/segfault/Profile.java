@@ -25,6 +25,12 @@ public class Profile {
         return false;
     }
 
+    public boolean deleteMinor(String minor){
+        return true;
+    }
+    public boolean addMinor(String minor){
+        return true;
+    }
     public boolean updateMinors(ArrayList<String> minors) {
         return false;
     }
