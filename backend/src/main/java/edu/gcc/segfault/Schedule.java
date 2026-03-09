@@ -4,8 +4,13 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
-import org.apache.pdfbox.contentstream.PDContentStream;
+
 import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import be.quodlibet.boxable.BaseTable;
+import be.quodlibet.boxable.Row;
+import be.quodlibet.boxable.Cell;
 
 public class Schedule {
     private String semesterName;
@@ -87,9 +92,36 @@ public class Schedule {
 
     public void makePDF() throws IOException {
         pdf = new PDDocument();
-        PDPage schedulePage = new PDPage();
+        PDPage schedulePage = new PDPage(PDRectangle.A4);
         pdf.addPage(schedulePage);
 
+        float margin = 50;
+        float yPosition = PDRectangle.A4.getWidth() - margin;
+        BaseTable table = new BaseTable(yPosition, yPosition, margin, PDRectangle.A4.getWidth(), margin, pdf, schedulePage, true, true);
+        Row<PDPage> header = table.createRow(33f);
+        header.createCell(60f, "CODE");
+        header.createCell(60f, "Course Title");
+        header.createCell(60f, "Course Description");
+        //Combine the days and times?
+        header.createCell(60f, "Days");
+        header.createCell(60f, "Times");
+        header.createCell(60f, "Professor");
+        header.createCell(60f, "Credit Hours");
+
+
         PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);
+        write.beginText();
+        write.setFont(PDType1Font.COURIER, 24);
+        for(Course c: courses){
+            Row<PDPage> newRow = table.createRow(33f);
+            newRow.createCell(60f, c.getCourseCode());
+            newRow.createCell(60f, c.getCourseName());
+            newRow.createCell(60f, "We need to discover this");
+            newRow.createCell(60f, c.getDays().toString());
+            newRow.createCell(60f, c.getStartTime() + "-" + c.getEndTime());
+            newRow.createCell(60f, c.getCredits() + "");
+
+
+        }
     }
 }
