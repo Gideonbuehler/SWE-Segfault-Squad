@@ -1,12 +1,17 @@
 package edu.gcc.segfault;
 
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
+
+import org.apache.pdfbox.contentstream.PDContentStream;
+import org.apache.pdfbox.pdmodel.*;
 
 public class Schedule {
     private String semesterName;
     private ArrayList<Course> courses;
     private Calendar calendar;
+    private PDDocument pdf;
 
     public Schedule(String name){
         semesterName = name;
@@ -78,5 +83,13 @@ public class Schedule {
 
     public ArrayList<Course> getCourses(){
         return new ArrayList<>();
+    }
+
+    public void makePDF() throws IOException {
+        pdf = new PDDocument();
+        PDPage schedulePage = new PDPage();
+        pdf.addPage(schedulePage);
+
+        PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);
     }
 }
