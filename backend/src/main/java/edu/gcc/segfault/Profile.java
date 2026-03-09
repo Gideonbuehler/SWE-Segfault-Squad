@@ -5,7 +5,9 @@ import java.util.ArrayList;
 
 public class Profile {
     //Force them to update year as a dropdown?
+    //change this to int for graduation year?
     private String year;
+    //Standardized in capital letters
     private String major;
     //minors are standardized in capital letters to make it easier to check them
     private ArrayList<String> minors;
@@ -19,16 +21,24 @@ public class Profile {
         completedCourses = courses;
     }
 
+    /**
+     * Backend for the user to change their college year
+     * @param year - String of their college year (freshman, sophomore, junior, senior, super senior)
+     * @return true if the year updated.
+     */
     public boolean updateYear(String year) {
         this.year = year;
-        if(this.year.equals(year)) {
-            return true;
-        }
-        return false;
+        return this.year.equals(year);
     }
 
+    /**
+     * Backend for the user to change their major
+     * @param major - String of their update college major
+     * @return - true if the major updated
+     */
     public boolean updateMajor(String major) {
-        return false;
+        this.major = major.toUpperCase();
+        return this.major.equals(major.toUpperCase());
     }
 
     /**
@@ -55,11 +65,26 @@ public class Profile {
         return false;
     }
 
-    public boolean updateCompletedCourses(ArrayList<Course> completedCourses) {
-        return false;
+    public boolean addCompletedCourses(ArrayList<Course> completedCourses) {
+        for(Course c : completedCourses){
+            if(!this.completedCourses.contains(c)){
+                this.completedCourses.add(c);
+            }
+        }
+        //perform check to make sure that all the courses were added?
+        return true;
+    }
+    public boolean removeCompletedCourses(ArrayList<Course> cc){
+        for(Course c : cc){
+            if(completedCourses.contains(c)){
+                completedCourses.remove(c);
+            }
+        }
+        return true;
     }
 
     //Getters
+    //
     public String getYear() {
         return year;
     }
