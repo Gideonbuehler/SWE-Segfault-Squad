@@ -16,11 +16,12 @@ public class Schedule {
     public void addCourse(Course toAdd){
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
+            calendar.addTimeBlock(toAdd);
         }
     }
 
     public void removeCourse(Course toRemove){
-
+        calendar.removeTimeBlock(toRemove);
     }
 
     public boolean checkConflicts(Course toCheck){
