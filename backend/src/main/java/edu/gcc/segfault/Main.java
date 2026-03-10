@@ -16,8 +16,8 @@ public class Main {
         Javalin app = Javalin.create().start(7000);
         Controller.routeManager(app);
 
-//        Main main = new Main();
-//        main.run();
+        Main main = new Main();
+        main.run();
     }
     public void run() throws Exception {
         ObjectMapper mapper = new ObjectMapper();
