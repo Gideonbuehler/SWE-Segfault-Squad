@@ -24,6 +24,7 @@ public class Filter {
         ArrayList<Course> query = new ArrayList<>();
 
         for(int c = 0; c<allCourses.size(); c++){
+            String tmpFilter = "placeholder";
             Course toCheck = allCourses.get(c);
             String code = toCheck.getCourseCode();
             String name = toCheck.getCourseName();

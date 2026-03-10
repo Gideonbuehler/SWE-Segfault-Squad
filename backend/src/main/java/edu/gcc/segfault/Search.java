@@ -59,6 +59,12 @@ public class Search {
         return false;
     }
 
+
+    /**
+     * Public getter for the very first search into the database
+     * Necessary for Filter to access the courses
+     * @return originalResults arraylist
+     */
     public ArrayList<Course> getResults(){
         return new ArrayList<>();
     }
