@@ -18,7 +18,7 @@ public class Controller {
 
         app.post("/searchResults/{searchParameters}", ctx -> {
             String results = ctx.pathParam("searchParameters");
-            user.searchCourses(results);
+            ctx.json(user.searchCourses(results));
             ctx.status(201);
         });
 
@@ -27,7 +27,7 @@ public class Controller {
         app.get("/profile", ctx -> ctx.json(user.getProfile()));
         //Structure this by a route for each thing to change?
         //allow the user to update their major
-        app.post("/profile/{major}", ctx -> {
+        app.post("/profile/major/{major}", ctx -> {
             String change = ctx.pathParam("major");
             if(user.getProfile().updateMajor(change)){
                 ctx.status(201);
@@ -36,15 +36,15 @@ public class Controller {
                 ctx.status(400);
             }
         });
-        //update minors one at a time?
-        app.post("/profile/{minors}", ctx -> {
+        //update minors one at a time
+        app.post("/profile/minors/{minors}", ctx -> {
             String change = ctx.pathParam("minors");
             if(user.getProfile().addMinor(change)){
                 ctx.status(201);
             }
 
         });
-        app.delete("/profile/{minor}", ctx -> {
+        app.delete("/profile/minors/{minor}", ctx -> {
             String change = ctx.pathParam("minor");
             if(user.getProfile().deleteMinor(change)){
                 ctx.status(201);
