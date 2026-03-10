@@ -1,5 +1,6 @@
 package edu.gcc.segfault;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 
@@ -9,6 +10,13 @@ public class Profile {
     private ArrayList<String> minors;
     private ArrayList<Course> completedCourses;
 
+    public Profile(String schoolYear, String major, ArrayList<String> minors, ArrayList<Course> courses){
+        year = schoolYear;
+        this.major = major;
+        this.minors = new ArrayList<>(minors);
+        completedCourses = courses;
+    }
+
     public boolean updateYear(String year) {
         return false;
     }
@@ -17,6 +25,12 @@ public class Profile {
         return false;
     }
 
+    public boolean deleteMinor(String minor){
+        return true;
+    }
+    public boolean addMinor(String minor){
+        return true;
+    }
     public boolean updateMinors(ArrayList<String> minors) {
         return false;
     }
