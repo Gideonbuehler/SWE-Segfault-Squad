@@ -21,6 +21,7 @@ public class Schedule {
     }
 
     public void removeCourse(Course toRemove){
+        courses.remove(toRemove);
         calendar.removeTimeBlock(toRemove);
     }
 
