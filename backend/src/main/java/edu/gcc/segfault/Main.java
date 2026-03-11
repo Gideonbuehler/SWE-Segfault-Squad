@@ -2,7 +2,9 @@ package edu.gcc.segfault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.javalin.Javalin;
+import io.javalin.json.JavalinJackson;
 
 import java.io.File;
 import java.time.LocalTime;
@@ -13,7 +15,12 @@ public class Main {
 
     // runs the parser
     public static void main(String[] args) throws Exception {
-        Javalin app = Javalin.create().start(7000);
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());  // ADD THIS
+
+        Javalin app = Javalin.create(config -> {
+            config.jsonMapper(new JavalinJackson());  // tell Javalin to use it
+        }).start(7000);
         Controller.routeManager(app);
 
         Main main = new Main();
