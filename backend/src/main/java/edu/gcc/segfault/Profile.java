@@ -1,6 +1,7 @@
 package edu.gcc.segfault;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 
 public class Profile {
@@ -15,18 +16,24 @@ public class Profile {
 
 
     public Profile(String schoolYear, String major, ArrayList<String> minors, ArrayList<Course> courses){
-        year = schoolYear;
-        this.major = major;
-        this.minors = new ArrayList<>(minors);
+        year = schoolYear.toUpperCase();
+        this.major = major.toUpperCase();
+        this.minors = new ArrayList<>();
+        for(String m : minors){
+            this.minors.add(m.toUpperCase());
+        }
         completedCourses = courses;
     }
 
     /**
      * Backend for the user to change their college year
+     * Note: Should implement dropdown to pick their year,
+     * otherwise will need to add more checks to make sure they pick a valid year.
      * @param year - String of their college year (freshman, sophomore, junior, senior, super senior)
      * @return true if the year updated.
      */
     public boolean updateYear(String year) {
+        year = year.toUpperCase();
         this.year = year;
         return this.year.equals(year);
     }
@@ -47,7 +54,7 @@ public class Profile {
      * @return true if the minor was added to the list. False if the minor was not added or the
      * list already contained that minor
      */
-    public boolean addMinors(String minor){
+    public boolean addMinor(String minor){
         minor = minor.toUpperCase();
         if(!minors.contains(minor)){
             minors.add(minor);
@@ -56,10 +63,12 @@ public class Profile {
         //check whether or not it just failed vs already was in the list of minors?
         return false;
     }
-    public boolean removeMinor(String minor){
+    public boolean deleteMinor(String minor){
         minor = minor.toUpperCase();
+
         if(minors.contains(minor)){
             minors.remove(minor);
+
             return true;
         }
         return false;
