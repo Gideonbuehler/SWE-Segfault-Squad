@@ -84,7 +84,6 @@ public class Profile {
     }
 
     //Getters
-    //
     public String getYear() {
         return year;
     }
