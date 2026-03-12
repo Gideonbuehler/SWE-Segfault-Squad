@@ -11,6 +11,8 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import be.quodlibet.boxable.BaseTable;
 import be.quodlibet.boxable.Row;
 import be.quodlibet.boxable.Cell;
+import be.quodlibet.boxable.HorizontalAlignment;
+import be.quodlibet.boxable.VerticalAlignment;
 
 public class Schedule {
     private String semesterName;
@@ -94,34 +96,66 @@ public class Schedule {
         pdf = new PDDocument();
         PDPage schedulePage = new PDPage(PDRectangle.A4);
         pdf.addPage(schedulePage);
-
+        PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);
         float margin = 50;
         float yPosition = PDRectangle.A4.getWidth() - margin;
         BaseTable table = new BaseTable(yPosition, yPosition, margin, PDRectangle.A4.getWidth(), margin, pdf, schedulePage, true, true);
         Row<PDPage> header = table.createRow(33f);
-        header.createCell(60f, "CODE");
-        header.createCell(60f, "Course Title");
-        header.createCell(60f, "Course Description");
+
+        Cell<PDPage> cell = header.createCell(12f, "CODE");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
+        cell = header.createCell(12f, "Course Title");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
+        cell = header.createCell(16f, "Description");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
         //Combine the days and times?
-        header.createCell(60f, "Days");
-        header.createCell(60f, "Times");
-        header.createCell(60f, "Professor");
-        header.createCell(60f, "Credit Hours");
+        cell = header.createCell(12f, "Days");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
+        cell = header.createCell(12f, "Times");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
+        cell = header.createCell(12f, "Professor");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(10);
+        cell = header.createCell(12f, "Credit Hours");
+        cell.setAlign(HorizontalAlignment.CENTER);
+        cell.setValign(VerticalAlignment.MIDDLE);
+        cell.setFont(PDType1Font.COURIER_BOLD);
+        cell.setFontSize(12);
 
 
-        PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);
+
         write.beginText();
         write.setFont(PDType1Font.COURIER, 24);
         for(Course c: courses){
             Row<PDPage> newRow = table.createRow(33f);
-            newRow.createCell(60f, c.getCourseCode());
-            newRow.createCell(60f, c.getCourseName());
-            newRow.createCell(60f, "We need to discover this");
-            newRow.createCell(60f, c.getDays().toString());
-            newRow.createCell(60f, c.getStartTime() + "-" + c.getEndTime());
-            newRow.createCell(60f, c.getCredits() + "");
-
-
+            newRow.createCell(12f, c.getCourseCode());
+            newRow.createCell(12f, c.getCourseName());
+            newRow.createCell(16f, "We need to discover this");
+            newRow.createCell(12f, c.getDays().toString());
+            newRow.createCell(12f, c.getStartTime() + "-" + c.getEndTime());
+            newRow.createCell(12f, c.getProfessor());
+            newRow.createCell(12f, c.getCredits() + "");
         }
+        table.draw();
+        write.endText();
+        write.close();
+        pdf.save("Schedule.pdf");
     }
 }
