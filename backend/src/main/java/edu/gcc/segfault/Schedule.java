@@ -28,11 +28,13 @@ public class Schedule {
     public void addCourse(Course toAdd){
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
+            calendar.addTimeBlock(toAdd);
         }
     }
 
     public void removeCourse(Course toRemove){
-
+        courses.remove(toRemove);
+        calendar.removeTimeBlock(toRemove);
     }
 
     public boolean checkConflicts(Course toCheck){
@@ -89,7 +91,10 @@ public class Schedule {
     }
 
     public ArrayList<Course> getCourses(){
-        return new ArrayList<>();
+        return new ArrayList<>(courses);
+    }
+    public Calendar getCalendar(){
+        return calendar;
     }
 
     public void makePDF() throws IOException {
