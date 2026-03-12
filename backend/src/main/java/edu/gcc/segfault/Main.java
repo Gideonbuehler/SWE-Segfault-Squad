@@ -2,6 +2,7 @@ package edu.gcc.segfault;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.Javalin;
 
 import java.io.File;
 import java.time.LocalTime;
@@ -12,6 +13,9 @@ public class Main {
 
     // runs the parser
     public static void main(String[] args) throws Exception {
+        Javalin app = Javalin.create().start(7000);
+        Controller.routeManager(app);
+
         Main main = new Main();
         main.run();
     }
@@ -21,9 +25,6 @@ public class Main {
         courses = loadAll(root);
     }
 
-    public static void main(String[] args) {
-
-    }
     private static ArrayList<Course> loadAll(JsonNode root) {
         // Create arraylist for courses
         ArrayList<Course> courseList = new ArrayList<>();
