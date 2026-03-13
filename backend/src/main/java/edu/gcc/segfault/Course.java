@@ -20,6 +20,8 @@ public class Course {
     private int openSeats;
     private int totalSeats;
 
+    //Default constructor for tests
+
     // Constructor for main
     public Course(String courseCode, String courseName, String professor, String department,
            String location, String semester, LocalTime startTime, LocalTime endTime,
