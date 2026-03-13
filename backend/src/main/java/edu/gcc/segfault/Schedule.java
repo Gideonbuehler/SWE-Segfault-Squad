@@ -107,6 +107,8 @@ public class Schedule {
         }
 
         return s.toString();
+    }
+
     public void makePDF() throws IOException {
         //Need to push
         pdf = new PDDocument();
