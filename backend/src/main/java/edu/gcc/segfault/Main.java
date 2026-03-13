@@ -87,6 +87,7 @@ public class Main {
                 startTime = LocalTime.parse(times.get(0).get("start_time").asText());
                 endTime = LocalTime.parse(times.get(0).get("end_time").asText());
 
+
                 // For each timeslot add, get the day and add it to days; ie M, W, F
                 for (JsonNode t : times) {
                     days.add(t.get("day").asText());
