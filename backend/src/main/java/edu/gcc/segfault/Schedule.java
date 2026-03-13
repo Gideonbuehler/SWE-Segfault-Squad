@@ -29,12 +29,14 @@ public class Schedule {
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
             calendar.addTimeBlock(toAdd);
+            System.out.println(courses.toString());
         }
     }
 
     public void removeCourse(Course toRemove){
         courses.remove(toRemove);
         calendar.removeTimeBlock(toRemove);
+        System.out.println(courses.toString());
     }
 
     public boolean checkConflicts(Course toCheck){
@@ -95,6 +97,16 @@ public class Schedule {
     }
     public Calendar getCalendar(){
         return calendar;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder s = new StringBuilder();
+        for (Course c : courses) {
+            s.append(c.toString()).append(" ");
+        }
+
+        return s.toString();
     }
 
     public void makePDF() throws IOException {
