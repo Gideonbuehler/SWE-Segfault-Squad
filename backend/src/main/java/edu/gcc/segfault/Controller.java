@@ -97,9 +97,16 @@ public class Controller {
                 return;
             }
 
-            user.getSchedule().addCourse(toAdd);
-            ctx.status(201);
-            ctx.result("Course added");
+            if(user.getSchedule().addCourse(toAdd)) {
+                ctx.status(201);
+                ctx.result("Course added");
+                return;
+            }
+            else {
+                ctx.status(500);
+                ctx.result("Course conflict");
+                return;
+            }
         });
     }
 }
