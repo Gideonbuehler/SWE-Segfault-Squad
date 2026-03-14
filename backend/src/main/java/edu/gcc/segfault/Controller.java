@@ -11,6 +11,7 @@ public class Controller {
         ArrayList<String> tempMinors = new ArrayList<>();
         tempMinors.add("Buisiness");
         user.setProfile(new Profile("Freshman", "Computer Science", tempMinors, null));
+        user.setSchedule(new Schedule("F25"));  // Claude
     }
     public static void routeManager (Javalin app){
         // routes for search pages
@@ -77,5 +78,28 @@ public class Controller {
 
         //routes for schedule
         app.get("/mySchedule", ctx -> ctx.json(user.getSchedule()));
+
+        app.post("/mySchedule/add/{courseCode}", ctx -> {
+            String courseCode = ctx.pathParam("courseCode");
+            ArrayList<Course> allCourses = Main.getCourses();
+
+            Course toAdd = null;
+            for (Course c : allCourses) {
+                if (c.getCourseCode().equalsIgnoreCase(courseCode)) {
+                    toAdd = c;
+                    break;
+                }
+            }
+
+            if (toAdd == null) {
+                ctx.status(404);
+                ctx.result("Course not found");
+                return;
+            }
+
+            user.getSchedule().addCourse(toAdd);
+            ctx.status(201);
+            ctx.result("Course added");
+        });
     }
 }

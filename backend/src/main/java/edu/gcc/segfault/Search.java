@@ -52,6 +52,7 @@ public class Search {
         }
 
         history.push(query);
+        originalResults = query;  // Claude
         return query;
     }
 
@@ -60,6 +61,6 @@ public class Search {
     }
 
     public ArrayList<Course> getResults(){
-        return new ArrayList<>();
+        return originalResults;
     }
 }

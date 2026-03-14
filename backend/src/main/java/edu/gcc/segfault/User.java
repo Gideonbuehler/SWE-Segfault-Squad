@@ -1,5 +1,7 @@
 package edu.gcc.segfault;
 
+import java.util.ArrayList;
+
 public class User {
     private String userName;
     private Schedule schedule;
@@ -15,8 +17,16 @@ public class User {
 
     }
 
-    public Search searchCourses(String search){
+    public Search searchCourses(String search) {
         Search s = new Search();
+        try {
+            ArrayList<String> keywords = new ArrayList<>();
+            keywords.add(search);
+            s.fetchQuery(keywords);  // this populates the history stack
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        lastSearchResults = s;
         return s;
     }
 
