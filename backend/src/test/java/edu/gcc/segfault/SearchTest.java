@@ -22,6 +22,13 @@ class SearchTest {
         ArrayList<Course> result = new Search().fetchQuery(keywords);
         assertFalse(result.isEmpty());
     }
+    @Test
+    void fetchQueryMatchByPartOfName() throws Exception {
+        ArrayList<String> keywords = new ArrayList<>();
+        keywords.add("PRINCIPLES");
+        ArrayList<Course> result = new Search().fetchQuery(keywords);
+        assertFalse(result.isEmpty());
+    }
 
     @Test
     void fetchQueryMatchByProfessor() throws Exception {

@@ -56,19 +56,22 @@ public class Search {
             for(int k=0; k<searchKeywords.size(); k++){
                 //tests for each part of the course code ie COMP, 141, and A
                 for (int l = 0; l < codeSplit.length; l++) {
-                    if (codeSplit[l].contains(searchKeywords.get(k))) {
+                    if ((codeSplit[l].toUpperCase()).contains(searchKeywords.get(k).toUpperCase())) {
                         query.add(toCheck);
                         break;
                     }
                 }
-                for(String n : nameSplit){
-                    if(n.contains(searchKeywords.get(k))){
+                //Test for each part of the name
+                for (int n = 0; n < nameSplit.length; n++)
+                {
+                    if(nameSplit[n].contains(searchKeywords.get(k)) || nameSplit[n].equalsIgnoreCase(searchKeywords.get(k))){
                         query.add(toCheck);
                         break;
                     }
                 }
-                for(String p : professorSplit){
-                    if(p.contains(searchKeywords.get(k))){
+                for (int p = 0; p < professorSplit.length; p++)
+                {
+                    if(professorSplit[p].contains(searchKeywords.get(k))|| professorSplit[p].equalsIgnoreCase(searchKeywords.get(k))){
                         query.add(toCheck);
                         break;
                     }
@@ -81,7 +84,8 @@ public class Search {
         }
 
         history.push(query);
-        originalResults = query;  // Claude
+        originalResults = query;// Claude
+        System.out.println(originalResults);
         return query;
     }
 
