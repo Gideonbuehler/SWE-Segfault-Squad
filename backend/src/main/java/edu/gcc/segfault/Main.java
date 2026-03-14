@@ -18,10 +18,10 @@ public class Main {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());  // ADD THIS
 
-        Javalin app = Javalin.create(config -> {
-            config.jsonMapper(new JavalinJackson());  // tell Javalin to use it
-        }).start(7000);
-        Controller.routeManager(app);
+//        Javalin app = Javalin.create(config -> {
+//            config.jsonMapper(new JavalinJackson());  // tell Javalin to use it
+//        }).start(7000);
+//        Controller.routeManager(app);
 
         Main main = new Main();
         main.run();
