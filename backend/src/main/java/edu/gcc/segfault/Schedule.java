@@ -25,12 +25,15 @@ public class Schedule {
         courses = new ArrayList<>();
         calendar = new Calendar();
     }
-    public void addCourse(Course toAdd){
+    public boolean addCourse(Course toAdd){
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
             calendar.addTimeBlock(toAdd);
             System.out.println(courses.toString());
+            return true;
         }
+
+        return false;
     }
 
     public void removeCourse(Course toRemove){
