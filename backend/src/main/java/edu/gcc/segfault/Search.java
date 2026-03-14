@@ -19,8 +19,10 @@ public class Search {
     }
 
     /**
-     * @param searchKeywords
-     * @return an ArrayList of courses that have a similarity to the searchKeywords ArrayList
+     * This method compares the entered search terms to each class in the database's information, resulting
+     * in search results that are fulfilled by all the search terms
+     * @param searchKeywords - the words that the user typed into the search bar
+     * @return a Set of courses that have a similarity to the searchKeywords ArrayList
      */
     public Set<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
         //stub code return new ArrayList<>();
@@ -87,12 +89,13 @@ public class Search {
                     }
                 }
 
-                //Department is already covered through
+                //Department is already covered through course code
 //                if(department.contains(searchKeywords.get(k)) || department.equalsIgnoreCase(searchKeywords.get(k))){
 //                    keywordCheck++;
 //                    break;
 //                }
             }
+            //Makes sure that the course is applicable to all the search terms
             if(keywordCheck >= searchKeywords.size())
                 query.add(toCheck);
         }
