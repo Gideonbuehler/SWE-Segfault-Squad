@@ -1,16 +1,18 @@
 package edu.gcc.segfault;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 public class Search {
-    private ArrayList<Course> originalResults;
-    private Stack<ArrayList<Course>> history;
+    private Set<Course> originalResults;
+    private Stack<Set<Course>> history;
     private ArrayList<Filter> activeFilters;
     private ArrayList<String> searchKeywords;
 
     public Search(){
-        this.originalResults = new ArrayList<>();
+        this.originalResults = new HashSet<>();
         this.history = new Stack<>();
         this.activeFilters = new ArrayList<>();
         this.searchKeywords = new ArrayList<>();
@@ -20,7 +22,7 @@ public class Search {
      * @param searchKeywords
      * @return an ArrayList of courses that have a similarity to the searchKeywords ArrayList
      */
-    public ArrayList<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
+    public Set<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
         //stub code return new ArrayList<>();
 
         //Course code
@@ -35,7 +37,7 @@ public class Search {
         ArrayList<Course> allCourses = search.getCourses();
         //ArrayList<Course> allCourses = Main.getCourses();
 
-        ArrayList<Course> query = new ArrayList<>();
+        Set<Course> query = new HashSet<>();
 
         for(int c = 0; c<allCourses.size(); c++){
             Course toCheck = allCourses.get(c);
@@ -51,34 +53,48 @@ public class Search {
                 }
             }
             String department = toCheck.getDepartment();
+            int keywordCheck = 0;
             for(int k=0; k<searchKeywords.size(); k++){
+                boolean found = false;
                 //tests for each part of the course code ie COMP, 141, and A
                 for (int l = 0; l < codeSplit.length; l++) {
                     if ((codeSplit[l].toUpperCase()).contains(searchKeywords.get(k).toUpperCase())) {
-                        query.add(toCheck);
+                        keywordCheck++;
+                        found = true;
                         break;
                     }
+                }
+                if (found){
+                    continue;
                 }
                 //Test for each part of the name
                 for (int n = 0; n < nameSplit.length; n++)
                 {
                     if(nameSplit[n].contains(searchKeywords.get(k)) || nameSplit[n].equalsIgnoreCase(searchKeywords.get(k))){
-                        query.add(toCheck);
+                        keywordCheck++;
+                        found = true;
                         break;
                     }
+                }
+                if (found){
+                    continue;
                 }
                 for (int p = 0; p < professorSplit.length; p++)
                 {
                     if(professorSplit[p].contains(searchKeywords.get(k))|| professorSplit[p].equalsIgnoreCase(searchKeywords.get(k))){
-                        query.add(toCheck);
+                        keywordCheck++;
                         break;
                     }
                 }
-                if(department.contains(searchKeywords.get(k)) || department.equalsIgnoreCase(searchKeywords.get(k))){
-                    query.add(toCheck);
-                    break;
-                }
+
+                //Department is already covered through
+//                if(department.contains(searchKeywords.get(k)) || department.equalsIgnoreCase(searchKeywords.get(k))){
+//                    keywordCheck++;
+//                    break;
+//                }
             }
+            if(keywordCheck >= searchKeywords.size())
+                query.add(toCheck);
         }
 
         history.push(query);
@@ -90,7 +106,7 @@ public class Search {
         return false;
     }
 
-    public ArrayList<Course> getResults(){
+    public Set<Course> getResults(){
         return originalResults;
     }
 }

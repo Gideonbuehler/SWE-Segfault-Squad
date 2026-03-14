@@ -1,6 +1,7 @@
 package edu.gcc.segfault;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     private String userName;
@@ -21,7 +22,7 @@ public class User {
         Search s = new Search();
         try {
             ArrayList<String> keywords = new ArrayList<>();
-            keywords.add(search);
+            keywords.addAll(List.of(search.split(" ")));
             s.fetchQuery(keywords);  // this populates the history stack
         } catch (Exception e) {
             e.printStackTrace();
