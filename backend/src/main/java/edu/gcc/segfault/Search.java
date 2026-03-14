@@ -50,9 +50,7 @@ public class Search {
                     professorSplit[i] = professorSplit[i].replace(",", "");
                 }
             }
-
             String department = toCheck.getDepartment();
-
             for(int k=0; k<searchKeywords.size(); k++){
                 //tests for each part of the course code ie COMP, 141, and A
                 for (int l = 0; l < codeSplit.length; l++) {
@@ -76,7 +74,7 @@ public class Search {
                         break;
                     }
                 }
-                if(department.equalsIgnoreCase(searchKeywords.get(k))){
+                if(department.contains(searchKeywords.get(k)) || department.equalsIgnoreCase(searchKeywords.get(k))){
                     query.add(toCheck);
                     break;
                 }
@@ -85,7 +83,6 @@ public class Search {
 
         history.push(query);
         originalResults = query;// Claude
-        System.out.println(originalResults);
         return query;
     }
 
