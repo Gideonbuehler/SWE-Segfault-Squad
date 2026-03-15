@@ -1,5 +1,10 @@
 package edu.gcc.segfault;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
 
@@ -7,6 +12,9 @@ public class Schedule {
     private String semesterName;
     private ArrayList<Course> courses;
     private Calendar calendar;
+
+    //File path to store/save schedule
+    private static final String save_dir = "schedules/";
 
     public Schedule(String name){
         semesterName = name;
@@ -71,7 +79,27 @@ public class Schedule {
     }
 
     public boolean saveSchedule(){
-        return false;
+        try {
+            // Make sure the save directory exists
+            File dir = new File(save_dir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule()); // handles LocalTime
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            // Creates/writes to save file
+            File saveFile = new File(save_dir + semesterName + ".json");
+            mapper.writeValue(saveFile, courses);
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean loadSchedule(){
