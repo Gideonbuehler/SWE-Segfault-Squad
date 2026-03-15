@@ -22,7 +22,12 @@ public class User {
         Search s = new Search();
         try {
             ArrayList<String> keywords = new ArrayList<>();
-            keywords.addAll(List.of(search.split(" ")));
+            //clean the search words
+            String[] searchSplit = search.split(" ");
+            for (int i = 0; i < searchSplit.length; i++) {
+                searchSplit[i] = searchSplit[i].replaceAll("\\p{Punct}", "");
+            }
+            keywords.addAll(List.of(searchSplit));
             s.fetchQuery(keywords);  // this populates the history stack
         } catch (Exception e) {
             e.printStackTrace();

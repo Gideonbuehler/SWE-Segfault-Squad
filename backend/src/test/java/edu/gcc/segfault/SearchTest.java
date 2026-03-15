@@ -2,6 +2,7 @@ package edu.gcc.segfault;
 
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -18,8 +19,8 @@ class SearchTest {
 
     @Test
     void fetchQueryMatchByName() throws Exception {
-        ArrayList<String> keywords = new ArrayList<>();
-        keywords.add("PRINCIPLES OF ACCOUNTING I");
+        ArrayList<String> keywords = new ArrayList<>(List.of(("PRINCIPLES OF ACCOUNTING I").split(" ")));
+
         Set<Course> result = new Search().fetchQuery(keywords);
         assertFalse(result.isEmpty());
     }
@@ -33,16 +34,15 @@ class SearchTest {
 
     @Test
     void fetchQueryMatchByProfessor() throws Exception {
-        ArrayList<String> keywords = new ArrayList<>();
-        keywords.add("Graybill, Keith B.");
+        //user's search method cleans the search parameters
+        ArrayList<String> keywords = new ArrayList<>(List.of("Graybill", "Keith", "B"));
         Set<Course> result = new Search().fetchQuery(keywords);
         assertFalse(result.isEmpty());
     }
 
     @Test
     void fetchQueryCaseInsensitive() throws Exception {
-        ArrayList<String> keywords = new ArrayList<>();
-        keywords.add("principles of accounting i");
+        ArrayList<String> keywords = new ArrayList<>(List.of("principles", "of", "accounting", "i"));
         Set<Course> result = new Search().fetchQuery(keywords);
         assertFalse(result.isEmpty());
     }
@@ -58,8 +58,8 @@ class SearchTest {
     @Test
     void fetchQueryMultipleKeywords() throws Exception {
         ArrayList<String> keywords = new ArrayList<>();
-        keywords.add("COST ACCOUNTING");
-        keywords.add("AUDITING");
+        keywords.add("COST");
+        keywords.add("ACCOUNTING");
         Set<Course> result = new Search().fetchQuery(keywords);
         assertTrue(result.size() >= 2);
     }

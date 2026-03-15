@@ -40,7 +40,9 @@ public class Search {
         //ArrayList<Course> allCourses = Main.getCourses();
 
         Set<Course> query = new HashSet<>();
-
+        if(searchKeywords.isEmpty()){
+            return query;
+        }
         for(int c = 0; c<allCourses.size(); c++){
             Course toCheck = allCourses.get(c);
             String code = toCheck.getCourseCode();
