@@ -19,21 +19,92 @@ public class Filter {
      */
     public boolean applyFilters(){
 
-        ArrayList<Course> allCourses = Search.history.peek();
-
-        ArrayList<Course> query = new ArrayList<>();
-
-        for(int c = 0; c<allCourses.size(); c++){
-            String tmpFilter = "placeholder";
-            Course toCheck = allCourses.get(c);
-            String code = toCheck.getCourseCode();
-            String name = toCheck.getCourseName();
-            String professor = toCheck.getProfessor();
-            String department = toCheck.getDepartment();
-
+        // Check if there are any search results to filter
+        if(Search.history.isEmpty()){
+            return false;
         }
 
-        Search.history.push(query);
+        // Get the most recent search results
+        java.util.Set<Course> allCourses = Search.history.peek();
+
+        // Create a new filtered set
+        java.util.Set<Course> filteredQuery = new java.util.HashSet<>();
+
+        // Iterate through all courses and apply filters
+        for(Course toCheck : allCourses){
+            // Check if course matches all applied filters
+            if(matchesAllFilters(toCheck)){
+                filteredQuery.add(toCheck);
+            }
+        }
+
+        // Check if the filtered results are the same as before
+        if(filteredQuery.equals(allCourses)){
+            return false;
+        }
+
+        // Push the filtered results to history
+        Search.history.push(filteredQuery);
+        return true;
+    }
+
+    /**
+     * Helper method to check if a course matches all active filters
+     * @param course the course to check
+     * @return TRUE if course matches all filters, FALSE otherwise
+     */
+    private boolean matchesAllFilters(Course course){
+        // Filter by professor name (if specified)
+        if(professorName != null && !professorName.isEmpty()){
+            if(!course.getProfessor().equalsIgnoreCase(professorName)){
+                return false;
+            }
+        }
+
+        // Filter by department (if specified)
+        if(departmentName != null && !departmentName.isEmpty()){
+            if(!course.getDepartment().equalsIgnoreCase(departmentName)){
+                return false;
+            }
+        }
+
+        // Filter by credits (if specified, credits > 0 means it was set)
+        if(credits > 0){
+            if(course.getCredits() != credits){
+                return false;
+            }
+        }
+
+        // Filter by days (if specified)
+        if(days != null && !days.isEmpty()){
+            ArrayList<String> courseDays = course.getDays();
+            // Check if the course has at least one matching day
+            boolean dayMatch = false;
+            for(String day : days){
+                if(courseDays.contains(day)){
+                    dayMatch = true;
+                    break;
+                }
+            }
+            if(!dayMatch){
+                return false;
+            }
+        }
+
+        // Filter by start time (if specified)
+        if(startTime != null){
+            if(!course.getStartTime().equals(startTime) && course.getStartTime().isBefore(startTime)){
+                return false;
+            }
+        }
+
+        // Filter by end time (if specified)
+        if(endTime != null){
+            if(!course.getEndTime().equals(endTime) && course.getEndTime().isAfter(endTime)){
+                return false;
+            }
+        }
+
         return true;
     }
 
