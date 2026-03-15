@@ -38,6 +38,7 @@ public class Schedule {
             courses.add(toAdd);
             calendar.addTimeBlock(toAdd);
             System.out.println(courses.toString());
+            saveSchedule();
             return true;
         }
 
@@ -48,6 +49,7 @@ public class Schedule {
         courses.remove(toRemove);
         calendar.removeTimeBlock(toRemove);
         System.out.println(courses.toString());
+        saveSchedule();
     }
 
     public boolean checkConflicts(Course toCheck){
@@ -120,7 +122,34 @@ public class Schedule {
     }
 
     public boolean loadSchedule(){
-        return false;
+        try {
+            File saveFile = new File(save_dir + semesterName + ".json");
+            if (!saveFile.exists()) {
+                return false;
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            // Tells Jackson that it wants an arraylist of Courses
+            ArrayList<Course> loaded = mapper.readValue(
+                    saveFile,
+                    mapper.getTypeFactory().constructCollectionType(ArrayList.class, Course.class)
+            );
+
+            // Clear current state and rebuild from loaded data
+            courses.clear();
+            calendar = new Calendar();
+            for (Course c : loaded) {
+                courses.add(c);
+                calendar.addTimeBlock(c);
+            }
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public ArrayList<Course> getCourses(){

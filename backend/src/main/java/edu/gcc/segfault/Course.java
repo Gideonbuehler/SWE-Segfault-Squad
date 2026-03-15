@@ -3,7 +3,11 @@ package edu.gcc.segfault;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Course {
     private String courseCode;
     private String courseName;
@@ -21,6 +25,9 @@ public class Course {
     private int totalSeats;
 
     //Default constructor for tests
+    public Course() {
+        this.days = new ArrayList<>();
+    }
 
     // Constructor for main
     public Course(String courseCode, String courseName, String professor, String department,
@@ -77,11 +84,11 @@ public class Course {
         return credits;
     }
 
-    public boolean isOpen() {
+    public boolean getIsOpen() {
         return isOpen;
     }
 
-    public boolean isLab() {
+    public boolean getIsLab() {
         return isLab;
     }
 

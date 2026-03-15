@@ -60,6 +60,7 @@ public class User {
 
     public void setSchedule(Schedule schedule) {
         this.schedule = schedule;
+        this.schedule.loadSchedule(); //Restore save file if it exists
     }
 
     public String getUserName() {
