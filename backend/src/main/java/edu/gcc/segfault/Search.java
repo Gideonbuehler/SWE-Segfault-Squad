@@ -21,21 +21,14 @@ public class Search {
     /**
      * This method compares the entered search terms to each class in the database's information, resulting
      * in search results that are fulfilled by all the search terms
-     * @param searchKeywords - the words that the user typed into the search bar
-     * @return a Set of courses that have a similarity to the searchKeywords ArrayList
+     * @param searchKeywords ArrayList of words that the user has entered to search by.
+     * @return A set of courses that have a similarity to the searchKeywords ArrayList
      */
     public Set<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
-        //stub code return new ArrayList<>();
-
-        //Course code
-        //Course name
-        //Prof name
-        //Dept
-
-
-//        uncomment these lines and comment line 36, to run the SearchTest alone instead of having the gradle build do it.
+        //uncomment these lines and comment line 36, to run the SearchTest alone instead of having the gradle build do it.
         Main search = new Main();
         search.run();
+        //Get al courses from database.
         ArrayList<Course> allCourses = search.getCourses();
         //ArrayList<Course> allCourses = Main.getCourses();
 
@@ -43,6 +36,7 @@ public class Search {
         if(searchKeywords.isEmpty()){
             return query;
         }
+
         for(int c = 0; c<allCourses.size(); c++){
             Course toCheck = allCourses.get(c);
             String code = toCheck.getCourseCode();
@@ -51,12 +45,16 @@ public class Search {
             String[] nameSplit = name.split(" ");
             String professor = toCheck.getProfessor();
             String[] professorSplit = professor.split(" ");
+
+            //Cleans professor names of commas.
             for (int i = 0; i < professorSplit.length; i++) {
                 if(professorSplit[i].contains(",")){
                     professorSplit[i] = professorSplit[i].replace(",", "");
                 }
             }
             String department = toCheck.getDepartment();
+
+
             int keywordCheck = 0;
             for(int k=0; k<searchKeywords.size(); k++){
                 boolean found = false;
@@ -68,6 +66,7 @@ public class Search {
                         break;
                     }
                 }
+                //Next keyword.
                 if (found){
                     continue;
                 }
@@ -80,6 +79,7 @@ public class Search {
                         break;
                     }
                 }
+                //Next keyword.
                 if (found){
                     continue;
                 }
@@ -90,12 +90,6 @@ public class Search {
                         break;
                     }
                 }
-
-                //Department is already covered through course code
-//                if(department.contains(searchKeywords.get(k)) || department.equalsIgnoreCase(searchKeywords.get(k))){
-//                    keywordCheck++;
-//                    break;
-//                }
             }
             //Makes sure that the course is applicable to all the search terms
             if(keywordCheck >= searchKeywords.size())
@@ -103,7 +97,7 @@ public class Search {
         }
 
         history.push(query);
-        originalResults = query;// Claude
+        originalResults = query;
         return query;
     }
 
@@ -111,7 +105,10 @@ public class Search {
         return false;
     }
 
+    /**
+     * @return The top of the history stack, which is the most recent search results.
+     */
     public Set<Course> getResults(){
-        return originalResults;
+        return history.peek();
     }
 }
