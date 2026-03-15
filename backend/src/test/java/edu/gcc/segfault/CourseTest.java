@@ -88,14 +88,14 @@ class CourseTest {
 
     @Test
     void isOpen() {
-        assertFalse(courseWithoutTimes.isOpen());
-        assertTrue(courseWithTimes.isOpen());
+        assertFalse(courseWithoutTimes.getIsOpen());
+        assertTrue(courseWithTimes.getIsOpen());
     }
 
     @Test
     void isLab() {
-        assertFalse(courseWithoutTimes.isLab());
-        assertFalse(courseWithTimes.isLab());
+        assertFalse(courseWithoutTimes.getIsLab());
+        assertFalse(courseWithTimes.getIsLab());
     }
 
     @Test

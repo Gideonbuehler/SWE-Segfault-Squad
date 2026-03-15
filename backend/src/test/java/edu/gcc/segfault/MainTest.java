@@ -73,11 +73,11 @@ class MainTest {
     @Test
     void fromJsonParsesOpenAndLab() {
         Course closed = Main.fromJson(classes.get(0));
-        assertFalse(closed.isOpen());
-        assertFalse(closed.isLab());
+        assertFalse(closed.getIsOpen());
+        assertFalse(closed.getIsLab());
 
         Course open = Main.fromJson(classes.get(1));
-        assertTrue(open.isOpen());
+        assertTrue(open.getIsOpen());
     }
 
     @Test

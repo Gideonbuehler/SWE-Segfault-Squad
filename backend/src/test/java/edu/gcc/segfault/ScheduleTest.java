@@ -1,8 +1,9 @@
 package edu.gcc.segfault;
 
 import net.bytebuddy.asm.Advice;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -91,5 +92,186 @@ class ScheduleTest {
         s.addCourse(new Course("code2", "happiness2", "Dr. Hutchins", "COMP", "HAL102", "Fall", LocalTime.of(13, 0), LocalTime.of(13, 50), days , 3, true, false, 20, 30));
         s.makePDF();
 
+    }
+
+    private static final String SAVE_DIR = "schedules/";
+    private static final String TEST_SEMESTER = "TEST_SEMESTER";
+
+    private Course makeCourse(String code, LocalTime start, LocalTime end, ArrayList<String> days) {
+        return new Course(code, "Test Course", "Dr. Test", "COMP", "HAL101",
+                "Fall", start, end, days, 3, true, false, 10, 30);
+    }
+
+    private ArrayList<String> mwfDays() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Monday");
+        days.add("Wednesday");
+        days.add("Friday");
+        return days;
+    }
+
+    private ArrayList<String> tthDays() {
+        ArrayList<String> days = new ArrayList<>();
+        days.add("Tuesday");
+        days.add("Thursday");
+        return days;
+    }
+
+    // Delete the test save file before and after each test
+    @BeforeEach
+    @AfterEach
+    void cleanUp() {
+        File f = new File(SAVE_DIR + TEST_SEMESTER + ".json");
+        if (f.exists()) f.delete();
+    }
+
+    @Test
+    void saveSchedule_createsFile() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        s.addCourse(makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays()));
+
+        boolean result = s.saveSchedule();
+
+        assertTrue(result, "saveSchedule() should return true on success");
+        assertTrue(new File(SAVE_DIR + TEST_SEMESTER + ".json").exists(),
+                "Save file should exist after saveSchedule()");
+    }
+
+    @Test
+    void saveSchedule_emptySchedule_createsFile() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+
+        boolean result = s.saveSchedule();
+
+        assertTrue(result, "saveSchedule() should succeed even with no courses");
+        assertTrue(new File(SAVE_DIR + TEST_SEMESTER + ".json").exists());
+    }
+
+    @Test
+    void loadSchedule_noFileExists_returnsFalse() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+
+        boolean result = s.loadSchedule();
+
+        assertFalse(result, "loadSchedule() should return false if no save file exists");
+    }
+
+    @Test
+    void loadSchedule_afterSave_returnsTrue() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        s.addCourse(makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays()));
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        assertTrue(loaded.loadSchedule(), "loadSchedule() should return true when file exists");
+    }
+
+
+    @Test
+    void saveAndLoad_singleCourse_preservesCourseCode() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        Course c = makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays());
+        s.addCourse(c);
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        assertEquals(1, loaded.getCourses().size());
+        assertEquals("COMP-101", loaded.getCourses().get(0).getCourseCode());
+    }
+
+    @Test
+    void saveAndLoad_singleCourse_preservesStartAndEndTime() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        Course c = makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays());
+        s.addCourse(c);
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        Course restored = loaded.getCourses().get(0);
+        assertEquals(LocalTime.of(9, 0), restored.getStartTime());
+        assertEquals(LocalTime.of(9, 50), restored.getEndTime());
+    }
+
+    @Test
+    void saveAndLoad_singleCourse_preservesDays() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        Course c = makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays());
+        s.addCourse(c);
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        assertEquals(mwfDays(), loaded.getCourses().get(0).getDays());
+    }
+
+    @Test
+    void saveAndLoad_multipleCourses_preservesCount() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        s.addCourse(makeCourse("COMP-101", LocalTime.of(9, 0),  LocalTime.of(9, 50),  mwfDays()));
+        s.addCourse(makeCourse("COMP-201", LocalTime.of(10, 0), LocalTime.of(10, 50), tthDays()));
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        assertEquals(2, loaded.getCourses().size());
+    }
+
+    @Test
+    void saveAndLoad_multipleCourses_conflictStillDetectedAfterLoad() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        s.addCourse(makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays()));
+        s.saveSchedule();
+
+        // Load into a fresh schedule, should be conflict
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        Course conflict = makeCourse("COMP-999", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays());
+        assertFalse(loaded.checkConflicts(conflict),
+                "Conflict detection should work correctly after loading from file");
+    }
+
+    @Test
+    void saveAndLoad_removeCourse_thenSaveAndReload_courseIsGone() {
+        Schedule s = new Schedule(TEST_SEMESTER);
+        Course c1 = makeCourse("COMP-101", LocalTime.of(9, 0),  LocalTime.of(9, 50),  mwfDays());
+        Course c2 = makeCourse("COMP-201", LocalTime.of(10, 0), LocalTime.of(10, 50), tthDays());
+        s.addCourse(c1);
+        s.addCourse(c2);
+        s.saveSchedule();
+
+        // Remove one course and save again
+        s.removeCourse(c1);
+        s.saveSchedule();
+
+        Schedule loaded = new Schedule(TEST_SEMESTER);
+        loaded.loadSchedule();
+
+        assertEquals(1, loaded.getCourses().size());
+        assertEquals("COMP-201", loaded.getCourses().get(0).getCourseCode());
+    }
+
+
+    @Test
+    void user_setSchedule_autoLoadsExistingSave() {
+        // Create and save a schedule
+        Schedule firstSession = new Schedule(TEST_SEMESTER);
+        firstSession.addCourse(
+                makeCourse("COMP-101", LocalTime.of(9, 0), LocalTime.of(9, 50), mwfDays()));
+        firstSession.saveSchedule();
+
+        // User sets the same schedule name
+        User user = new User();
+        Schedule secondSession = new Schedule(TEST_SEMESTER);
+        user.setSchedule(secondSession); // should auto load
+
+        assertEquals(1, user.getSchedule().getCourses().size(),
+                "User's schedule should be restored from save file on setSchedule()");
     }
 }

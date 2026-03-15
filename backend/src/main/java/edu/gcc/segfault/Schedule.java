@@ -1,5 +1,10 @@
 package edu.gcc.segfault;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -20,6 +25,9 @@ public class Schedule {
     private Calendar calendar;
     private PDDocument pdf;
 
+    //File path to store/save schedule
+    private static final String save_dir = "schedules/";
+
     public Schedule(String name){
         semesterName = name;
         courses = new ArrayList<>();
@@ -30,6 +38,7 @@ public class Schedule {
             courses.add(toAdd);
             calendar.addTimeBlock(toAdd);
             System.out.println(courses.toString());
+            saveSchedule();
             return true;
         }
 
@@ -40,6 +49,7 @@ public class Schedule {
         courses.remove(toRemove);
         calendar.removeTimeBlock(toRemove);
         System.out.println(courses.toString());
+        saveSchedule();
     }
 
     public boolean checkConflicts(Course toCheck){
@@ -88,11 +98,58 @@ public class Schedule {
     }
 
     public boolean saveSchedule(){
-        return false;
+        try {
+            // Make sure the save directory exists
+            File dir = new File(save_dir);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule()); // handles LocalTime
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+            // Creates/writes to save file
+            File saveFile = new File(save_dir + semesterName + ".json");
+            mapper.writeValue(saveFile, courses);
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean loadSchedule(){
-        return false;
+        try {
+            File saveFile = new File(save_dir + semesterName + ".json");
+            if (!saveFile.exists()) {
+                return false;
+            }
+
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+            // Tells Jackson that it wants an arraylist of Courses
+            ArrayList<Course> loaded = mapper.readValue(
+                    saveFile,
+                    mapper.getTypeFactory().constructCollectionType(ArrayList.class, Course.class)
+            );
+
+            // Clear current state and rebuild from loaded data
+            courses.clear();
+            calendar = new Calendar();
+            for (Course c : loaded) {
+                courses.add(c);
+                calendar.addTimeBlock(c);
+            }
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public ArrayList<Course> getCourses(){
