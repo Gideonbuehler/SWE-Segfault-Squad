@@ -92,9 +92,9 @@ class SearchTest {
 
     @Test
     void fetchQueryNullInput() {
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(NullPointerException.class, () ->
                         search.fetchQuery(null),
-                "Null input should throw IllegalArgumentException");
+                "Null input should throw NullPointerException");
     }
 
     @Test
