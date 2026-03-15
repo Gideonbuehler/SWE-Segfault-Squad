@@ -1,9 +1,7 @@
 package edu.gcc.segfault;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Search {
     private Set<Course> originalResults;
@@ -19,81 +17,37 @@ public class Search {
     }
 
     /**
-     * This method compares the entered search terms to each class in the database's information, resulting
-     * in search results that are fulfilled by all the search terms
+     * Takes the list of keywords entered by the user (in the search bar). Makes a database
+     * call, and adds every course that satisfies every keyword entered to the query that
+     * is to be returned.
+     *
      * @param searchKeywords ArrayList of words that the user has entered to search by.
-     * @return A set of courses that have a similarity to the searchKeywords ArrayList
+     * @return A HashSet of courses that have a similarity to the searchKeywords ArrayList.
      */
     public Set<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
-        //uncomment these lines and comment line 36, to run the SearchTest alone instead of having the gradle build do it.
         Main search = new Main();
         search.run();
-        //Get al courses from database.
+        //Get all courses from database.
         ArrayList<Course> allCourses = search.getCourses();
-        //ArrayList<Course> allCourses = Main.getCourses();
 
         Set<Course> query = new HashSet<>();
-        if(searchKeywords.isEmpty()){
-            return query;
-        }
+        if(searchKeywords.isEmpty()) return query;
 
-        for(int c = 0; c<allCourses.size(); c++){
-            Course toCheck = allCourses.get(c);
-            String code = toCheck.getCourseCode();
-            String[] codeSplit = code.split("-");
-            String name = toCheck.getCourseName();
-            String[] nameSplit = name.split(" ");
-            String professor = toCheck.getProfessor();
-            String[] professorSplit = professor.split(" ");
+        ArrayList<String> keywords = searchKeywords.stream().map(String::toLowerCase).collect(Collectors.toCollection(ArrayList::new));
 
-            //Cleans professor names of commas.
-            for (int i = 0; i < professorSplit.length; i++) {
-                if(professorSplit[i].contains(",")){
-                    professorSplit[i] = professorSplit[i].replace(",", "");
-                }
-            }
-            String department = toCheck.getDepartment();
+        for (Course toCheck : allCourses){
+            //Split Course code, name, and professor names.
+            String[] codeSplit = toCheck.getCourseCode().toLowerCase().split("-");
+            String[] nameSplit = toCheck.getCourseName().toLowerCase().split(" ");
+            String[] professorSplit = Arrays.stream(toCheck.getProfessor().toLowerCase().split(" ")).map(s -> s.replace(",", "")).toArray(String[]::new);
 
-
-            int keywordCheck = 0;
-            for(int k=0; k<searchKeywords.size(); k++){
-                boolean found = false;
-                //tests for each part of the course code ie COMP, 141, and A
-                for (int l = 0; l < codeSplit.length; l++) {
-                    if ((codeSplit[l].toUpperCase()).contains(searchKeywords.get(k).toUpperCase())) {
-                        keywordCheck++;
-                        found = true;
-                        break;
-                    }
-                }
-                //Next keyword.
-                if (found){
-                    continue;
-                }
-                //Test for each part of the name
-                for (int n = 0; n < nameSplit.length; n++)
-                {
-                    if(nameSplit[n].contains(searchKeywords.get(k)) || nameSplit[n].equalsIgnoreCase(searchKeywords.get(k))){
-                        keywordCheck++;
-                        found = true;
-                        break;
-                    }
-                }
-                //Next keyword.
-                if (found){
-                    continue;
-                }
-                for (int p = 0; p < professorSplit.length; p++)
-                {
-                    if(professorSplit[p].contains(searchKeywords.get(k))|| professorSplit[p].equalsIgnoreCase(searchKeywords.get(k))){
-                        keywordCheck++;
-                        break;
-                    }
-                }
-            }
-            //Makes sure that the course is applicable to all the search terms
-            if(keywordCheck >= searchKeywords.size())
-                query.add(toCheck);
+            //One boolean check to ensure all keywords match.
+            boolean allKeysMatch = keywords.stream().allMatch(keyword ->
+                    Arrays.stream(codeSplit).anyMatch((p -> p.contains(keyword))) ||
+                    Arrays.stream(nameSplit).anyMatch(p -> p.contains(keyword)) ||
+                    Arrays.stream(professorSplit).anyMatch(p -> p.contains(keyword))
+            );
+            if (allKeysMatch) query.add(toCheck);
         }
 
         history.push(query);
