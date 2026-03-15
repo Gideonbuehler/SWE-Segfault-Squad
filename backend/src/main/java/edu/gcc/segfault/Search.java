@@ -17,12 +17,11 @@ public class Search {
     }
 
     /**
+     * Allows user to search for courses by keywords which include, Course code, Course name, Prof name, Department, and Course Description
      * @param searchKeywords
      * @return an ArrayList of courses that have a similarity to the searchKeywords ArrayList
      */
     public ArrayList<Course> fetchQuery(ArrayList<String> searchKeywords) throws Exception {
-        //stub code return new ArrayList<>();
-
         //Course code
         //Course name
         //Prof name
@@ -52,6 +51,7 @@ public class Search {
         }
 
         history.push(query);
+        originalResults = query;
         return query;
     }
 
