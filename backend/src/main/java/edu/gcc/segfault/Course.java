@@ -20,6 +20,8 @@ public class Course {
     private int openSeats;
     private int totalSeats;
 
+    //Default constructor for tests
+
     // Constructor for main
     public Course(String courseCode, String courseName, String professor, String department,
            String location, String semester, LocalTime startTime, LocalTime endTime,
@@ -113,5 +115,16 @@ public class Course {
     @Override
     public int hashCode() {
         return Objects.hash(courseCode, courseName, location, professor, department, startTime, endTime, days, credits, semester, isOpen, isLab, openSeats, totalSeats);
+    }
+
+    @Override
+    public String toString() {
+        return "Course{" +
+                "courseCode='" + courseCode + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", professor='" + professor + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
     }
 }
