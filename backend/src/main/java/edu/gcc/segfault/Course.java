@@ -2,6 +2,7 @@ package edu.gcc.segfault;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -14,9 +15,7 @@ public class Course {
     private String location;
     private String professor;
     private String department;
-    private LocalTime startTime;
-    private LocalTime endTime;
-    private ArrayList<String> days;
+    private LinkedHashMap<String, LocalTime[]> dayTimeMap;
     private int credits;
     private String semester;
     private Boolean isOpen;
@@ -26,13 +25,12 @@ public class Course {
 
     //Default constructor for tests
     public Course() {
-        this.days = new ArrayList<>();
+        this.dayTimeMap = new LinkedHashMap<>();
     }
 
     // Constructor for main
     public Course(String courseCode, String courseName, String professor, String department,
-           String location, String semester, LocalTime startTime, LocalTime endTime,
-           ArrayList<String> days, int credits, boolean isOpen, boolean isLab,
+           String location, String semester, LinkedHashMap<String, LocalTime[]> dayTimeMap, int credits, boolean isOpen, boolean isLab,
            int openSeats, int totalSeats) {
 
         this.courseCode  = courseCode;
@@ -41,9 +39,7 @@ public class Course {
         this.department  = department;
         this.location    = location;
         this.semester    = semester;
-        this.startTime   = startTime;
-        this.endTime     = endTime;
-        this.days        = days;
+        this.dayTimeMap  = dayTimeMap;
         this.credits     = credits;
         this.isOpen      = isOpen;
         this.isLab       = isLab;
@@ -68,16 +64,8 @@ public class Course {
         return department;
     }
 
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
-    public ArrayList<String> getDays() {
-        return days;
+    public LinkedHashMap<String, LocalTime[]> getDayTimeMap() {
+        return dayTimeMap;
     }
 
     public int getCredits() {
@@ -115,13 +103,13 @@ public class Course {
     public boolean equals(Object o) {
         if (!(o instanceof Course course)) return false;
         return credits == course.credits && totalSeats == course.totalSeats && Objects.equals(courseCode, course.courseCode) && Objects.equals(courseName, course.courseName) &&
-                Objects.equals(location, course.location) && Objects.equals(professor, course.professor) && Objects.equals(department, course.department) && Objects.equals(startTime, course.startTime) &&
-                Objects.equals(endTime, course.endTime) && Objects.equals(days, course.days) && Objects.equals(semester, course.semester) && Objects.equals(isLab, course.isLab);
+                Objects.equals(location, course.location) && Objects.equals(professor, course.professor) && Objects.equals(department, course.department) &&
+                Objects.equals(dayTimeMap, course.dayTimeMap) && Objects.equals(semester, course.semester) && Objects.equals(isLab, course.isLab);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(courseCode, courseName, location, professor, department, startTime, endTime, days, credits, semester, isOpen, isLab, openSeats, totalSeats);
+        return Objects.hash(courseCode, courseName, location, professor, department, dayTimeMap, credits, semester, isOpen, isLab, openSeats, totalSeats);
     }
 
     @Override
@@ -130,8 +118,7 @@ public class Course {
                 "courseCode='" + courseCode + '\'' +
                 ", courseName='" + courseName + '\'' +
                 ", professor='" + professor + '\'' +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
+                ", dayTimeMap=" + dayTimeMap +
                 '}';
     }
 }
