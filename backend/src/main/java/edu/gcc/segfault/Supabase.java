@@ -29,13 +29,13 @@ public class Supabase {
         }
 
 
-        String preparedStatement = "SELECT * FROM CourseOfferings WHERE code LIKE %Intro%";
+        String preparedStatement = "SELECT * FROM CourseOfferings WHERE name ILIKE '%intro%'";
         PreparedStatement pstmt = conn.prepareStatement(preparedStatement);
         Statement s = conn.createStatement();
 
         ResultSet rs = pstmt.executeQuery();
         while(rs.next()){
-            System.out.println("code: " + rs.getString("code") + rs.getString("number") + " course name: " + rs.getString("name"));
+            System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
         }
 
     }
