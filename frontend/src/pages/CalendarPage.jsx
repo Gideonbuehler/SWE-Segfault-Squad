@@ -47,6 +47,10 @@ function CalendarPage() {
     setEvents(mapped);
   };
 
+ const downloadPDF = () => {
+    window.open("/api/mySchedule/pdf", "_blank");
+  };
+
   useEffect(() => {
     fetchCalendar();
   }, []);
@@ -102,6 +106,13 @@ function CalendarPage() {
           </div>
         </div>
       )}
+
+     <button
+      onClick={downloadPDF}
+      style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer", marginBottom: "10px" }}
+    >
+      Download Schedule PDF
+    </button>
 
       <div className="card">
         <FullCalendar

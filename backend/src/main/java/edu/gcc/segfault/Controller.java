@@ -2,6 +2,8 @@ package edu.gcc.segfault;
 
 import io.javalin.Javalin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -168,6 +170,21 @@ public class Controller {
 
 
             ctx.status(200);
+        });
+
+
+        app.get("/mySchedule/pdf", ctx -> {
+            try {
+                user.getSchedule().makePDF();
+                File pdfFile = new File("Schedule.pdf");
+                ctx.contentType("application/pdf");
+                ctx.header("Content-Disposition", "attachment; filename=Schedule.pdf");
+                ctx.result(new FileInputStream(pdfFile));
+            } catch (Exception e) {
+                e.printStackTrace();
+                ctx.status(500);
+                ctx.result("Failed to generate PDF");
+            }
         });
     }
 }
