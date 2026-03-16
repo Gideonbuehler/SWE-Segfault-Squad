@@ -20,6 +20,7 @@ public class Supabase {
     }
 
     public static void main(String[] args) throws SQLException {
+        //connecting to the database
         System.out.println(System.getProperty("user.dir"));
         System.out.println(URL);
         try {
@@ -28,7 +29,7 @@ public class Supabase {
             throw new RuntimeException(e);
         }
 
-
+        //Example Query
         String preparedStatement = "SELECT * FROM CourseOfferings WHERE name ILIKE '%intro%'";
         PreparedStatement pstmt = conn.prepareStatement(preparedStatement);
         Statement s = conn.createStatement();
