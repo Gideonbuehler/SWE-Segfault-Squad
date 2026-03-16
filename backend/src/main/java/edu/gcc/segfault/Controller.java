@@ -2,7 +2,10 @@ package edu.gcc.segfault;
 
 import io.javalin.Javalin;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Controller {
     public static User user = new User();
@@ -106,6 +109,81 @@ public class Controller {
                 ctx.status(500);
                 ctx.result("Course conflict");
                 return;
+            }
+        });
+
+        app.delete("/mySchedule/remove/{courseCode}", ctx -> {
+            String courseCode = ctx.pathParam("courseCode");
+            ArrayList<Course> courses = user.getSchedule().getCourses();
+
+            Course toRemove = null;
+            for (Course c : courses) {
+                if (c.getCourseCode().equalsIgnoreCase(courseCode)) {
+                    toRemove = c;
+                    break;
+                }
+            }
+
+            if (toRemove == null) {
+                ctx.status(404);
+                ctx.result("Course not found in schedule");
+                return;
+            }
+
+            user.getSchedule().removeCourse(toRemove);
+            ctx.status(200);
+            ctx.result("Course removed");
+        });
+
+        app.post("/searchResults/{searchParameters}/filter", ctx -> {
+
+            if (user.getLastSearchResults() == null) {
+                ctx.status(400);
+                ctx.result("No search results to filter");
+                return;
+            }
+
+            Filter filter = new Filter();
+
+            String department = ctx.queryParam("department");
+            String professor = ctx.queryParam("professor");
+            String credits = ctx.queryParam("credits");
+            String days = ctx.queryParam("days");
+
+            if (department != null && !department.isEmpty())
+                filter.setDepartmentNames(new String[]{department});
+
+            if (professor != null && !professor.isEmpty())
+                filter.setProfessorNames(new String[]{professor});
+
+            if (credits != null && !credits.isEmpty())
+                filter.setCredits(new int[]{Integer.parseInt(credits)});
+
+            if (days != null && !days.isEmpty()) {
+                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
+                filter.setDays(dayList);
+            }
+
+            user.getLastSearchResults().addFilter(filter);
+            user.getLastSearchResults().applyFilters();
+            ctx.json(user.getLastSearchResults().getResults());
+
+
+            ctx.status(200);
+        });
+
+
+        app.get("/mySchedule/pdf", ctx -> {
+            try {
+                user.getSchedule().makePDF();
+                File pdfFile = new File("Schedule.pdf");
+                ctx.contentType("application/pdf");
+                ctx.header("Content-Disposition", "attachment; filename=Schedule.pdf");
+                ctx.result(new FileInputStream(pdfFile));
+            } catch (Exception e) {
+                e.printStackTrace();
+                ctx.status(500);
+                ctx.result("Failed to generate PDF");
             }
         });
     }
