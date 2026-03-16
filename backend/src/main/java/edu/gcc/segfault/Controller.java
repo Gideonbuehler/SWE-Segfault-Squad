@@ -110,6 +110,29 @@ public class Controller {
             }
         });
 
+        app.delete("/mySchedule/remove/{courseCode}", ctx -> {
+            String courseCode = ctx.pathParam("courseCode");
+            ArrayList<Course> courses = user.getSchedule().getCourses();
+
+            Course toRemove = null;
+            for (Course c : courses) {
+                if (c.getCourseCode().equalsIgnoreCase(courseCode)) {
+                    toRemove = c;
+                    break;
+                }
+            }
+
+            if (toRemove == null) {
+                ctx.status(404);
+                ctx.result("Course not found in schedule");
+                return;
+            }
+
+            user.getSchedule().removeCourse(toRemove);
+            ctx.status(200);
+            ctx.result("Course removed");
+        });
+
         app.post("/searchResults/{searchParameters}/filter", ctx -> {
 
             if (user.getLastSearchResults() == null) {

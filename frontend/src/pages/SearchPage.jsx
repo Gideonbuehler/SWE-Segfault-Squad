@@ -12,6 +12,18 @@ function SearchPage() {
       days: []
   });
 
+  const [schedule, setSchedule] = useState([]);
+
+  const fetchSchedule = async () => {
+    const response = await fetch("/api/mySchedule");
+    const data = await response.json();
+    setSchedule(data.courses ?? []);
+  };
+
+  const sortByCourseCode = (courses) => {
+    return [...courses].sort((a, b) => a.courseCode.localeCompare(b.courseCode));
+  };
+
   const formatTime = (time) => {
     if (!time) return "TBA";
     const hour = time[0];
@@ -23,6 +35,7 @@ function SearchPage() {
   };
 
   const runSearch = async () => {
+    await fetchSchedule();
     const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
     const data = await response.json();
 
@@ -31,7 +44,7 @@ function SearchPage() {
       if (hasFilters) {
         await runFilter();
       } else {
-        setResults(Array.from(data.results ?? []));
+        setResults(sortByCourseCode(Array.from(data.results ?? [])));
       }
     } else {
       setResults([]);
@@ -51,7 +64,7 @@ function SearchPage() {
 
     if (response.ok) {
       const data = await response.json();
-      setResults(Array.from(data));
+      setResults(sortByCourseCode(Array.from(data)));
     }
   };
 
@@ -62,8 +75,21 @@ function SearchPage() {
 
     if (response.ok) {
       alert(`${courseCode} added to schedule!`);
+      await fetchSchedule();
     } else {
       alert("Failed to add course. It may conflict with an existing course.");
+    }
+  };
+  const removeCourse = async (courseCode) => {
+    const response = await fetch(`/api/mySchedule/remove/${courseCode}`, {
+      method: "DELETE"
+    });
+
+    if (response.ok) {
+      alert(`${courseCode} removed from schedule!`);
+      await fetchSchedule();
+    } else {
+      alert("Failed to remove course.");
     }
   };
 
@@ -167,7 +193,10 @@ function SearchPage() {
                 <td style={{ padding: "10px" }}>{course.credits}</td>
                 <td style={{ padding: "10px" }}>{course.semester}</td>
                 <td style={{ padding: "10px" }}>
-                  <button onClick={() => addCourse(course.courseCode)}>Add</button>
+                  {schedule.some(c => c.courseCode === course.courseCode)
+                    ? <button onClick={() => removeCourse(course.courseCode)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
+                    : <button onClick={() => addCourse(course.courseCode)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
+                  }
                 </td>
               </tr>
             ))}
