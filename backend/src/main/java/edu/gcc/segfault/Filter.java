@@ -7,42 +7,114 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Filter {
-    private String[] professorName;
-    private String[] departmentName;
+    private String[] professorNames;
+    private String[] departmentNames;
     private int[] credits;
     private ArrayList<String> days;
-    private LocalTime[] startTime;
-    private LocalTime[] endTime;
+    private LocalTime[] startTimes;
+    private LocalTime[] endTimes;
 
 
     /**
-     * This method retrieves the most recent search query (top of the stack named history in the Search class) and parses it over the filters specified by the user.
-     * This generates a new list which is returned and show to the suer, as well as pushed to the top of the history stack.
-     * @return TRUE if filters apply successfully ? FALSE if it fails/the filters applied are the same as last time
+     * Applies all active filters to a set of courses and returns the filtered results.
+     * A course is included in the results only if it matches ALL active filter criteria.
+     * For array-based filters, a course must match AT LEAST ONE value in that array.
+     *
+     * @param courses the Set of courses to filter
+     * @return a filtered Set of courses that match all active filter criteria
      */
-    public boolean applyFilters(Set<Course> courses){
-
-        Set<Course> toFilter = Search.getResults();
-
-        Set<Course> filtered = new HashSet<>();
+    public Set<Course> applyFilters(Set<Course> courses){
+        Set<Course> filtered = new HashSet<>(courses);
 
 
-        for (Course toCheck : toFilter) {
-            //Split Course code, name, and professor names.
-            String[] codeSplit = toCheck.getCourseCode().toLowerCase().split("-");
-            String[] nameSplit = toCheck.getCourseName().toLowerCase().split(" ");
-            String[] professorSplit = Arrays.stream(toCheck.getProfessor().toLowerCase().split(" ")).map(s -> s.replace(",", "")).toArray(String[]::new);
-
-            //One boolean check to ensure all keywords match.
-            boolean allFiltersMatch = filters.stream().allMatch(keyword ->
-                    Arrays.stream(codeSplit).anyMatch((p -> p.contains(filter))) ||
-                            Arrays.stream(nameSplit).anyMatch(p -> p.contains(filter)) ||
-                            Arrays.stream(professorSplit).anyMatch(p -> p.contains(filter))
-            );
-
+        // Removes a course from the list if it does not match at least one name provided.
+        if (professorNames != null && professorNames.length > 0) {
+            filtered.removeIf(course -> {
+                String courseProf = course.getProfessor().toLowerCase();
+                return Arrays.stream(professorNames)
+                        .map(String::toLowerCase)
+                        .noneMatch(courseProf::contains);
+            });
         }
-        return false;
+
+        // Removes a course from the list if it does not match at least one dept provided.
+        if (departmentNames != null && departmentNames.length > 0) {
+            filtered.removeIf(course -> {
+                String courseDept = course.getDepartment().toLowerCase();
+                return Arrays.stream(departmentNames)
+                        .map(String::toLowerCase)
+                        .noneMatch(dept -> courseDept.equals(dept));
+            });
+        }
+
+        //  Removes a course from the list if it does not match at least credit amounts provided.
+        if (credits != null && credits.length > 0) {
+            filtered.removeIf(course -> {
+                int courseCredits = course.getCredits();
+                return Arrays.stream(credits)
+                        .noneMatch(credit -> credit == courseCredits);
+            });
+        }
+
+        // Removes a course from the list if it does not match the days provided.
+        // Because of the way the JSON parse is set up the days are should be in
+        // a list format. i.e MWF -> ["M", "W", "F"]. This filter snip will then check for
+        // all the days.
+        if (days != null && !days.isEmpty()) {
+            filtered.removeIf(course -> {
+                ArrayList<String> courseDays = course.getDays();
+                return !courseDays.containsAll(days);
+            });
+        }
+
+        // Removes a course from the list if it does not match the start time provided.
+        // Should be paired with the end time.
+        if (startTimes != null && startTimes.length > 0) {
+            filtered.removeIf(course -> {
+                if (course.getStartTime() == null) return true;
+                return Arrays.stream(startTimes)
+                        .noneMatch(time -> course.getStartTime().equals(time));
+            });
+        }
+
+        // Removes a course from the list if it does not match the end time provided.
+        // Should be paired with the start time.
+        if (endTimes != null && endTimes.length > 0) {
+            filtered.removeIf(course -> {
+                if (course.getEndTime() == null) return true;
+                return Arrays.stream(endTimes)
+                        .noneMatch(time -> course.getEndTime().equals(time));
+            });
+        }
+
+        //All courses that had a match with all filters provided.
+        return filtered;
     }
 
+    /*
+    Setters for frontend, when the user enters or checks filters it should add the filter(s) with these setters.
+     */
+    public void setProfessorNames(String[] professorNames) {
+        this.professorNames = professorNames;
+    }
 
+    public void setDepartmentNames(String[] departmentNames) {
+        this.departmentNames = departmentNames;
+    }
+
+    public void setCredits(int[] credits) {
+        this.credits = credits;
+    }
+
+    public void setDays(ArrayList<String> days) {
+        this.days = days;
+    }
+
+    public void setStartTimes(LocalTime[] startTimes) {
+        this.startTimes = startTimes;
+    }
+
+    public void setEndTimes(LocalTime[] endTimes) {
+        this.endTimes = endTimes;
+    }
 }
