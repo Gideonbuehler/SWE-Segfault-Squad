@@ -56,11 +56,59 @@ public class Search {
     }
 
     public boolean applyFilters(){
-        return false;
+        if (activeFilters.isEmpty() || history.isEmpty()) {
+            return false;
+        }
+
+        Set<Course> currentResults = history.peek();
+
+        // Loop through each filter set by frontend.
+        /*
+        John an example for front end might be that when a checkbox is checked something like this runs:
+        Filter f = new Filter();
+        f.setProfessorNames(new String[]{"Wolfe"});
+        search.addFilter(f);
+
+        then the filter result is updated and if they check another box it does this again.
+         */
+        Set<Course> filteredResults = new HashSet<>(currentResults);
+        for (Filter filter : activeFilters) {
+            filteredResults = filter.applyFilters(filteredResults);
+        }
+
+        if (filteredResults.equals(currentResults)) {
+            return false;
+        }
+
+        history.push(filteredResults);
+        return true;
     }
 
     /**
-     * @return The top of the history stack, which is the most recent search results.
+     * Adds a filter to the list of active filters
+     * @param filter the filter to add.
+     */
+    public void addFilter(Filter filter) {
+        this.activeFilters.add(filter);
+    }
+
+    /**
+     * Removes a filter from the list of active filters
+     * @param filter the filter to remove.
+     */
+    public void removeFilter(Filter filter) {
+        this.activeFilters.remove(filter);
+    }
+
+    /**
+     * Removes all filters and places the original database call to the top of the stack.
+     */
+    public void clearFilters(){
+        history.push(originalResults);
+    }
+
+    /**
+     * @return The top of the history stack, which is the most recent list of courses.
      */
     public Set<Course> getResults(){
         return history.peek();
