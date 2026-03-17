@@ -22,8 +22,8 @@ public class Calendar {
         Block newBlock = new Block();
 
         newBlock.setCourse(course);
-        newBlock.setStartTime(course.getStartTime());
-        newBlock.setEndTime(course.getEndTime());
+        newBlock.setStartTime(course.getDayTimeMap().firstEntry().getValue()[0]);
+        newBlock.setEndTime(course.getDayTimeMap().firstEntry().getValue()[1]);
 
         return blocks.add(newBlock);
     }

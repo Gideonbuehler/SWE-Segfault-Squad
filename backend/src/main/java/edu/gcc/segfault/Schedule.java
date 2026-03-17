@@ -6,10 +6,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.time.LocalTime;
-import java.util.ArrayList;
+import java.util.*;
 
 
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import net.bytebuddy.asm.Advice;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -54,21 +57,21 @@ public class Schedule {
 
     public boolean checkConflicts(Course toCheck){
         for(Course c: courses){
-            for(String d: c.getDays()){
-                for(String d2: toCheck.getDays()){
+            for(Map.Entry<String, LocalTime[]> d: c.getDayTimeMap().entrySet()){
+                for(Map.Entry<String, LocalTime[]> d2: toCheck.getDayTimeMap().entrySet()){
                     System.out.println(d + " " + d2);
-                    if(d.equals(d2)){
+                    if(d.getKey().equals(d2.getKey())){
                         //if the start time is in the time of the other classes
-                        if(!c.getStartTime().isAfter(toCheck.getStartTime()) && c.getEndTime().isAfter(toCheck.getStartTime())){
+                        if(!d.getValue()[0].isAfter(d2.getValue()[0]) && d.getValue()[1].isAfter(d2.getValue()[0])){
                             return false;
                         }
                         //if the end time is in the time of another class
-                        if(c.getStartTime().isBefore(toCheck.getEndTime()) && c.getEndTime().isAfter(toCheck.getEndTime())){
+                        if(d.getValue()[0].isBefore(d2.getValue()[1]) && d.getValue()[1].isAfter(d2.getValue()[1])){
                             return false;
                         }
                         //check if there is overlap on the specific end/beginning times
-                        if(c.getStartTime().equals(toCheck.getStartTime()) || c.getEndTime().equals(toCheck.getStartTime()) ||
-                        c.getEndTime().equals(toCheck.getEndTime()) || c.getStartTime().equals(toCheck.getEndTime())){
+                        if(d.getValue()[0].equals(d2.getValue()[0]) || d.getValue()[1].equals(d2.getValue()[0]) ||
+                        d.getValue()[1].equals(d2.getValue()[1]) || d.getValue()[0].equals(d2.getValue()[1])){
                             return false;
                         }
                     }
@@ -91,9 +94,19 @@ public class Schedule {
         days2.add("Wednesday");
         ArrayList<String> days3 = new ArrayList<>();
         days3.add("Tuesday");
-        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", LocalTime.of(12, 0), LocalTime.of(12, 50), days , 3, true, false, 20, 30));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", LocalTime.of(12, 0), LocalTime.of(12, 50), days2, 1, true, false, 20, 30)));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", LocalTime.of(12, 0), LocalTime.of(12, 50), days3, 1, true, false, 20, 30)));
+        LocalTime[] l = new LocalTime[2];
+        l[0] = LocalTime.of(12, 0);
+        l[1] = LocalTime.of(1, 0);
+        LinkedHashMap<String, LocalTime[]> m = new LinkedHashMap<>(Map.of("M",l));
+        m.put("W", l);
+        m.put("F", l);
+        LinkedHashMap<String, LocalTime[]> m2 = new LinkedHashMap<>();
+        m2.put("W", l);
+        LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
+        m3.put("T", l);
+        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30));
+        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30)));
+        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30)));
 
     }
 
@@ -196,12 +209,7 @@ public class Schedule {
         cell.setFont(PDType1Font.COURIER_BOLD);
         cell.setFontSize(12);
         //Combine the days and times?
-        cell = header.createCell(12f, "Days");
-        cell.setAlign(HorizontalAlignment.CENTER);
-        cell.setValign(VerticalAlignment.MIDDLE);
-        cell.setFont(PDType1Font.COURIER_BOLD);
-        cell.setFontSize(12);
-        cell = header.createCell(12f, "Times");
+        cell = header.createCell(24f, "Days/Times");
         cell.setAlign(HorizontalAlignment.CENTER);
         cell.setValign(VerticalAlignment.MIDDLE);
         cell.setFont(PDType1Font.COURIER_BOLD);
@@ -226,8 +234,15 @@ public class Schedule {
             newRow.createCell(12f, c.getCourseCode());
             newRow.createCell(12f, c.getCourseName());
             newRow.createCell(16f, "We need to discover this");
-            newRow.createCell(12f, c.getDays().toString());
-            newRow.createCell(12f, c.getStartTime() + "-" + c.getEndTime());
+            Cell<PDPage> cell1 = newRow.createCell(24f, "");
+            for(Map.Entry<String, LocalTime[]> s : c.getDayTimeMap().entrySet()) {
+                if(s.equals(c.getDayTimeMap().lastEntry())){
+                    cell1.setText(cell1.getText() + s.getKey() + " " + s.getValue()[0] + "-" + s.getValue()[1]);
+                }
+                else {
+                    cell1.setText(cell1.getText() + s.getKey() + " " + s.getValue()[0] + "-" + s.getValue()[1] + ", ");
+                }
+            }
             newRow.createCell(12f, c.getProfessor());
             newRow.createCell(12f, c.getCredits() + "");
         }

@@ -90,25 +90,25 @@ class MainTest {
     @Test
     void fromJsonParsesTimesWhenPresent() {
         Course c = Main.fromJson(classes.get(1));
-        assertEquals(LocalTime.of(15, 30), c.getStartTime());
-        assertEquals(LocalTime.of(16, 45), c.getEndTime());
-        assertEquals(List.of("T", "R"), c.getDays());
+        assertEquals(LocalTime.of(15, 30), c.getDayTimeMap().firstEntry().getValue()[0]);
+        assertEquals(LocalTime.of(16, 45), c.getDayTimeMap().firstEntry().getValue()[1]);
+        assertEquals(List.of("T", "R"), c.getDayTimeMap().keySet());
     }
 
     @Test
     void fromJsonHandlesEmptyTimes() {
         Course c = Main.fromJson(classes.get(0));
-        assertNull(c.getStartTime());
-        assertNull(c.getEndTime());
-        assertTrue(c.getDays().isEmpty());
+        assertNull(c.getDayTimeMap().firstEntry().getValue()[0]);
+        assertNull(c.getDayTimeMap().firstEntry().getValue()[1]);
+        assertTrue(c.getDayTimeMap().isEmpty());
     }
 
     @Test
     void fromJsonParsesMWFSchedule() {
         Course c = Main.fromJson(classes.get(2));
-        assertEquals(LocalTime.of(10, 0), c.getStartTime());
-        assertEquals(LocalTime.of(10, 50), c.getEndTime());
-        assertEquals(List.of("M", "W", "F"), c.getDays());
+        assertEquals(LocalTime.of(10, 0), c.getDayTimeMap().firstEntry().getValue()[0]);
+        assertEquals(LocalTime.of(10, 50), c.getDayTimeMap().firstEntry().getValue()[1]);
+        assertEquals(List.of("M", "W", "F"), c.getDayTimeMap().firstEntry().getKey());
     }
 
     // loadAll / getCourses tests

@@ -58,20 +58,20 @@ class CourseTest {
 
     @Test
     void getStartTime() {
-        assertNull(courseWithoutTimes.getStartTime());
-        assertEquals(LocalTime.of(15, 30), courseWithTimes.getStartTime());
+        assertNull(courseWithoutTimes.getDayTimeMap());
+        assertEquals(LocalTime.of(15, 30), courseWithTimes.getDayTimeMap().firstEntry().getValue()[0]);
     }
 
     @Test
     void getEndTime() {
-        assertNull(courseWithoutTimes.getEndTime());
-        assertEquals(LocalTime.of(16, 45), courseWithTimes.getEndTime());
+        assertNull(courseWithoutTimes.getDayTimeMap());
+        assertEquals(LocalTime.of(16, 45), courseWithTimes.getDayTimeMap().firstEntry().getValue()[1]);
     }
 
     @Test
     void getDays() {
-        assertTrue(courseWithoutTimes.getDays().isEmpty());
-        assertEquals(List.of("T", "R"), courseWithTimes.getDays());
+        assertTrue(courseWithoutTimes.getDayTimeMap().isEmpty());
+        assertEquals(List.of("T", "R"), (List<String>) courseWithTimes.getDayTimeMap().keySet());
     }
 
     @Test
