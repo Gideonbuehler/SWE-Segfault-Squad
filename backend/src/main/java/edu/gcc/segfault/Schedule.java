@@ -56,23 +56,25 @@ public class Schedule {
     }
 
     public boolean checkConflicts(Course toCheck){
-        for(Course c: courses){
-            for(Map.Entry<String, LocalTime[]> d: c.getDayTimeMap().entrySet()){
-                for(Map.Entry<String, LocalTime[]> d2: toCheck.getDayTimeMap().entrySet()){
-                    System.out.println(d + " " + d2);
-                    if(d.getKey().equals(d2.getKey())){
-                        //if the start time is in the time of the other classes
-                        if(!d.getValue()[0].isAfter(d2.getValue()[0]) && d.getValue()[1].isAfter(d2.getValue()[0])){
-                            return false;
-                        }
-                        //if the end time is in the time of another class
-                        if(d.getValue()[0].isBefore(d2.getValue()[1]) && d.getValue()[1].isAfter(d2.getValue()[1])){
-                            return false;
-                        }
-                        //check if there is overlap on the specific end/beginning times
-                        if(d.getValue()[0].equals(d2.getValue()[0]) || d.getValue()[1].equals(d2.getValue()[0]) ||
-                        d.getValue()[1].equals(d2.getValue()[1]) || d.getValue()[0].equals(d2.getValue()[1])){
-                            return false;
+        if(!courses.isEmpty()) {
+            for (Course c : courses) {
+                for (Map.Entry<String, LocalTime[]> d : c.getDayTimeMap().entrySet()) {
+                    for (Map.Entry<String, LocalTime[]> d2 : toCheck.getDayTimeMap().entrySet()) {
+                        System.out.println(d + " " + d2);
+                        if (d.getKey().equals(d2.getKey())) {
+                            //if the start time is in the time of the other classes
+                            if (!d.getValue()[0].isAfter(d2.getValue()[0]) && d.getValue()[1].isAfter(d2.getValue()[0])) {
+                                return false;
+                            }
+                            //if the end time is in the time of another class
+                            if (d.getValue()[0].isBefore(d2.getValue()[1]) && d.getValue()[1].isAfter(d2.getValue()[1])) {
+                                return false;
+                            }
+                            //check if there is overlap on the specific end/beginning times
+                            if (d.getValue()[0].equals(d2.getValue()[0]) || d.getValue()[1].equals(d2.getValue()[0]) ||
+                                    d.getValue()[1].equals(d2.getValue()[1]) || d.getValue()[0].equals(d2.getValue()[1])) {
+                                return false;
+                            }
                         }
                     }
                 }

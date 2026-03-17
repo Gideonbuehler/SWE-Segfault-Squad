@@ -10,6 +10,7 @@ import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -92,14 +93,14 @@ class MainTest {
         Course c = Main.fromJson(classes.get(1));
         assertEquals(LocalTime.of(15, 30), c.getDayTimeMap().firstEntry().getValue()[0]);
         assertEquals(LocalTime.of(16, 45), c.getDayTimeMap().firstEntry().getValue()[1]);
-        assertEquals(List.of("T", "R"), c.getDayTimeMap().keySet());
+        assertEquals(Set.of("T", "R"), c.getDayTimeMap().keySet());
     }
 
     @Test
     void fromJsonHandlesEmptyTimes() {
         Course c = Main.fromJson(classes.get(0));
-        assertNull(c.getDayTimeMap().firstEntry().getValue()[0]);
-        assertNull(c.getDayTimeMap().firstEntry().getValue()[1]);
+        assertNull(c.getDayTimeMap().firstEntry());
+        assertNull(c.getDayTimeMap().firstEntry());
         assertTrue(c.getDayTimeMap().isEmpty());
     }
 
@@ -108,7 +109,7 @@ class MainTest {
         Course c = Main.fromJson(classes.get(2));
         assertEquals(LocalTime.of(10, 0), c.getDayTimeMap().firstEntry().getValue()[0]);
         assertEquals(LocalTime.of(10, 50), c.getDayTimeMap().firstEntry().getValue()[1]);
-        assertEquals(List.of("M", "W", "F"), c.getDayTimeMap().firstEntry().getKey());
+        assertEquals(Set.of("M", "W", "F"), c.getDayTimeMap().keySet());
     }
 
     // loadAll / getCourses tests

@@ -69,12 +69,12 @@ class ScheduleTest {
         l2[1] = LocalTime.of(10, 50);
 
         LinkedHashMap<String, LocalTime[]> m2 = new LinkedHashMap<>();
-        m.put("T", l2);
-        m.put("R", l2);
+        m2.put("T", l2);
+        m2.put("R", l2);
         Course c1 = new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall",
                 m2, 3, true, false, 20, 30);
         Course c2 = new Course("code2", "sadness", "Dr. Smith", "COMP", "HAL103", "Fall",
-               m2, 3, true, false, 20, 30);
+               m, 3, true, false, 20, 30);
 
         // Before adding, no conflicts should exist
         assertTrue(s.checkConflicts(c1));
