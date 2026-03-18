@@ -70,6 +70,7 @@ public class Main {
             boolean isLab = node.has("is_lab") ? node.get("is_lab").asBoolean() : false;
             int openSeats = node.has("open_seats") ? node.get("open_seats").asInt() : 0;
             int totalSeats = node.has("total_seats") ? node.get("total_seats").asInt() : 0;
+            String description = node.has("description") ? node.get("description").asText() : " ";
 
             // Faculty is an array, but there doesnt appear to be more than one prof. Named it professor so it's accurate to everything else
             String professor = "TBA";
@@ -94,7 +95,7 @@ public class Main {
             }
 
             return new Course(courseCode, courseName, professor, department,
-                    location, semester, dayTimeMap, credits, isOpen, isLab, openSeats, totalSeats);
+                    location, semester, dayTimeMap, credits, isOpen, isLab, openSeats, totalSeats, description);
 
         } catch (Exception e) {
             System.err.println("Failed to parse course: " + node.toString());

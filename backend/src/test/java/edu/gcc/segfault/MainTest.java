@@ -130,4 +130,10 @@ class MainTest {
         assertDoesNotThrow(main::run);
         assertNotNull(Main.getCourses());
     }
+
+    @Test
+    void getDescription() {
+        Course c = Main.fromJson(classes.get(1));
+        assertEquals("Principles of Accounting I at Grove City College introduces foundational concepts of financial accounting, focusing on the accounting cycle, U.S. Generally Accepted Accounting Principles (GAAP), and the preparation and analysis of financial statements.", c.getDescription());
+    }
 }

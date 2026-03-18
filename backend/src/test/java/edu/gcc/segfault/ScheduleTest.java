@@ -36,9 +36,9 @@ class ScheduleTest {
         m2.put("W", l);
         LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
         m3.put("T", l);
-        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m, 3, true, false, 20, 30));
-        assertFalse(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30)));
-        assertTrue(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30)));
+        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m, 3, true, false, 20, 30, ""));
+        assertFalse(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30, "")));
+        assertTrue(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30, "")));
 
 
     }
@@ -72,9 +72,9 @@ class ScheduleTest {
         m2.put("T", l2);
         m2.put("R", l2);
         Course c1 = new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall",
-                m2, 3, true, false, 20, 30);
+                m2, 3, true, false, 20, 30, "");
         Course c2 = new Course("code2", "sadness", "Dr. Smith", "COMP", "HAL103", "Fall",
-               m, 3, true, false, 20, 30);
+               m, 3, true, false, 20, 30, "");
 
         // Before adding, no conflicts should exist
         assertTrue(s.checkConflicts(c1));
@@ -83,13 +83,13 @@ class ScheduleTest {
         // After adding c1, a course with the same time/days should conflict
         s.addCourse(c1);
         Course conflictWithC1 = new Course("code3", "conflict", "Dr. Jones", "COMP", "HAL104", "Fall",
-                m2, 3, true, false, 20, 30);
+                m2, 3, true, false, 20, 30, "");
         assertFalse(s.checkConflicts(conflictWithC1));
 
         // After adding c2, a course with the same time/days should conflict
         s.addCourse(c2);
         Course conflictWithC2 = new Course("code4", "conflict2", "Dr. Jones", "COMP", "HAL104", "Fall",
-                m, 3, true, false, 20, 30);
+                m, 3, true, false, 20, 30, "");
         assertFalse(s.checkConflicts(conflictWithC2));
 
         // After removing c1, timeslot should be free again
@@ -122,8 +122,8 @@ class ScheduleTest {
         m2.put("W", l);
         LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
         m3.put("T", l);
-        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30));
-        s.addCourse(new Course("code2", "happiness2", "Dr. Hutchins", "COMP", "HAL102", "Fall",m3, 3, true, false, 20, 30));
+        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30, ""));
+        s.addCourse(new Course("code2", "happiness2", "Dr. Hutchins", "COMP", "HAL102", "Fall",m3, 3, true, false, 20, 30, ""));
         s.makePDF();
 
     }

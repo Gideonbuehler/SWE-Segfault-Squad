@@ -43,7 +43,8 @@
           "start_time": "15:30:00"
         }
       ],
-      "total_seats": 30
+      "total_seats": 30,
+      "description":  "Principles of Accounting I at Grove City College introduces foundational concepts of financial accounting, focusing on the accounting cycle, U.S. Generally Accepted Accounting Principles (GAAP), and the preparation and analysis of financial statements."
     },
     {
       "credits": 3,

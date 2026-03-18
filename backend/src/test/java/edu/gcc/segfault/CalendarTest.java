@@ -38,7 +38,8 @@ class CalendarTest {
                 true,
                 false,
                 10,
-                30
+                30,
+                "This is a course that is awesome"
         );
         Block block = new Block(course);
 
