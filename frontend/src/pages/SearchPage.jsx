@@ -26,12 +26,43 @@ function SearchPage() {
 
   const formatTime = (time) => {
     if (!time) return "TBA";
-    const hour = time[0];
-    const minute = time[1];
+    let hour;
+    let minute;
+
+    if (Array.isArray(time)) {
+      hour = Number(time[0]);
+      minute = Number(time[1] ?? 0);
+    } else if (typeof time === "string") {
+      const [h, m] = time.split(":");
+      hour = Number(h);
+      minute = Number(m ?? 0);
+    }
+
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return "TBA";
+
     const period = hour >= 12 ? "PM" : "AM";
     const hour12 = hour % 12 || 12;
     const min = minute.toString().padStart(2, "0");
     return `${hour12}:${min} ${period}`;
+  };
+
+  const getMeetings = (course) => Object.entries(course.dayTimeMap ?? {});
+
+  const formatDays = (course) => {
+    const days = getMeetings(course).map(([day]) => day);
+    return days.length > 0 ? days.join(", ") : "TBA";
+  };
+
+  const formatMeetingTimes = (course) => {
+    const ranges = getMeetings(course)
+      .map(([, range]) => {
+        if (!Array.isArray(range)) return null;
+        return `${formatTime(range[0])} - ${formatTime(range[1])}`;
+      })
+      .filter(Boolean);
+
+    const uniqueRanges = [...new Set(ranges)];
+    return uniqueRanges.length > 0 ? uniqueRanges.join("; ") : "TBA";
   };
 
   const runSearch = async () => {
@@ -188,8 +219,8 @@ function SearchPage() {
                 <td style={{ padding: "10px" }}><b>{course.courseCode}</b></td>
                 <td style={{ padding: "10px" }}>{course.courseName}</td>
                 <td style={{ padding: "10px" }}>{course.professor}</td>
-                <td style={{ padding: "10px" }}>{course.days?.join(", ")}</td>
-                <td style={{ padding: "10px" }}>{formatTime(course.startTime)} - {formatTime(course.endTime)}</td>
+                <td style={{ padding: "10px" }}>{formatDays(course)}</td>
+                <td style={{ padding: "10px" }}>{formatMeetingTimes(course)}</td>
                 <td style={{ padding: "10px" }}>{course.credits}</td>
                 <td style={{ padding: "10px" }}>{course.semester}</td>
                 <td style={{ padding: "10px" }}>
