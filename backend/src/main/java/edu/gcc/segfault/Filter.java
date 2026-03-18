@@ -62,7 +62,7 @@ public class Filter {
         // all the days.
         if (days != null && !days.isEmpty()) {
             filtered.removeIf(course -> {
-                ArrayList<String> courseDays = course.getDays();
+                ArrayList<String> courseDays = (ArrayList<String>) course.getDayTimeMap().keySet();
                 return !courseDays.containsAll(days);
             });
         }
@@ -71,9 +71,9 @@ public class Filter {
         // Should be paired with the end time.
         if (startTimes != null && startTimes.length > 0) {
             filtered.removeIf(course -> {
-                if (course.getStartTime() == null) return true;
+                if (course.getDayTimeMap().firstEntry().getValue()[0] == null) return true;
                 return Arrays.stream(startTimes)
-                        .noneMatch(time -> course.getStartTime().equals(time));
+                        .noneMatch(time -> course.getDayTimeMap().firstEntry().getValue()[0].equals(time));
             });
         }
 
@@ -81,9 +81,9 @@ public class Filter {
         // Should be paired with the start time.
         if (endTimes != null && endTimes.length > 0) {
             filtered.removeIf(course -> {
-                if (course.getEndTime() == null) return true;
+                if (course.getDayTimeMap().firstEntry().getValue()[1]== null) return true;
                 return Arrays.stream(endTimes)
-                        .noneMatch(time -> course.getEndTime().equals(time));
+                        .noneMatch(time -> course.getDayTimeMap().firstEntry().getValue()[1].equals(time));
             });
         }
 

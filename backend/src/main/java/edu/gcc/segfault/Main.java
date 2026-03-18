@@ -9,6 +9,7 @@ import io.javalin.json.JavalinJackson;
 import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 public class Main {
     private static ArrayList<Course> courses;
@@ -76,27 +77,24 @@ public class Main {
             if (faculty != null && !faculty.isEmpty()) {
                 professor = faculty.get(0).asText();
             }
-            // List of days
-            ArrayList<String> days = new ArrayList<>();
-            LocalTime startTime = null;
-            LocalTime endTime = null;
 
+            // Made a hashmap for day times
+            LinkedHashMap<String, LocalTime[]> dayTimeMap = new LinkedHashMap<>();
             JsonNode times = node.get("times");
+
             // Parse time as LocalTime object
             if (times != null && !times.isEmpty()) {
-                startTime = LocalTime.parse(times.get(0).get("start_time").asText());
-                endTime = LocalTime.parse(times.get(0).get("end_time").asText());
-
-
-                // For each timeslot add, get the day and add it to days; ie M, W, F
+                // For each timeslot add it to the day time map
                 for (JsonNode t : times) {
-                    days.add(t.get("day").asText());
+                    String day = t.get("day").asText();
+                    LocalTime start = LocalTime.parse(t.get("start_time").asText());
+                    LocalTime end = LocalTime.parse(t.get("end_time").asText());
+                    dayTimeMap.put(day, new LocalTime[]{start, end});
                 }
             }
 
             return new Course(courseCode, courseName, professor, department,
-                    location, semester, startTime, endTime, days,
-                    credits, isOpen, isLab, openSeats, totalSeats);
+                    location, semester, dayTimeMap, credits, isOpen, isLab, openSeats, totalSeats);
 
         } catch (Exception e) {
             System.err.println("Failed to parse course: " + node.toString());

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,20 +59,20 @@ class CourseTest {
 
     @Test
     void getStartTime() {
-        assertNull(courseWithoutTimes.getStartTime());
-        assertEquals(LocalTime.of(15, 30), courseWithTimes.getStartTime());
+        assertTrue(courseWithoutTimes.getDayTimeMap().isEmpty());
+        assertEquals(LocalTime.of(15, 30), courseWithTimes.getDayTimeMap().firstEntry().getValue()[0]);
     }
 
     @Test
     void getEndTime() {
-        assertNull(courseWithoutTimes.getEndTime());
-        assertEquals(LocalTime.of(16, 45), courseWithTimes.getEndTime());
+        assertTrue(courseWithoutTimes.getDayTimeMap().isEmpty());
+        assertEquals(LocalTime.of(16, 45), courseWithTimes.getDayTimeMap().firstEntry().getValue()[1]);
     }
 
     @Test
     void getDays() {
-        assertTrue(courseWithoutTimes.getDays().isEmpty());
-        assertEquals(List.of("T", "R"), courseWithTimes.getDays());
+        assertTrue(courseWithoutTimes.getDayTimeMap().isEmpty());
+        assertEquals(Set.of("T", "R"), courseWithTimes.getDayTimeMap().keySet());
     }
 
     @Test

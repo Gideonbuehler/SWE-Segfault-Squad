@@ -18,8 +18,8 @@ public class Block {
     // Block with course info
     public Block(Course course) {
         this.course = course;
-        this.startTime = course.getStartTime();
-        this.endTime = course.getEndTime();
+        this.startTime = course.getDayTimeMap().firstEntry().getValue()[0];
+        this.endTime = course.getDayTimeMap().firstEntry().getValue()[1];
     }
 
     //Getters and Setters

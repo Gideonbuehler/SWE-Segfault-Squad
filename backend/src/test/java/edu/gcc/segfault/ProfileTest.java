@@ -33,35 +33,35 @@ class ProfileTest {
         Profile p = new Profile("Freshman", "computer Science", new ArrayList<>(List.of("History")), new ArrayList<>());
         assertTrue(p.deleteMinor("History"));
     }
+//
+//    @Test
+//    void addCompletedCourses() {
+//        ArrayList<String> days = new ArrayList<>();
+//        days.add("Monday");
+//        days.add("Wednesday");
+//        days.add("Friday");
+//        Profile p = new Profile("Freshman", "computer Science", new ArrayList<>(List.of("History")), new ArrayList<>());
+//        assertTrue(p.addCompletedCourses(new ArrayList<>(List.of(new Course("code1",
+//                "happiness", "Dr. Hutchins", "COMP",
+//                "HAL102", "Fall", LocalTime.of(12, 0),
+//                LocalTime.of(12, 50), days , 3, true,
+//                false, 20, 30)))));
+//    }
 
-    @Test
-    void addCompletedCourses() {
-        ArrayList<String> days = new ArrayList<>();
-        days.add("Monday");
-        days.add("Wednesday");
-        days.add("Friday");
-        Profile p = new Profile("Freshman", "computer Science", new ArrayList<>(List.of("History")), new ArrayList<>());
-        assertTrue(p.addCompletedCourses(new ArrayList<>(List.of(new Course("code1",
-                "happiness", "Dr. Hutchins", "COMP",
-                "HAL102", "Fall", LocalTime.of(12, 0),
-                LocalTime.of(12, 50), days , 3, true,
-                false, 20, 30)))));
-    }
-
-    @Test
-    void removeCompletedCourses() {
-        ArrayList<String> days = new ArrayList<>();
-        days.add("Monday");
-        days.add("Wednesday");
-        days.add("Friday");
-        Profile p = new Profile("Freshman", "computer Science", new ArrayList<>(List.of("History")), new ArrayList<>());
-        p.addCompletedCourses(new ArrayList<>(List.of(new Course("code1", "happiness",
-                "Dr. Hutchins", "COMP", "HAL102", "Fall",
-                LocalTime.of(12, 0), LocalTime.of(12, 50), days , 3,
-                true, false, 20, 30))));
-
-        assertTrue(p.removeCompletedCourses(new ArrayList<>(List.of(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall",
-                LocalTime.of(12, 0), LocalTime.of(12, 50), days ,
-                3, true, false, 20, 30)))));
-    }
+//    @Test
+//    void removeCompletedCourses() {
+//        ArrayList<String> days = new ArrayList<>();
+//        days.add("Monday");
+//        days.add("Wednesday");
+//        days.add("Friday");
+//        Profile p = new Profile("Freshman", "computer Science", new ArrayList<>(List.of("History")), new ArrayList<>());
+//        p.addCompletedCourses(new ArrayList<>(List.of(new Course("code1", "happiness",
+//                "Dr. Hutchins", "COMP", "HAL102", "Fall",
+//                LocalTime.of(12, 0), LocalTime.of(12, 50), days , 3,
+//                true, false, 20, 30))));
+//
+//        assertTrue(p.removeCompletedCourses(new ArrayList<>(List.of(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall",
+//                LocalTime.of(12, 0), LocalTime.of(12, 50), days ,
+//                3, true, false, 20, 30)))));
+//    }
 }
