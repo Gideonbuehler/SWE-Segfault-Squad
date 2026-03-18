@@ -9,7 +9,9 @@ function SearchPage() {
       department: "",
       professor: "",
       credits: "",
-      days: []
+      days: [],
+      startTime: "",
+      endTime: ""
   });
 
   const [schedule, setSchedule] = useState([]);
@@ -88,7 +90,7 @@ function SearchPage() {
   const data = await response.json();
 
   if (response.ok) {
-    setFilters({ department: "", professor: "", credits: "", days: [] });
+    setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
     setResults(sortByCourseCode(Array.from(data ?? [])));
   } else {
     setResults([]);
@@ -96,7 +98,7 @@ function SearchPage() {
 };
 
 const runFilter = async () => {
-  const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0;
+  const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
   
   if (!hasFilters) {
     await clearFilter(); // fall back to original results
@@ -108,6 +110,8 @@ const runFilter = async () => {
   if (filters.professor) params.append("professor", filters.professor);
   if (filters.credits) params.append("credits", filters.credits);
   if (filters.days.length > 0) params.append("days", filters.days.join(","));
+  if (filters.startTime) params.append("startTime", filters.startTime);
+  if (filters.endTime) params.append("endTime", filters.endTime);
 
   const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
     method: "POST"
@@ -160,7 +164,7 @@ const runFilter = async () => {
         <button onClick={runSearch}>Search</button>
         <button onClick={runFilter}>Refresh Filters</button>
         <button onClick={() => {
-          setFilters({ department: "", professor: "", credits: "", days: [] });
+          setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
           clearFilter();
         }}>Clear Filters</button>
       </div>
@@ -214,6 +218,25 @@ const runFilter = async () => {
                 /> {day}
               </label>
             ))}
+          </label>
+          <label>Start Time:
+              <input
+              type="text"
+              placeholder="e.g. 10:00"
+              value={filters.startTime}
+              onChange={(e) => setFilters({ ...filters, startTime: e.target.value })}
+              style={{ marginLeft: "8px", width: "80px" }}
+              />
+          </label>
+
+          <label>End Time:
+            <input
+            type="text"
+            placeholder="e.g. 10:50"
+            value={filters.endTime}
+            onChange={(e) => setFilters({ ...filters, endTime: e.target.value })}
+            style={{ marginLeft: "8px", width: "80px" }}
+            />
           </label>
 
         </div>
