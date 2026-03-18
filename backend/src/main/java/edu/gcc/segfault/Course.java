@@ -22,6 +22,7 @@ public class Course {
     private Boolean isLab;
     private int openSeats;
     private int totalSeats;
+    private String description;
 
     //Default constructor for tests
     public Course() {
@@ -31,7 +32,7 @@ public class Course {
     // Constructor for main
     public Course(String courseCode, String courseName, String professor, String department,
            String location, String semester, LinkedHashMap<String, LocalTime[]> dayTimeMap, int credits, boolean isOpen, boolean isLab,
-           int openSeats, int totalSeats) {
+           int openSeats, int totalSeats, String description) {
 
         this.courseCode  = courseCode;
         this.courseName  = courseName;
@@ -45,6 +46,7 @@ public class Course {
         this.isLab       = isLab;
         this.openSeats   = openSeats;
         this.totalSeats  = totalSeats;
+        this.description = description;
     }
 
     // Getters
@@ -96,6 +98,10 @@ public class Course {
         return location;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
 
     // Equals and hashCode overriden to ease comparison of Blocks
     // (especially useful in Block.equals() override)
@@ -104,12 +110,12 @@ public class Course {
         if (!(o instanceof Course course)) return false;
         return credits == course.credits && totalSeats == course.totalSeats && Objects.equals(courseCode, course.courseCode) && Objects.equals(courseName, course.courseName) &&
                 Objects.equals(location, course.location) && Objects.equals(professor, course.professor) && Objects.equals(department, course.department) &&
-                Objects.equals(dayTimeMap, course.dayTimeMap) && Objects.equals(semester, course.semester) && Objects.equals(isLab, course.isLab);
+                Objects.equals(dayTimeMap, course.dayTimeMap) && Objects.equals(semester, course.semester) && Objects.equals(isLab, course.isLab) && Objects.equals(description, course.description);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(courseCode, courseName, location, professor, department, dayTimeMap, credits, semester, isOpen, isLab, openSeats, totalSeats);
+        return Objects.hash(courseCode, courseName, location, professor, department, dayTimeMap, credits, semester, isOpen, isLab, openSeats, totalSeats, description);
     }
 
     @Override
@@ -118,7 +124,8 @@ public class Course {
                 "courseCode='" + courseCode + '\'' +
                 ", courseName='" + courseName + '\'' +
                 ", professor='" + professor + '\'' +
-                ", dayTimeMap=" + dayTimeMap +
+                ", dayTimeMap=" + dayTimeMap + '\'' +
+                ", description=" + description +
                 '}';
     }
 }

@@ -106,9 +106,9 @@ public class Schedule {
         m2.put("W", l);
         LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
         m3.put("T", l);
-        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30)));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30)));
+        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30, "This is the first course that is cool"));
+        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30, " ")));
+        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30, "This is the second course that is awesome")));
 
     }
 
