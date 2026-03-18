@@ -235,7 +235,14 @@ public class Schedule {
             Row<PDPage> newRow = table.createRow(33f);
             newRow.createCell(12f, c.getCourseCode());
             newRow.createCell(12f, c.getCourseName());
-            newRow.createCell(16f, "We need to discover this");
+            String description = c.getDescription();
+            if(description.isEmpty()){
+                description = "We need to discover this";
+            }
+            else if(description.length() > 24){
+                description = description.substring(0, 24);
+            }
+            newRow.createCell(16f, description);
             Cell<PDPage> cell1 = newRow.createCell(24f, "");
             for(Map.Entry<String, LocalTime[]> s : c.getDayTimeMap().entrySet()) {
                 if(s.equals(c.getDayTimeMap().lastEntry())){
