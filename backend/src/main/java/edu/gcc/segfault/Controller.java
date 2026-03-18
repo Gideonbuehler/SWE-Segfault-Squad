@@ -172,6 +172,78 @@ public class Controller {
             ctx.status(200);
         });
 
+        app.get("/clearFilters", ctx -> {
+
+            if (user.getLastSearchResults() == null) {
+                ctx.status(400);
+                ctx.result("No search results to filter");
+                return;
+            }
+
+            Filter filter = new Filter();
+
+            String department = ctx.queryParam("");
+            String professor = ctx.queryParam("");
+            String credits = ctx.queryParam("");
+            String days = ctx.queryParam("");
+
+            if (department != null && !department.isEmpty())
+                filter.setDepartmentNames(new String[]{department});
+
+            if (professor != null && !professor.isEmpty())
+                filter.setProfessorNames(new String[]{professor});
+
+            if (credits != null && !credits.isEmpty())
+                filter.setCredits(new int[]{Integer.parseInt(credits)});
+
+            if (days != null && !days.isEmpty()) {
+                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
+                filter.setDays(dayList);
+            }
+
+            ctx.json(user.getLastSearchResults().getOriginalResults());
+            ctx.status(200);
+        });
+
+        app.post("/filterResults/{searchParameters}/filter", ctx -> {
+
+            if (user.getLastSearchResults() == null) {
+                ctx.status(400);
+                ctx.result("No search results to filter");
+                return;
+            }
+
+            Filter filter = new Filter();
+
+            String department = ctx.queryParam("department");
+            String professor = ctx.queryParam("professor");
+            String credits = ctx.queryParam("credits");
+            String days = ctx.queryParam("days");
+
+            if (department != null && !department.isEmpty())
+                filter.setDepartmentNames(new String[]{department});
+
+            if (professor != null && !professor.isEmpty())
+                filter.setProfessorNames(new String[]{professor});
+
+            if (credits != null && !credits.isEmpty())
+                filter.setCredits(new int[]{Integer.parseInt(credits)});
+
+            if (days != null && !days.isEmpty()) {
+                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
+                filter.setDays(dayList);
+            }
+
+            user.getLastSearchResults().clearFilters(); // reset history
+            user.getLastSearchResults().getActiveFilters().clear(); // clear old filters
+            user.getLastSearchResults().addFilter(filter);
+            user.getLastSearchResults().applyFilters();
+            ctx.json(user.getLastSearchResults().getResults());
+
+
+            ctx.status(200);
+        });
+
 
         app.get("/mySchedule/pdf", ctx -> {
             try {
