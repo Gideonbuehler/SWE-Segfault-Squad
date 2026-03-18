@@ -14,11 +14,43 @@ function CalendarPage() {
 
   const formatTime = (timeArray) => {
     if (!timeArray) return "TBA";
-    const hour = timeArray[0];
-    const minute = timeArray[1].toString().padStart(2, "0");
+    let hour;
+    let minute;
+
+    if (Array.isArray(timeArray)) {
+      hour = Number(timeArray[0]);
+      minute = Number(timeArray[1] ?? 0);
+    } else if (typeof timeArray === "string") {
+      const [h, m] = timeArray.split(":");
+      hour = Number(h);
+      minute = Number(m ?? 0);
+    }
+
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return "TBA";
+
+    const minuteLabel = minute.toString().padStart(2, "0");
     const period = hour >= 12 ? "PM" : "AM";
     const hour12 = hour % 12 || 12;
-    return `${hour12}:${minute} ${period}`;
+    return `${hour12}:${minuteLabel} ${period}`;
+  };
+
+  const toCalendarTime = (timeArray) => {
+    if (!timeArray) return null;
+
+    let hour;
+    let minute;
+
+    if (Array.isArray(timeArray)) {
+      hour = Number(timeArray[0]);
+      minute = Number(timeArray[1] ?? 0);
+    } else if (typeof timeArray === "string") {
+      const [h, m] = timeArray.split(":");
+      hour = Number(h);
+      minute = Number(m ?? 0);
+    }
+
+    if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+    return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
   };
 
   const fetchCalendar = async () => {
@@ -28,18 +60,21 @@ function CalendarPage() {
     const mapped = [];
     for (const block of data.blocks) {
       const course = block.course;
-      if (!course || !course.days) continue;
+      if (!course || !course.dayTimeMap) continue;
 
-      for (const day of course.days) {
+      for (const [day, range] of Object.entries(course.dayTimeMap)) {
         const dayNum = dayToNumber(day);
+        const start = Array.isArray(range) ? toCalendarTime(range[0]) : null;
+        const end = Array.isArray(range) ? toCalendarTime(range[1]) : null;
         if (dayNum === undefined) continue;
+        if (!start || !end) continue;
 
         mapped.push({
           title: course.courseName,
           daysOfWeek: [dayNum],
-          startTime: `${block.startTime[0].toString().padStart(2, "0")}:${block.startTime[1].toString().padStart(2, "0")}`,
-          endTime: `${block.endTime[0].toString().padStart(2, "0")}:${block.endTime[1].toString().padStart(2, "0")}`,
-          extendedProps: { course }
+          startTime: start,
+          endTime: end,
+          extendedProps: { course, day, startTime: range[0], endTime: range[1] }
         });
       }
     }
@@ -56,7 +91,8 @@ function CalendarPage() {
   }, []);
 
   const handleEventClick = (info) => {
-    setSelectedCourse(info.event.extendedProps.course);
+    const { course, day, startTime, endTime } = info.event.extendedProps;
+    setSelectedCourse({ ...course, day, startTime, endTime });
   };
 
   const removeCourse = async () => {
@@ -86,7 +122,7 @@ function CalendarPage() {
               <p style={{ margin: "4px 0" }}><b>Professor:</b> {selectedCourse.professor}</p>
               <p style={{ margin: "4px 0" }}><b>Location:</b> {selectedCourse.location}</p>
               <p style={{ margin: "4px 0" }}><b>Time:</b> {formatTime(selectedCourse.startTime)} - {formatTime(selectedCourse.endTime)}</p>
-              <p style={{ margin: "4px 0" }}><b>Days:</b> {selectedCourse.days?.join(", ")}</p>
+              <p style={{ margin: "4px 0" }}><b>Days:</b> {selectedCourse.day}</p>
               <p style={{ margin: "4px 0" }}><b>Credits:</b> {selectedCourse.credits}</p>
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
