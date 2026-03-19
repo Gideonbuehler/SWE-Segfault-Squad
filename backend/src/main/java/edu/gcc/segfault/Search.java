@@ -113,4 +113,19 @@ public class Search {
     public Set<Course> getResults(){
         return history.peek();
     }
+    public ArrayList<Filter> getActiveFilters() {
+        return activeFilters;
+    }
+
+    public void popHistory(){
+        history.pop();
+    }
+
+    public void setHistory(Set<Course> results){
+        history.push(results);
+    }
+
+    public Set<Course> getOriginalResults(){
+        return originalResults;
+    }
 }

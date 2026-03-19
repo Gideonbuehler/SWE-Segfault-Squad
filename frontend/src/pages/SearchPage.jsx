@@ -9,7 +9,9 @@ function SearchPage() {
       department: "",
       professor: "",
       credits: "",
-      days: []
+      days: [],
+      startTime: "",
+      endTime: ""
   });
 
   const [schedule, setSchedule] = useState([]);
@@ -82,22 +84,44 @@ function SearchPage() {
     }
   };
 
-  const runFilter = async () => {
-    const params = new URLSearchParams();
-    if (filters.department) params.append("department", filters.department);
-    if (filters.professor) params.append("professor", filters.professor);
-    if (filters.credits) params.append("credits", filters.credits);
-    if (filters.days.length > 0) params.append("days", filters.days.join(","));
+  const clearFilter = async () => {
+  await fetchSchedule();
+  const response = await fetch(`/api/noFilters`, { method: "GET" });
+  const data = await response.json();
 
-    const response = await fetch(`/api/searchResults/${query}/filter?${params}`, {
-      method: "POST"
-    });
+  if (response.ok) {
+    setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
+    setResults(sortByCourseCode(Array.from(data ?? [])));
+  } else {
+    setResults([]);
+  }
+};
 
-    if (response.ok) {
-      const data = await response.json();
-      setResults(sortByCourseCode(Array.from(data)));
-    }
-  };
+const runFilter = async () => {
+  const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
+  
+  if (!hasFilters) {
+    await clearFilter(); // fall back to original results
+    return;
+  }
+
+  const params = new URLSearchParams();
+  if (filters.department) params.append("department", filters.department);
+  if (filters.professor) params.append("professor", filters.professor);
+  if (filters.credits) params.append("credits", filters.credits);
+  if (filters.days.length > 0) params.append("days", filters.days.join(","));
+  if (filters.startTime) params.append("startTime", filters.startTime);
+  if (filters.endTime) params.append("endTime", filters.endTime);
+
+  const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
+    method: "POST"
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    setResults(sortByCourseCode(Array.from(data)));
+  }
+};
 
   const addCourse = async (courseCode) => {
     const response = await fetch(`/api/mySchedule/add/${courseCode}`, {
@@ -140,8 +164,8 @@ function SearchPage() {
         <button onClick={runSearch}>Search</button>
         <button onClick={runFilter}>Refresh Filters</button>
         <button onClick={() => {
-          setFilters({ department: "", professor: "", credits: "", days: [] });
-          runSearch();
+          setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
+          clearFilter();
         }}>Clear Filters</button>
       </div>
 
@@ -194,6 +218,25 @@ function SearchPage() {
                 /> {day}
               </label>
             ))}
+          </label>
+          <label>Start Time:
+              <input
+              type="text"
+              placeholder="e.g. 10:00"
+              value={filters.startTime}
+              onChange={(e) => setFilters({ ...filters, startTime: e.target.value })}
+              style={{ marginLeft: "8px", width: "80px" }}
+              />
+          </label>
+
+          <label>End Time:
+            <input
+            type="text"
+            placeholder="e.g. 10:50"
+            value={filters.endTime}
+            onChange={(e) => setFilters({ ...filters, endTime: e.target.value })}
+            style={{ marginLeft: "8px", width: "80px" }}
+            />
           </label>
 
         </div>

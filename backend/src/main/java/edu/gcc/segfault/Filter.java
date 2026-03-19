@@ -1,10 +1,7 @@
 package edu.gcc.segfault;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Filter {
     private String[] professorNames;
@@ -13,6 +10,7 @@ public class Filter {
     private ArrayList<String> days;
     private LocalTime[] startTimes;
     private LocalTime[] endTimes;
+    private Map<String, List<String>> dayTimeMap;
 
 
     /**
@@ -62,7 +60,7 @@ public class Filter {
         // all the days.
         if (days != null && !days.isEmpty()) {
             filtered.removeIf(course -> {
-                ArrayList<String> courseDays = (ArrayList<String>) course.getDayTimeMap().keySet();
+                Set<String> courseDays = course.getDayTimeMap().keySet();
                 return !courseDays.containsAll(days);
             });
         }
@@ -71,9 +69,10 @@ public class Filter {
         // Should be paired with the end time.
         if (startTimes != null && startTimes.length > 0) {
             filtered.removeIf(course -> {
-                if (course.getDayTimeMap().firstEntry().getValue()[0] == null) return true;
-                return Arrays.stream(startTimes)
-                        .noneMatch(time -> course.getDayTimeMap().firstEntry().getValue()[0].equals(time));
+                if (course.getDayTimeMap().isEmpty()) return true;
+                LocalTime[] times = course.getDayTimeMap().values().iterator().next();
+                if (times == null || times[0] == null) return true;
+                return Arrays.stream(startTimes).noneMatch(time -> times[0].equals(time));
             });
         }
 
@@ -81,9 +80,10 @@ public class Filter {
         // Should be paired with the start time.
         if (endTimes != null && endTimes.length > 0) {
             filtered.removeIf(course -> {
-                if (course.getDayTimeMap().firstEntry().getValue()[1]== null) return true;
-                return Arrays.stream(endTimes)
-                        .noneMatch(time -> course.getDayTimeMap().firstEntry().getValue()[1].equals(time));
+                if (course.getDayTimeMap().isEmpty()) return true;
+                LocalTime[] times = course.getDayTimeMap().values().iterator().next();
+                if (times == null || times[1] == null) return true;
+                return Arrays.stream(endTimes).noneMatch(time -> times[1].equals(time));
             });
         }
 
@@ -94,6 +94,13 @@ public class Filter {
     /*
     Setters for frontend, when the user enters or checks filters it should add the filter(s) with these setters.
      */
+    public void setDayTimeMap(Map<String, List<String>> dayTimeMap) {
+        this.dayTimeMap = dayTimeMap;
+    }
+
+    public Map<String, List<String>> getDayTimeMap() {
+        return dayTimeMap;
+    }
     public void setProfessorNames(String[] professorNames) {
         this.professorNames = professorNames;
     }

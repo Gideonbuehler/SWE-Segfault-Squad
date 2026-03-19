@@ -2,12 +2,14 @@ package edu.gcc.segfault;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class User {
     private String userName;
     private Schedule schedule;
     private Profile profile;
     private Search lastSearchResults;
+    private Set<Course> originalResults;
 
 
     public void addCourse(Course toAdd){
@@ -33,6 +35,7 @@ public class User {
             e.printStackTrace();
         }
         lastSearchResults = s;
+        originalResults = s.getOriginalResults();
         return s;
     }
 

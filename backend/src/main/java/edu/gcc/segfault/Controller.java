@@ -4,8 +4,8 @@ import io.javalin.Javalin;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalTime;
+import java.util.*;
 
 public class Controller {
     public static User user = new User();
@@ -168,6 +168,62 @@ public class Controller {
             user.getLastSearchResults().applyFilters();
             ctx.json(user.getLastSearchResults().getResults());
 
+
+            ctx.status(200);
+        });
+
+        app.get("/noFilters", ctx -> {
+            if (user.getLastSearchResults() == null) {
+                ctx.status(400);
+                ctx.result("No search results to filter");
+                return;
+            }
+
+            ctx.json(user.getLastSearchResults().getOriginalResults());
+            ctx.status(200);
+        });
+
+        app.post("/filterResults/{searchParameters}/filter", ctx -> {
+            if (user.getLastSearchResults() == null) {
+                ctx.status(400);
+                ctx.result("No search results to filter");
+                return;
+            }
+
+            Filter filter = new Filter();
+
+            String department = ctx.queryParam("department");
+            String professor = ctx.queryParam("professor");
+            String credits = ctx.queryParam("credits");
+            String days = ctx.queryParam("days");
+            String startTime = ctx.queryParam("startTime");
+            String endTime = ctx.queryParam("endTime");
+
+            if (department != null && !department.isEmpty())
+                filter.setDepartmentNames(new String[]{department});
+
+            if (professor != null && !professor.isEmpty())
+                filter.setProfessorNames(new String[]{professor});
+
+            if (credits != null && !credits.isEmpty())
+                filter.setCredits(new int[]{Integer.parseInt(credits)});
+
+            if (days != null && !days.isEmpty()) {
+                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
+                filter.setDays(dayList);
+            }
+
+            if (startTime != null && !startTime.isEmpty())
+                filter.setStartTimes(new LocalTime[]{LocalTime.parse(startTime)});
+
+            if (endTime != null && !endTime.isEmpty())
+                filter.setEndTimes(new LocalTime[]{LocalTime.parse(endTime)});
+
+            user.getLastSearchResults().clearFilters();
+            user.getLastSearchResults().getActiveFilters().clear();
+            user.getLastSearchResults().addFilter(filter);
+            user.getLastSearchResults().applyFilters();
+            ctx.json(user.getLastSearchResults().getResults());
 
             ctx.status(200);
         });
