@@ -86,7 +86,7 @@ function SearchPage() {
 
   const clearFilter = async () => {
   await fetchSchedule();
-  const response = await fetch(`/api/clearFilters`, { method: "GET" });
+  const response = await fetch(`/api/noFilters`, { method: "GET" });
   const data = await response.json();
 
   if (response.ok) {

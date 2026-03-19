@@ -172,7 +172,7 @@ public class Controller {
             ctx.status(200);
         });
 
-        app.get("/clearFilters", ctx -> {
+        app.get("/noFilters", ctx -> {
             if (user.getLastSearchResults() == null) {
                 ctx.status(400);
                 ctx.result("No search results to filter");
