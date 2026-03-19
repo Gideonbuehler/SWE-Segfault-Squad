@@ -36,10 +36,24 @@ class ScheduleTest {
         m2.put("W", l);
         LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
         m3.put("T", l);
+        LinkedHashMap<String, LocalTime[]> m4 = new LinkedHashMap<>();
+        LocalTime[] l3 = new LocalTime[2];
+        l3[0] = LocalTime.of(11, 30);
+        l3[1] = LocalTime.of(12, 30);
+        m4.put("T", l3);
+        m4.put("R", l3);
+        LinkedHashMap<String, LocalTime[]> m5 = new LinkedHashMap<>();
+        LocalTime[] l5 = new LocalTime[2];
+        l5[0] = LocalTime.of(12, 0);
+        l5[1] = LocalTime.of(12, 50);
+        m4.put("M", l5);
+        m4.put("W", l5);
         s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m, 3, true, false, 20, 30, ""));
         assertFalse(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30, "")));
         assertTrue(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30, "")));
-
+        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m4, 3, true, false, 20, 30, ""));
+        assertTrue(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m5, 1, true, false, 20, 30, "")));
+        s.removeCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m, 3, true, false, 20, 30, ""));
 
     }
 
