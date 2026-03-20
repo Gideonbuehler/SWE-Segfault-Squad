@@ -1,34 +1,22 @@
 import { useState } from "react";
 
-function SearchPage() {
-
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
-
-  const [filters, setFilters] = useState({
-      department: "",
-      professor: "",
-      credits: "",
-      days: [],
-      startTime: "",
-      endTime: ""
-  });
-
-  const [schedule, setSchedule] = useState([]);
-
+function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
+  expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester,
+  schedule, fetchSchedule }) {
+  
   const DESCRIPTION_PREVIEW_LENGTH = 100;
 
-  const fetchSchedule = async () => {
-    const response = await fetch("/api/mySchedule");
-    const data = await response.json();
-    setSchedule(data.courses ?? []);
-  };
+  const filteredResults = selectedSemester
+    ? results.filter(c => c.semester === selectedSemester)
+    : results;
+
+  const availableSemesters = [...new Set(results.map(c => c.semester).filter(Boolean))].sort();
 
   const sortByCourseCode = (courses) => {
     return [...courses].sort((a, b) => a.courseCode.localeCompare(b.courseCode));
   };
 
+  // Ensures display time is formatted correctly from the DayTimeMap
   const formatTime = (time) => {
     if (!time) return "TBA";
     let hour;
@@ -51,13 +39,16 @@ function SearchPage() {
     return `${hour12}:${min} ${period}`;
   };
 
+  // Gets individual meetins from DayTimeMap
   const getMeetings = (course) => Object.entries(course.dayTimeMap ?? {});
 
+  // Formats DayTimeMap in easy to read display
   const formatDays = (course) => {
     const days = getMeetings(course).map(([day]) => day);
     return days.length > 0 ? days.join(", ") : "TBA";
   };
 
+  // Formats times in easy to read display
   const formatMeetingTimes = (course) => {
     const ranges = getMeetings(course)
       .map(([, range]) => {
@@ -72,6 +63,7 @@ function SearchPage() {
 
   const getDescription = (course) => (course.description ?? "").trim();
 
+  // Toggles description of course on and off
   const toggleDescription = (courseKey) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -79,6 +71,7 @@ function SearchPage() {
     }));
   };
 
+  // Fetchs the schedule, applies filters
   const runSearch = async () => {
     await fetchSchedule();
     const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
@@ -98,70 +91,82 @@ function SearchPage() {
     }
   };
 
+  // Clears all filters
   const clearFilter = async () => {
-  await fetchSchedule();
-  const response = await fetch(`/api/noFilters`, { method: "GET" });
-  const data = await response.json();
-
-  if (response.ok) {
-    setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
-    setExpandedDescriptions({});
-    setResults(sortByCourseCode(Array.from(data ?? [])));
-  } else {
-    setExpandedDescriptions({});
-    setResults([]);
-  }
-};
-
-const runFilter = async () => {
-  const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
-  
-  if (!hasFilters) {
-    await clearFilter(); // fall back to original results
-    return;
-  }
-
-  const params = new URLSearchParams();
-  if (filters.department) params.append("department", filters.department);
-  if (filters.professor) params.append("professor", filters.professor);
-  if (filters.credits) params.append("credits", filters.credits);
-  if (filters.days.length > 0) params.append("days", filters.days.join(","));
-  if (filters.startTime) params.append("startTime", filters.startTime);
-  if (filters.endTime) params.append("endTime", filters.endTime);
-
-  const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
-    method: "POST"
-  });
-
-  if (response.ok) {
+    await fetchSchedule();
+    const response = await fetch(`/api/noFilters`, { method: "GET" });
     const data = await response.json();
-    setExpandedDescriptions({});
-    setResults(sortByCourseCode(Array.from(data)));
-  }
-};
 
-  const addCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/add/${courseCode}`, {
+    if (response.ok) {
+      setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
+      setExpandedDescriptions({});
+      setResults(sortByCourseCode(Array.from(data ?? [])));
+    } else {
+      setExpandedDescriptions({});
+      setResults([]);
+    }
+  };
+
+  // Applies all filters
+  const runFilter = async () => {
+    const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
+    
+    if (!hasFilters) {
+      await clearFilter(); // fall back to original results
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (filters.department) params.append("department", filters.department);
+    if (filters.professor) params.append("professor", filters.professor);
+    if (filters.credits) params.append("credits", filters.credits);
+    if (filters.days.length > 0) params.append("days", filters.days.join(","));
+    if (filters.startTime) params.append("startTime", filters.startTime + ":00");
+    if (filters.endTime) params.append("endTime", filters.endTime + ":00");
+    if (filters.semester) params.append("semester", filters.semester);
+
+    const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
       method: "POST"
     });
 
     if (response.ok) {
-      alert(`${courseCode} added to schedule!`);
-      await fetchSchedule();
-    } else {
-      alert("Failed to add course. It may conflict with an existing course.");
+      const data = await response.json();
+      setExpandedDescriptions({});
+      setResults(sortByCourseCode(Array.from(data)));
     }
   };
-  const removeCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/remove/${courseCode}`, {
-      method: "DELETE"
+
+  // Adds courses
+  const addCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/add/${courseCode}/${semester}`, {
+      method: "POST"
     });
 
     if (response.ok) {
-      alert(`${courseCode} removed from schedule!`);
+      alert(`${courseCode} in ${semester} added to schedule!`);
       await fetchSchedule();
-    } else {
-      alert("Failed to remove course.");
+    } else if (response.status == 500) {
+      alert("Failed to add course. It may conflict with an existing course.");
+    }
+    else {
+      alert("Failed to add course. It may have not been found");
+    }
+  };
+  
+  // Removes courses
+  const removeCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/remove/${courseCode}/${semester}`, {
+      method: "DELETE"
+    });
+
+    console.log("Course: " + courseCode + ", semester: " + semester)
+
+    if (response.ok) {
+      alert(`${courseCode} in ${semester} removed from schedule!`);
+      await fetchSchedule();
+    }
+    else if(response.status == 404) {
+      alert("Failed to remove course. It may have not been found");
     }
   };
 
@@ -238,8 +243,7 @@ const runFilter = async () => {
           </label>
           <label>Start Time:
               <input
-              type="text"
-              placeholder="e.g. 10:00"
+              type="time"
               value={filters.startTime}
               onChange={(e) => setFilters({ ...filters, startTime: e.target.value })}
               style={{ marginLeft: "8px", width: "80px" }}
@@ -248,8 +252,7 @@ const runFilter = async () => {
 
           <label>End Time:
             <input
-            type="text"
-            placeholder="e.g. 10:50"
+            type="time"
             value={filters.endTime}
             onChange={(e) => setFilters({ ...filters, endTime: e.target.value })}
             style={{ marginLeft: "8px", width: "80px" }}
@@ -257,6 +260,22 @@ const runFilter = async () => {
           </label>
 
         </div>
+      </div>
+
+
+      <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <label htmlFor="semester-select" style={{ fontWeight: "bold" }}>Semester:</label>
+        <select
+          id="semester-select"
+          value={selectedSemester}
+          onChange={(e) => setSelectedSemester(e.target.value)}
+          style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
+        >
+          <option value="">All</option>
+          {availableSemesters.map(sem => (
+            <option key={sem} value={sem}>{sem}</option>
+          ))}
+        </select>
       </div>
 
       <div className="card">
@@ -274,7 +293,7 @@ const runFilter = async () => {
             </tr>
           </thead>
           <tbody>
-            {results.map((course, index) => {
+            {filteredResults.map((course, index) => {
               const courseKey = `${course.courseCode}-${index}`;
               const description = getDescription(course);
               const isExpanded = Boolean(expandedDescriptions[courseKey]);
@@ -324,9 +343,9 @@ const runFilter = async () => {
                   <td style={{ padding: "10px" }}>{course.credits}</td>
                   <td style={{ padding: "10px" }}>{course.semester}</td>
                   <td style={{ padding: "10px" }}>
-                    {schedule.some(c => c.courseCode === course.courseCode)
-                      ? <button onClick={() => removeCourse(course.courseCode)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
-                      : <button onClick={() => addCourse(course.courseCode)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
+                    {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
+                      ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
+                      : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
                     }
                   </td>
                 </tr>

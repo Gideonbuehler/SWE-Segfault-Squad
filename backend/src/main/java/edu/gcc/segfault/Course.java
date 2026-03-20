@@ -123,6 +123,7 @@ public class Course {
         return "Course{" +
                 "courseCode='" + courseCode + '\'' +
                 ", courseName='" + courseName + '\'' +
+                ", semester='" + semester + '\'' +
                 ", professor='" + professor + '\'' +
                 ", dayTimeMap=" + dayTimeMap + '\'' +
                 ", description=" + description +
