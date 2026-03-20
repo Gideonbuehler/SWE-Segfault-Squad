@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-function SearchPage({ query, setQuery, results, setResults, filters, setFilters, expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester }) {
-
-  const [schedule, setSchedule] = useState([]);
-
+function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
+  expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester,
+  schedule, fetchSchedule }) {
+  
   const DESCRIPTION_PREVIEW_LENGTH = 100;
 
   const filteredResults = selectedSemester
@@ -11,12 +11,6 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     : results;
 
   const availableSemesters = [...new Set(results.map(c => c.semester).filter(Boolean))].sort();
-
-  const fetchSchedule = async () => {
-    const response = await fetch("/api/mySchedule");
-    const data = await response.json();
-    setSchedule(data.courses ?? []);
-  };
 
   const sortByCourseCode = (courses) => {
     return [...courses].sort((a, b) => a.courseCode.localeCompare(b.courseCode));
