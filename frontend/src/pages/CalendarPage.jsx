@@ -6,6 +6,8 @@ import interactionPlugin from "@fullcalendar/interaction";
 function CalendarPage() {
   const [events, setEvents] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
+  const [semesters, setSemesters] = useState([]);
+  const [selectedSemester, setSelectedSemester] = useState("");
 
   const dayToNumber = (day) => {
     const map = { "M": 1, "T": 2, "W": 3, "R": 4, "F": 5 };
@@ -14,8 +16,7 @@ function CalendarPage() {
 
   const formatTime = (timeArray) => {
     if (!timeArray) return "TBA";
-    let hour;
-    let minute;
+    let hour, minute;
 
     if (Array.isArray(timeArray)) {
       hour = Number(timeArray[0]);
@@ -36,9 +37,7 @@ function CalendarPage() {
 
   const toCalendarTime = (timeArray) => {
     if (!timeArray) return null;
-
-    let hour;
-    let minute;
+    let hour, minute;
 
     if (Array.isArray(timeArray)) {
       hour = Number(timeArray[0]);
@@ -53,21 +52,37 @@ function CalendarPage() {
     return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
   };
 
-  const fetchCalendar = async () => {
+  const fetchCalendar = async (semester) => {
     const response = await fetch("/api/calendar");
     const data = await response.json();
+
+    // Collect all unique semesters from the response
+    const semesterSet = new Set();
+    for (const block of data.blocks) {
+      if (block.course?.semester) {
+        semesterSet.add(block.course.semester);
+      }
+    }
+    const semesterList = Array.from(semesterSet);
+    setSemesters(semesterList);
+
+    // On first load, default to the first semester found
+    const activeSemester = semester || semesterList[0] || "";
+    if (!semester && semesterList.length > 0) {
+      setSelectedSemester(semesterList[0]);
+    }
 
     const mapped = [];
     for (const block of data.blocks) {
       const course = block.course;
       if (!course || !course.dayTimeMap) continue;
+      if (course.semester !== activeSemester) continue;
 
       for (const [day, range] of Object.entries(course.dayTimeMap)) {
         const dayNum = dayToNumber(day);
         const start = Array.isArray(range) ? toCalendarTime(range[0]) : null;
         const end = Array.isArray(range) ? toCalendarTime(range[1]) : null;
-        if (dayNum === undefined) continue;
-        if (!start || !end) continue;
+        if (dayNum === undefined || !start || !end) continue;
 
         mapped.push({
           title: course.courseName,
@@ -82,7 +97,7 @@ function CalendarPage() {
     setEvents(mapped);
   };
 
- const downloadPDF = () => {
+  const downloadPDF = () => {
     window.open("/api/mySchedule/pdf", "_blank");
   };
 
@@ -90,27 +105,53 @@ function CalendarPage() {
     fetchCalendar();
   }, []);
 
+  // Re-filter events whenever the selected semester changes
+  useEffect(() => {
+    if (selectedSemester) {
+      fetchCalendar(selectedSemester);
+    }
+  }, [selectedSemester]);
+
   const handleEventClick = (info) => {
     const { course, day, startTime, endTime } = info.event.extendedProps;
     setSelectedCourse({ ...course, day, startTime, endTime });
   };
 
   const removeCourse = async () => {
-    const response = await fetch(`/api/mySchedule/remove/${selectedCourse.courseCode}`, {
-      method: "DELETE"
-    });
+    const response = await fetch(
+      `/api/mySchedule/remove/${selectedCourse.courseCode}/${selectedCourse.semester}`,
+      { method: "DELETE" }
+    );
 
     if (response.ok) {
+      alert(`${selectedCourse.courseCode} in ${selectedCourse.semester} removed from schedule!`);
       setSelectedCourse(null);
-      await fetchCalendar();
-    } else {
-      alert("Failed to remove course.");
+      await fetchCalendar(selectedSemester);
+    } else if (response.status === 404) {
+      alert("Failed to remove course. It may have not been found.");
     }
   };
 
   return (
     <div>
       <h1>Weekly Schedule</h1>
+
+      {/* Semester dropdown */}
+      <div style={{ marginBottom: "16px" }}>
+        <label htmlFor="semester-select" style={{ fontWeight: "bold", marginRight: "10px" }}>
+          Semester:
+        </label>
+        <select
+          id="semester-select"
+          value={selectedSemester}
+          onChange={(e) => setSelectedSemester(e.target.value)}
+          style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
+        >
+          {semesters.map((sem) => (
+            <option key={sem} value={sem}>{sem}</option>
+          ))}
+        </select>
+      </div>
 
       {/* Course info popup */}
       {selectedCourse && (
@@ -119,6 +160,7 @@ function CalendarPage() {
             <div>
               <h3 style={{ margin: "0 0 8px 0" }}>{selectedCourse.courseName}</h3>
               <p style={{ margin: "4px 0" }}><b>Code:</b> {selectedCourse.courseCode}</p>
+              <p style={{ margin: "4px 0" }}><b>Semester:</b> {selectedCourse.semester}</p>
               <p style={{ margin: "4px 0" }}><b>Professor:</b> {selectedCourse.professor}</p>
               <p style={{ margin: "4px 0" }}><b>Location:</b> {selectedCourse.location}</p>
               <p style={{ margin: "4px 0" }}><b>Time:</b> {formatTime(selectedCourse.startTime)} - {formatTime(selectedCourse.endTime)}</p>
@@ -143,12 +185,12 @@ function CalendarPage() {
         </div>
       )}
 
-     <button
-      onClick={downloadPDF}
-      style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer", marginBottom: "10px" }}
-    >
-      Download Schedule PDF
-    </button>
+      <button
+        onClick={downloadPDF}
+        style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer", marginBottom: "10px" }}
+      >
+        Download Schedule PDF
+      </button>
 
       <div className="card">
         <FullCalendar

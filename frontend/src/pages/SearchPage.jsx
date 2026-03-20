@@ -1,23 +1,16 @@
 import { useState } from "react";
 
-function SearchPage() {
-
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
-
-  const [filters, setFilters] = useState({
-      department: "",
-      professor: "",
-      credits: "",
-      days: [],
-      startTime: "",
-      endTime: ""
-  });
+function SearchPage({ query, setQuery, results, setResults, filters, setFilters, expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester }) {
 
   const [schedule, setSchedule] = useState([]);
 
   const DESCRIPTION_PREVIEW_LENGTH = 100;
+
+  const filteredResults = selectedSemester
+    ? results.filter(c => c.semester === selectedSemester)
+    : results;
+
+  const availableSemesters = [...new Set(results.map(c => c.semester).filter(Boolean))].sort();
 
   const fetchSchedule = async () => {
     const response = await fetch("/api/mySchedule");
@@ -126,8 +119,9 @@ const runFilter = async () => {
   if (filters.professor) params.append("professor", filters.professor);
   if (filters.credits) params.append("credits", filters.credits);
   if (filters.days.length > 0) params.append("days", filters.days.join(","));
-  if (filters.startTime) params.append("startTime", filters.startTime);
-  if (filters.endTime) params.append("endTime", filters.endTime);
+  if (filters.startTime) params.append("startTime", filters.startTime + ":00");
+  if (filters.endTime) params.append("endTime", filters.endTime + ":00");
+  if (filters.semester) params.append("semester", filters.semester);
 
   const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
     method: "POST"
@@ -140,28 +134,35 @@ const runFilter = async () => {
   }
 };
 
-  const addCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/add/${courseCode}`, {
+  const addCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/add/${courseCode}/${semester}`, {
       method: "POST"
     });
 
     if (response.ok) {
-      alert(`${courseCode} added to schedule!`);
+      alert(`${courseCode} in ${semester} added to schedule!`);
       await fetchSchedule();
-    } else {
+    } else if (response.status == 500) {
       alert("Failed to add course. It may conflict with an existing course.");
     }
+    else {
+      alert("Failed to add course. It may have not been found");
+    }
   };
-  const removeCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/remove/${courseCode}`, {
+  
+  const removeCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/remove/${courseCode}/${semester}`, {
       method: "DELETE"
     });
 
+    console.log("Course: " + courseCode + ", semester: " + semester)
+
     if (response.ok) {
-      alert(`${courseCode} removed from schedule!`);
+      alert(`${courseCode} in ${semester} removed from schedule!`);
       await fetchSchedule();
-    } else {
-      alert("Failed to remove course.");
+    }
+    else if(response.status == 404) {
+      alert("Failed to remove course. It may have not been found");
     }
   };
 
@@ -238,8 +239,7 @@ const runFilter = async () => {
           </label>
           <label>Start Time:
               <input
-              type="text"
-              placeholder="e.g. 10:00"
+              type="time"
               value={filters.startTime}
               onChange={(e) => setFilters({ ...filters, startTime: e.target.value })}
               style={{ marginLeft: "8px", width: "80px" }}
@@ -248,8 +248,7 @@ const runFilter = async () => {
 
           <label>End Time:
             <input
-            type="text"
-            placeholder="e.g. 10:50"
+            type="time"
             value={filters.endTime}
             onChange={(e) => setFilters({ ...filters, endTime: e.target.value })}
             style={{ marginLeft: "8px", width: "80px" }}
@@ -257,6 +256,22 @@ const runFilter = async () => {
           </label>
 
         </div>
+      </div>
+
+
+      <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <label htmlFor="semester-select" style={{ fontWeight: "bold" }}>Semester:</label>
+        <select
+          id="semester-select"
+          value={selectedSemester}
+          onChange={(e) => setSelectedSemester(e.target.value)}
+          style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
+        >
+          <option value="">All</option>
+          {availableSemesters.map(sem => (
+            <option key={sem} value={sem}>{sem}</option>
+          ))}
+        </select>
       </div>
 
       <div className="card">
@@ -274,7 +289,7 @@ const runFilter = async () => {
             </tr>
           </thead>
           <tbody>
-            {results.map((course, index) => {
+            {filteredResults.map((course, index) => {
               const courseKey = `${course.courseCode}-${index}`;
               const description = getDescription(course);
               const isExpanded = Boolean(expandedDescriptions[courseKey]);
@@ -324,9 +339,9 @@ const runFilter = async () => {
                   <td style={{ padding: "10px" }}>{course.credits}</td>
                   <td style={{ padding: "10px" }}>{course.semester}</td>
                   <td style={{ padding: "10px" }}>
-                    {schedule.some(c => c.courseCode === course.courseCode)
-                      ? <button onClick={() => removeCourse(course.courseCode)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
-                      : <button onClick={() => addCourse(course.courseCode)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
+                    {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
+                      ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
+                      : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
                     }
                   </td>
                 </tr>

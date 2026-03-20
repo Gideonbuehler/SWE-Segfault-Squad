@@ -68,22 +68,24 @@ public class Filter {
         // Removes a course from the list if it does not match the start time provided.
         // Should be paired with the end time.
         if (startTimes != null && startTimes.length > 0) {
+            LocalTime startBound = startTimes[0];
             filtered.removeIf(course -> {
                 if (course.getDayTimeMap().isEmpty()) return true;
                 LocalTime[] times = course.getDayTimeMap().values().iterator().next();
                 if (times == null || times[0] == null) return true;
-                return Arrays.stream(startTimes).noneMatch(time -> times[0].equals(time));
+                return times[0].isBefore(startBound);
             });
         }
 
         // Removes a course from the list if it does not match the end time provided.
         // Should be paired with the start time.
         if (endTimes != null && endTimes.length > 0) {
+            LocalTime endBound = endTimes[0];
             filtered.removeIf(course -> {
                 if (course.getDayTimeMap().isEmpty()) return true;
                 LocalTime[] times = course.getDayTimeMap().values().iterator().next();
                 if (times == null || times[1] == null) return true;
-                return Arrays.stream(endTimes).noneMatch(time -> times[1].equals(time));
+                return times[1].isAfter(endBound);
             });
         }
 
