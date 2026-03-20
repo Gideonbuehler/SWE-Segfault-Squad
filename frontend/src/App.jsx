@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import SearchPage from "./pages/SearchPage";
@@ -18,6 +18,17 @@ function App() {
   });
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [selectedSemester, setSelectedSemester] = useState("");
+  const [schedule, setSchedule] = useState([]);
+
+  const fetchSchedule = async () => {
+    const response = await fetch("/api/mySchedule");
+    const data = await response.json();
+    setSchedule(data.courses ?? []);
+  };
+
+  useEffect(() => {
+    fetchSchedule();
+  }, []);
 
   return (
     <BrowserRouter>
@@ -32,7 +43,8 @@ function App() {
                 filters={filters} setFilters={setFilters}
                 expandedDescriptions={expandedDescriptions} setExpandedDescriptions={setExpandedDescriptions}
                 selectedSemester={selectedSemester} setSelectedSemester={setSelectedSemester}
-              />
+                schedule={schedule} fetchSchedule={fetchSchedule}
+            />
             }
           />
           <Route path="/calendar" element={<CalendarPage />} />
