@@ -1,10 +1,16 @@
 import { useState } from "react";
 
-function SearchPage({ query, setQuery, results, setResults, filters, setFilters, expandedDescriptions, setExpandedDescriptions }) {
+function SearchPage({ query, setQuery, results, setResults, filters, setFilters, expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester }) {
 
   const [schedule, setSchedule] = useState([]);
 
   const DESCRIPTION_PREVIEW_LENGTH = 100;
+
+  const filteredResults = selectedSemester
+    ? results.filter(c => c.semester === selectedSemester)
+    : results;
+
+  const availableSemesters = [...new Set(results.map(c => c.semester).filter(Boolean))].sort();
 
   const fetchSchedule = async () => {
     const response = await fetch("/api/mySchedule");
@@ -115,6 +121,7 @@ const runFilter = async () => {
   if (filters.days.length > 0) params.append("days", filters.days.join(","));
   if (filters.startTime) params.append("startTime", filters.startTime + ":00");
   if (filters.endTime) params.append("endTime", filters.endTime + ":00");
+  if (filters.semester) params.append("semester", filters.semester);
 
   const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
     method: "POST"
@@ -251,6 +258,22 @@ const runFilter = async () => {
         </div>
       </div>
 
+
+      <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <label htmlFor="semester-select" style={{ fontWeight: "bold" }}>Semester:</label>
+        <select
+          id="semester-select"
+          value={selectedSemester}
+          onChange={(e) => setSelectedSemester(e.target.value)}
+          style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
+        >
+          <option value="">All</option>
+          {availableSemesters.map(sem => (
+            <option key={sem} value={sem}>{sem}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="card">
         <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
           <thead>
@@ -266,7 +289,7 @@ const runFilter = async () => {
             </tr>
           </thead>
           <tbody>
-            {results.map((course, index) => {
+            {filteredResults.map((course, index) => {
               const courseKey = `${course.courseCode}-${index}`;
               const description = getDescription(course);
               const isExpanded = Boolean(expandedDescriptions[courseKey]);

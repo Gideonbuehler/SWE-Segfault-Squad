@@ -4,7 +4,7 @@ import "../styles/global.css";
 function Navbar() {
   return (
     <nav className="navbar">
-      <h2 className="logo">MyApp</h2>
+      <h2 className="logo">GCC Scheduler</h2>
 
       <div className="nav-links">
         <Link to="/">Search</Link>
