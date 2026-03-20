@@ -82,13 +82,15 @@ public class Controller {
         //routes for schedule
         app.get("/mySchedule", ctx -> ctx.json(user.getSchedule()));
 
-        app.post("/mySchedule/add/{courseCode}", ctx -> {
+        app.post("/mySchedule/add/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
+            String semester = ctx.pathParam("semester");
             ArrayList<Course> allCourses = Main.getCourses();
 
             Course toAdd = null;
             for (Course c : allCourses) {
-                if (c.getCourseCode().equalsIgnoreCase(courseCode)) {
+                if (c.getCourseCode().equalsIgnoreCase(courseCode)
+                        && c.getSemester().equalsIgnoreCase(semester)) {
                     toAdd = c;
                     break;
                 }
@@ -100,25 +102,26 @@ public class Controller {
                 return;
             }
 
-            if(user.getSchedule().addCourse(toAdd)) {
+            if (user.getSchedule().addCourse(toAdd)) {
                 ctx.status(201);
                 ctx.result("Course added");
                 return;
-            }
-            else {
+            } else {
                 ctx.status(500);
                 ctx.result("Course conflict");
                 return;
             }
         });
 
-        app.delete("/mySchedule/remove/{courseCode}", ctx -> {
+        app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
+            String semester = ctx.pathParam("semester");
             ArrayList<Course> courses = user.getSchedule().getCourses();
-
+            System.out.println("Current courses: " + courses);
             Course toRemove = null;
             for (Course c : courses) {
-                if (c.getCourseCode().equalsIgnoreCase(courseCode)) {
+                if (c.getCourseCode().equalsIgnoreCase(courseCode)
+                        && c.getSemester().equalsIgnoreCase(semester)) {
                     toRemove = c;
                     break;
                 }

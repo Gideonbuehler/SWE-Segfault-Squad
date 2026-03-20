@@ -140,28 +140,35 @@ const runFilter = async () => {
   }
 };
 
-  const addCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/add/${courseCode}`, {
+  const addCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/add/${courseCode}/${semester}`, {
       method: "POST"
     });
 
     if (response.ok) {
-      alert(`${courseCode} added to schedule!`);
+      alert(`${courseCode} in ${semester} added to schedule!`);
       await fetchSchedule();
-    } else {
+    } else if (response.status == 500) {
       alert("Failed to add course. It may conflict with an existing course.");
     }
+    else {
+      alert("Failed to add course. It may have not been found");
+    }
   };
-  const removeCourse = async (courseCode) => {
-    const response = await fetch(`/api/mySchedule/remove/${courseCode}`, {
+  
+  const removeCourse = async (courseCode, semester) => {
+    const response = await fetch(`/api/mySchedule/remove/${courseCode}/${semester}`, {
       method: "DELETE"
     });
 
+    console.log("Course: " + courseCode + ", semester: " + semester)
+
     if (response.ok) {
-      alert(`${courseCode} removed from schedule!`);
+      alert(`${courseCode} in ${semester} removed from schedule!`);
       await fetchSchedule();
-    } else {
-      alert("Failed to remove course.");
+    }
+    else if(response.status == 404) {
+      alert("Failed to remove course. It may have not been found");
     }
   };
 
@@ -324,9 +331,9 @@ const runFilter = async () => {
                   <td style={{ padding: "10px" }}>{course.credits}</td>
                   <td style={{ padding: "10px" }}>{course.semester}</td>
                   <td style={{ padding: "10px" }}>
-                    {schedule.some(c => c.courseCode === course.courseCode)
-                      ? <button onClick={() => removeCourse(course.courseCode)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
-                      : <button onClick={() => addCourse(course.courseCode)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
+                    {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
+                      ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
+                      : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
                     }
                   </td>
                 </tr>
