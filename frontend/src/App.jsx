@@ -6,6 +6,8 @@ import CalendarPage from "./pages/CalendarPage";
 import ProfilePage from "./pages/ProfilePage";
 
 function App() {
+
+  // Put queries, results, and filters here to ensure they stay even when leaving Schedule page.
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [filters, setFilters] = useState({
@@ -27,6 +29,7 @@ function App() {
             path="/"
             element={
               <SearchPage
+              // Sets variables in Search page when loaded.
                 query={query} setQuery={setQuery}
                 results={results} setResults={setResults}
                 filters={filters} setFilters={setFilters}

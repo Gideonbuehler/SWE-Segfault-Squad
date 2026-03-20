@@ -22,6 +22,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     return [...courses].sort((a, b) => a.courseCode.localeCompare(b.courseCode));
   };
 
+  // Ensures display time is formatted correctly from the DayTimeMap
   const formatTime = (time) => {
     if (!time) return "TBA";
     let hour;
@@ -44,13 +45,16 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     return `${hour12}:${min} ${period}`;
   };
 
+  // Gets individual meetins from DayTimeMap
   const getMeetings = (course) => Object.entries(course.dayTimeMap ?? {});
 
+  // Formats DayTimeMap in easy to read display
   const formatDays = (course) => {
     const days = getMeetings(course).map(([day]) => day);
     return days.length > 0 ? days.join(", ") : "TBA";
   };
 
+  // Formats times in easy to read display
   const formatMeetingTimes = (course) => {
     const ranges = getMeetings(course)
       .map(([, range]) => {
@@ -65,6 +69,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
 
   const getDescription = (course) => (course.description ?? "").trim();
 
+  // Toggles description of course on and off
   const toggleDescription = (courseKey) => {
     setExpandedDescriptions((prev) => ({
       ...prev,
@@ -72,6 +77,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     }));
   };
 
+  // Fetchs the schedule, applies filters
   const runSearch = async () => {
     await fetchSchedule();
     const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
@@ -91,49 +97,52 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     }
   };
 
+  // Clears all filters
   const clearFilter = async () => {
-  await fetchSchedule();
-  const response = await fetch(`/api/noFilters`, { method: "GET" });
-  const data = await response.json();
-
-  if (response.ok) {
-    setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
-    setExpandedDescriptions({});
-    setResults(sortByCourseCode(Array.from(data ?? [])));
-  } else {
-    setExpandedDescriptions({});
-    setResults([]);
-  }
-};
-
-const runFilter = async () => {
-  const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
-  
-  if (!hasFilters) {
-    await clearFilter(); // fall back to original results
-    return;
-  }
-
-  const params = new URLSearchParams();
-  if (filters.department) params.append("department", filters.department);
-  if (filters.professor) params.append("professor", filters.professor);
-  if (filters.credits) params.append("credits", filters.credits);
-  if (filters.days.length > 0) params.append("days", filters.days.join(","));
-  if (filters.startTime) params.append("startTime", filters.startTime + ":00");
-  if (filters.endTime) params.append("endTime", filters.endTime + ":00");
-  if (filters.semester) params.append("semester", filters.semester);
-
-  const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
-    method: "POST"
-  });
-
-  if (response.ok) {
+    await fetchSchedule();
+    const response = await fetch(`/api/noFilters`, { method: "GET" });
     const data = await response.json();
-    setExpandedDescriptions({});
-    setResults(sortByCourseCode(Array.from(data)));
-  }
-};
 
+    if (response.ok) {
+      setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
+      setExpandedDescriptions({});
+      setResults(sortByCourseCode(Array.from(data ?? [])));
+    } else {
+      setExpandedDescriptions({});
+      setResults([]);
+    }
+  };
+
+  // Applies all filters
+  const runFilter = async () => {
+    const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
+    
+    if (!hasFilters) {
+      await clearFilter(); // fall back to original results
+      return;
+    }
+
+    const params = new URLSearchParams();
+    if (filters.department) params.append("department", filters.department);
+    if (filters.professor) params.append("professor", filters.professor);
+    if (filters.credits) params.append("credits", filters.credits);
+    if (filters.days.length > 0) params.append("days", filters.days.join(","));
+    if (filters.startTime) params.append("startTime", filters.startTime + ":00");
+    if (filters.endTime) params.append("endTime", filters.endTime + ":00");
+    if (filters.semester) params.append("semester", filters.semester);
+
+    const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
+      method: "POST"
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setExpandedDescriptions({});
+      setResults(sortByCourseCode(Array.from(data)));
+    }
+  };
+
+  // Adds courses
   const addCourse = async (courseCode, semester) => {
     const response = await fetch(`/api/mySchedule/add/${courseCode}/${semester}`, {
       method: "POST"
@@ -150,6 +159,7 @@ const runFilter = async () => {
     }
   };
   
+  // Removes courses
   const removeCourse = async (courseCode, semester) => {
     const response = await fetch(`/api/mySchedule/remove/${courseCode}/${semester}`, {
       method: "DELETE"
