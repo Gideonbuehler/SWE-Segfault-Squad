@@ -126,8 +126,8 @@ const runFilter = async () => {
   if (filters.professor) params.append("professor", filters.professor);
   if (filters.credits) params.append("credits", filters.credits);
   if (filters.days.length > 0) params.append("days", filters.days.join(","));
-  if (filters.startTime) params.append("startTime", filters.startTime);
-  if (filters.endTime) params.append("endTime", filters.endTime);
+  if (filters.startTime) params.append("startTime", filters.startTime + ":00");
+  if (filters.endTime) params.append("endTime", filters.endTime + ":00");
 
   const response = await fetch(`/api/filterResults/${query}/filter?${params}`, {
     method: "POST"
@@ -245,8 +245,7 @@ const runFilter = async () => {
           </label>
           <label>Start Time:
               <input
-              type="text"
-              placeholder="e.g. 10:00"
+              type="time"
               value={filters.startTime}
               onChange={(e) => setFilters({ ...filters, startTime: e.target.value })}
               style={{ marginLeft: "8px", width: "80px" }}
@@ -255,8 +254,7 @@ const runFilter = async () => {
 
           <label>End Time:
             <input
-            type="text"
-            placeholder="e.g. 10:50"
+            type="time"
             value={filters.endTime}
             onChange={(e) => setFilters({ ...filters, endTime: e.target.value })}
             style={{ marginLeft: "8px", width: "80px" }}
