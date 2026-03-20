@@ -11,6 +11,7 @@ public class Filter {
     private LocalTime[] startTimes;
     private LocalTime[] endTimes;
     private Map<String, List<String>> dayTimeMap;
+    private String[] descriptionKeywords;
 
 
     /**
@@ -87,6 +88,16 @@ public class Filter {
             });
         }
 
+        if (descriptionKeywords != null && descriptionKeywords.length > 0) {
+            filtered.removeIf(course -> {
+                if (course.getDescription() == null) return true;
+                String desc = course.getDescription().toLowerCase();
+                return Arrays.stream(descriptionKeywords)
+                        .map(String::toLowerCase)
+                        .anyMatch(keyword -> !desc.contains(keyword));
+            });
+        }
+
         //All courses that had a match with all filters provided.
         return filtered;
     }
@@ -94,6 +105,10 @@ public class Filter {
     /*
     Setters for frontend, when the user enters or checks filters it should add the filter(s) with these setters.
      */
+    public void setDescriptionKeywords(String[] descriptionKeywords) {
+        this.descriptionKeywords = descriptionKeywords;
+    }
+
     public void setDayTimeMap(Map<String, List<String>> dayTimeMap) {
         this.dayTimeMap = dayTimeMap;
     }
