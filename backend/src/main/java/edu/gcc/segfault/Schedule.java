@@ -55,10 +55,12 @@ public class Schedule {
         saveSchedule();
     }
 
-    public boolean checkConflicts(Course toCheck){
-        if(!courses.isEmpty()) {
+    public boolean checkConflicts(Course toCheck) {
+        if (!courses.isEmpty()) {
             for (Course c : courses) {
-                if(!c.getSemester().equals(toCheck.getSemester())) { return true; }
+                if (!c.getSemester().equals(toCheck.getSemester())) {
+                    return true;
+                }
                 for (Map.Entry<String, LocalTime[]> d : c.getDayTimeMap().entrySet()) {
                     for (Map.Entry<String, LocalTime[]> d2 : toCheck.getDayTimeMap().entrySet()) {
                         System.out.println(d + " " + d2);
@@ -85,33 +87,6 @@ public class Schedule {
         //this is my 5th test
 
         return true;
-    }
-
-    public static void main(String[] args) {
-        Schedule s = new Schedule("F25");
-        ArrayList<String> days = new ArrayList<>();
-        days.add("Monday");
-        days.add("Wednesday");
-        days.add("Friday");
-        ArrayList<String> days2 = new ArrayList<>();
-        days2.add("Wednesday");
-        ArrayList<String> days3 = new ArrayList<>();
-        days3.add("Tuesday");
-        LocalTime[] l = new LocalTime[2];
-        l[0] = LocalTime.of(12, 0);
-        l[1] = LocalTime.of(1, 0);
-        LinkedHashMap<String, LocalTime[]> m = new LinkedHashMap<>(Map.of("M",l));
-        m.put("W", l);
-        m.put("F", l);
-        LinkedHashMap<String, LocalTime[]> m2 = new LinkedHashMap<>();
-        m2.put("W", l);
-        LinkedHashMap<String, LocalTime[]> m3 = new LinkedHashMap<>();
-        m3.put("T", l);
-        s.addCourse(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m , 3, true, false, 20, 30, "This is the first course that is cool"));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m2, 1, true, false, 20, 30, " ")));
-        System.out.println(s.checkConflicts(new Course("code1", "happiness", "Dr. Hutchins", "COMP", "HAL102", "Fall", m3, 1, true, false, 20, 30, "This is the second course that is awesome")));
-        s.courses.removeFirst();
-        System.out.println(s.courses);
     }
 
     public boolean saveSchedule(){
