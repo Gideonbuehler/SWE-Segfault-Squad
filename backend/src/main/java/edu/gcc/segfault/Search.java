@@ -40,12 +40,14 @@ public class Search {
             String[] codeSplit = toCheck.getCourseCode().toLowerCase().split("-");
             String[] nameSplit = toCheck.getCourseName().toLowerCase().split(" ");
             String[] professorSplit = Arrays.stream(toCheck.getProfessor().toLowerCase().split(" ")).map(s -> s.replace(",", "")).toArray(String[]::new);
+            String[] descriptionSplit = toCheck.getDescription() != null ? toCheck.getDescription().toLowerCase().split("\\s+") : new String[]{};
 
             //One boolean check to ensure all keywords match.
             boolean allKeysMatch = keywords.stream().allMatch(keyword ->
                     Arrays.stream(codeSplit).anyMatch((p -> p.contains(keyword))) ||
                             Arrays.stream(nameSplit).anyMatch(p -> p.contains(keyword)) ||
-                            Arrays.stream(professorSplit).anyMatch(p -> p.contains(keyword))
+                            Arrays.stream(professorSplit).anyMatch(p -> p.contains(keyword)) ||
+                            Arrays.stream(descriptionSplit).anyMatch(p -> p.contains(keyword))
             );
             if (allKeysMatch) query.add(toCheck);
         }

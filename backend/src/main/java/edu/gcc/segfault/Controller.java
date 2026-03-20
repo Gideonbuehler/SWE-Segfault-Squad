@@ -152,6 +152,7 @@ public class Controller {
             String professor = ctx.queryParam("professor");
             String credits = ctx.queryParam("credits");
             String days = ctx.queryParam("days");
+            String description = ctx.queryParam("description");
 
             if (department != null && !department.isEmpty())
                 filter.setDepartmentNames(new String[]{department});
@@ -166,6 +167,9 @@ public class Controller {
                 ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
                 filter.setDays(dayList);
             }
+
+            if (description != null && !description.isEmpty())
+                filter.setDescriptionKeywords(new String[]{description});
 
             user.getLastSearchResults().addFilter(filter);
             user.getLastSearchResults().applyFilters();
@@ -221,6 +225,7 @@ public class Controller {
 
             if (endTime != null && !endTime.isEmpty())
                 filter.setEndTimes(new LocalTime[]{LocalTime.parse(endTime)});
+
 
             user.getLastSearchResults().clearFilters();
             user.getLastSearchResults().getActiveFilters().clear();
