@@ -170,6 +170,7 @@ public class Schedule {
     public ArrayList<Course> getCourses(){
         return new ArrayList<>(courses);
     }
+
     public Calendar getCalendar(){
         return calendar;
     }

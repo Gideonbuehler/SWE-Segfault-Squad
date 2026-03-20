@@ -96,15 +96,17 @@ function CalendarPage() {
   };
 
   const removeCourse = async () => {
-    const response = await fetch(`/api/mySchedule/remove/${selectedCourse.courseCode}`, {
-      method: "DELETE"
-    });
+    const response = await fetch(
+      `/api/mySchedule/remove/${selectedCourse.courseCode}/${selectedCourse.semester}`,
+      { method: "DELETE" }
+    );
 
     if (response.ok) {
+      alert(`${selectedCourse.courseCode} in ${selectedCourse.semester} removed from schedule!`);
       setSelectedCourse(null);
       await fetchCalendar();
-    } else {
-      alert("Failed to remove course.");
+    } else if (response.status === 404) {
+      alert("Failed to remove course. It may have not been found.");
     }
   };
 
@@ -127,7 +129,7 @@ function CalendarPage() {
             </div>
             <div style={{ display: "flex", gap: "10px" }}>
               <button
-                onClick={removeCourse}
+                onClick={removeCourse}  // no args needed
                 style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "8px 16px", borderRadius: "4px", cursor: "pointer" }}
               >
                 Remove Course
