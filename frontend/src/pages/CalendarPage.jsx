@@ -4,6 +4,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 
 function CalendarPage() {
+  // Variables
   const [events, setEvents] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [semesters, setSemesters] = useState([]);
@@ -14,6 +15,7 @@ function CalendarPage() {
     return map[day];
   };
 
+  // Formats time in easy to read display
   const formatTime = (timeArray) => {
     if (!timeArray) return "TBA";
     let hour, minute;
@@ -35,6 +37,7 @@ function CalendarPage() {
     return `${hour12}:${minuteLabel} ${period}`;
   };
 
+  // Converst times to times we can display on the calendar
   const toCalendarTime = (timeArray) => {
     if (!timeArray) return null;
     let hour, minute;
@@ -52,6 +55,7 @@ function CalendarPage() {
     return `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}:00`;
   };
 
+  // fetches the proper calendar for the given semester
   const fetchCalendar = async (semester) => {
     const response = await fetch("/api/calendar");
     const data = await response.json();
@@ -97,26 +101,23 @@ function CalendarPage() {
     setEvents(mapped);
   };
 
+  // Opens saved PDf
   const downloadPDF = () => {
     window.open("/api/mySchedule/pdf", "_blank");
   };
 
-  useEffect(() => {
-    fetchCalendar();
-  }, []);
-
   // Re-filter events whenever the selected semester changes
   useEffect(() => {
-    if (selectedSemester) {
-      fetchCalendar(selectedSemester);
-    }
+    fetchCalendar(selectedSemester);
   }, [selectedSemester]);
 
+  // Displays information when course is clicked
   const handleEventClick = (info) => {
     const { course, day, startTime, endTime } = info.event.extendedProps;
     setSelectedCourse({ ...course, day, startTime, endTime });
   };
 
+  // Removes course
   const removeCourse = async () => {
     const response = await fetch(
       `/api/mySchedule/remove/${selectedCourse.courseCode}/${selectedCourse.semester}`,
