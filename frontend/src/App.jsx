@@ -17,6 +17,7 @@ function App() {
     endTime: ""
   });
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
+  const [selectedSemester, setSelectedSemester] = useState("");
 
   return (
     <BrowserRouter>
@@ -30,6 +31,7 @@ function App() {
                 results={results} setResults={setResults}
                 filters={filters} setFilters={setFilters}
                 expandedDescriptions={expandedDescriptions} setExpandedDescriptions={setExpandedDescriptions}
+                selectedSemester={selectedSemester} setSelectedSemester={setSelectedSemester}
               />
             }
           />
