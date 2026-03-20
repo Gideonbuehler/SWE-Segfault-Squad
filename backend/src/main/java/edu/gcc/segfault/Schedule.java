@@ -58,6 +58,7 @@ public class Schedule {
     public boolean checkConflicts(Course toCheck){
         if(!courses.isEmpty()) {
             for (Course c : courses) {
+                if(!c.getSemester().equals(toCheck.getSemester())) { return true; }
                 for (Map.Entry<String, LocalTime[]> d : c.getDayTimeMap().entrySet()) {
                     for (Map.Entry<String, LocalTime[]> d2 : toCheck.getDayTimeMap().entrySet()) {
                         System.out.println(d + " " + d2);

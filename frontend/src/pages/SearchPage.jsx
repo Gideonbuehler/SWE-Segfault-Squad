@@ -1,19 +1,6 @@
 import { useState } from "react";
 
-function SearchPage() {
-
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [expandedDescriptions, setExpandedDescriptions] = useState({});
-
-  const [filters, setFilters] = useState({
-      department: "",
-      professor: "",
-      credits: "",
-      days: [],
-      startTime: "",
-      endTime: ""
-  });
+function SearchPage({ query, setQuery, results, setResults, filters, setFilters, expandedDescriptions, setExpandedDescriptions }) {
 
   const [schedule, setSchedule] = useState([]);
 
