@@ -59,7 +59,7 @@ public class Schedule {
         if (!courses.isEmpty()) {
             for (Course c : courses) {
                 if (!c.getSemester().equals(toCheck.getSemester())) {
-                    return true;
+                    continue;
                 }
                 for (Map.Entry<String, LocalTime[]> d : c.getDayTimeMap().entrySet()) {
                     for (Map.Entry<String, LocalTime[]> d2 : toCheck.getDayTimeMap().entrySet()) {
