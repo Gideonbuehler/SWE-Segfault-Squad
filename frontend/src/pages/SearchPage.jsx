@@ -198,7 +198,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
 
       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
         {/* <button onClick={runSearch}>Search</button> */}
-        <button onClick={runFilter}>Refresh Filters</button>
+        {/* <button onClick={runFilter}>Refresh Filters</button> */}
         <button onClick={() => {
           setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
           clearFilter();
