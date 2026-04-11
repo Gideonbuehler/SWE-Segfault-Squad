@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 
 function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
   expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester,
@@ -71,26 +71,6 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     }));
   };
 
-  // Fetchs the schedule, applies filters
-  const runSearch = async () => {
-    await fetchSchedule();
-    const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
-    const data = await response.json();
-
-    if (response.ok) {
-      const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0;
-      if (hasFilters) {
-        await runFilter();
-      } else {
-        setExpandedDescriptions({});
-        setResults(sortByCourseCode(Array.from(data.results ?? [])));
-      }
-    } else {
-      setExpandedDescriptions({});
-      setResults([]);
-    }
-  };
-
   // Clears all filters
   const clearFilter = async () => {
     await fetchSchedule();
@@ -135,6 +115,33 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
       setResults(sortByCourseCode(Array.from(data)));
     }
   };
+
+const runSearch = async () => {
+  await fetchSchedule();
+  const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
+  const data = await response.json();
+
+  if (response.ok) {
+    const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0;
+    if (hasFilters) {
+      await runFilter();
+    } else {
+      setExpandedDescriptions({});
+      setResults(sortByCourseCode(Array.from(data.results ?? [])));
+    }
+  } else {
+    setExpandedDescriptions({});
+    setResults([]);
+  }
+};
+
+useEffect(() => {
+  const debounceTimer = setTimeout(() => {
+    runSearch();
+  }, 300);
+
+  return () => clearTimeout(debounceTimer);
+}, [query]);
 
   // Adds courses
   const addCourse = async (courseCode, semester) => {
@@ -183,7 +190,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
       />
 
       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
-        <button onClick={runSearch}>Search</button>
+        {/* <button onClick={runSearch}>Search</button> */}
         <button onClick={runFilter}>Refresh Filters</button>
         <button onClick={() => {
           setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
