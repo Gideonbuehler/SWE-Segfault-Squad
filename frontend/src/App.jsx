@@ -28,6 +28,12 @@ function App() {
     setSchedule(data.courses ?? []);
   };
 
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+  document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+
   useEffect(() => {
     fetchSchedule();
   }, []);
@@ -51,7 +57,7 @@ function App() {
             }
           />
           <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile" element={<ProfilePage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         </Routes>
       </Layout>
     </BrowserRouter>
