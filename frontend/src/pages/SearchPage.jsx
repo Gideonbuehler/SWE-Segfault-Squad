@@ -116,32 +116,39 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     }
   };
 
-const runSearch = async () => {
-  await fetchSchedule();
-  const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
-  const data = await response.json();
+  const runSearch = async () => {
+    await fetchSchedule();
+    const response = await fetch(`/api/searchResults/${query}`, { method: "POST" });
+    const data = await response.json();
 
-  if (response.ok) {
-    const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0;
-    if (hasFilters) {
-      await runFilter();
+    if (response.ok) {      
+        setExpandedDescriptions({});
+        setResults(sortByCourseCode(Array.from(data.results ?? [])));
     } else {
       setExpandedDescriptions({});
-      setResults(sortByCourseCode(Array.from(data.results ?? [])));
+      setResults([]);
     }
-  } else {
-    setExpandedDescriptions({});
-    setResults([]);
-  }
-};
+  };
 
-useEffect(() => {
+  useEffect(() => {
+    const debounceTimer = setTimeout(async () => {
+      await runSearch();
+      const hasFilters = filters.department || filters.professor || filters.credits || filters.days.length > 0 || filters.startTime || filters.endTime;
+      if (hasFilters) {
+        await runFilter();
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [query]);
+
+  useEffect(() => {
   const debounceTimer = setTimeout(() => {
-    runSearch();
+    runFilter();
   }, 300);
 
   return () => clearTimeout(debounceTimer);
-}, [query]);
+}, [filters]);
 
   // Adds courses
   const addCourse = async (courseCode, semester) => {
@@ -191,7 +198,7 @@ useEffect(() => {
 
       <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
         {/* <button onClick={runSearch}>Search</button> */}
-        <button onClick={runFilter}>Refresh Filters</button>
+        {/* <button onClick={runFilter}>Refresh Filters</button> */}
         <button onClick={() => {
           setFilters({ department: "", professor: "", credits: "", days: [], startTime: "", endTime: "" });
           clearFilter();
