@@ -27,7 +27,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Fetch base branch
-        run:
+        run: |
           git fetch origin master:master
           git fetch origin ${{ github.event.pull_request.head.sha }}
 
