@@ -2,9 +2,9 @@ name: Lint
 
 on:
   push:
-    branches-ignore: [main, master]  # runs on feature branches
+    branches-ignore: [main, master]
   pull_request:
-    branches: [main, master]         # runs on PRs targeting main/master
+    branches: [main, master]
 
 permissions: {}
 
@@ -15,22 +15,26 @@ jobs:
     permissions:
       contents: read
       packages: read
-      statuses: write       # lets Super-Linter post individual check statuses
-      issues: write         # needed for PR comment summaries
-      pull-requests: write  # needed for PR comment summaries
+      statuses: write
+      issues: write
+      pull-requests: write
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history needed to detect changed files
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Fetch base branch
+        run: git fetch origin master:master
 
       - name: Super-Linter
         uses: super-linter/super-linter@v8.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: master
-          VALIDATE_ALL_CODEBASE: false  # only lint files changed in the PR
-          VALIDATE_GOOGLE_JAVA_FORMAT: false #too late to switch to 2 space indents
-          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false #ZIZMOR checks for security, will likely always fail. Can consider reactivation if we switch to a sec focus.
-          VALIDATE_YAML_PRETTIER: false #We have like 2 yaml files, I can't be bothered to make them fit the format...they look fine to me.
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_GOOGLE_JAVA_FORMAT: false
+          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
+          VALIDATE_YAML_PRETTIER: false
