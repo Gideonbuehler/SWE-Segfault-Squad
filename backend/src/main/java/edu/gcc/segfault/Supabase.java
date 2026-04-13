@@ -18,6 +18,38 @@ public class Supabase {
     public static Connection connect() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
+    public Supabase() {
+        try {
+            conn = connect();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        setUpTable();
+    }
+
+    private void setUpTable() {
+        //Combines the searching table data into one cell so that we can
+        //search for substrings just once.
+        String ps = "ALTER TABLE CourseOfferings\n" +
+                "ADD COLUMN search_text TEXT;";
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(ps);
+            pstmt.executeQuery();
+        }
+        catch (SQLException e){
+
+        }
+        String statement = "UPDATE CourseOfferings\n" +
+                "SET search_text = name || ' ' || description || ' ' || professor || ' ' || subject || ' ' || number;";
+        try{
+            PreparedStatement pstmt = conn.prepareStatement(statement);
+            pstmt.executeQuery();
+        }
+        catch (SQLException e){
+
+        }
+
+    }
 
     public static void main(String[] args) throws SQLException {
         //connecting to the database
@@ -39,5 +71,8 @@ public class Supabase {
             System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
         }
 
+    }
+    public Connection getConn(){
+        return conn;
     }
 }

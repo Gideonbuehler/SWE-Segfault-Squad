@@ -1,5 +1,10 @@
 package edu.gcc.segfault;
 
+import net.bytebuddy.asm.Advice;
+
+import javax.security.auth.Subject;
+import java.sql.*;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -8,12 +13,15 @@ public class Search {
     private Stack<Set<Course>> history;
     private ArrayList<Filter> activeFilters;
     private ArrayList<String> searchKeywords;
+    private Connection conn;
 
     public Search(){
         this.originalResults = new HashSet<>();
         this.history = new Stack<>();
         this.activeFilters = new ArrayList<>();
         this.searchKeywords = new ArrayList<>();
+        Supabase s = new Supabase();
+        conn = s.getConn();
     }
 
     /**
@@ -55,6 +63,43 @@ public class Search {
         history.push(query);
         originalResults = query;
         return query;
+    }
+
+    public Set<Course> fetchQueryDatabase(ArrayList<String> searchKeywords) throws SQLException {
+
+
+        String preparedStatement = "SELECT * FROM CourseOfferings2 WHERE search_text ILIKE ?";
+        //Used chatGPT to optimize and safeten the sql search
+        for(int i = 1; i < searchKeywords.size(); i++) {
+            preparedStatement += " OR search_text ILIKE ?";
+        }
+
+        PreparedStatement pstmt = conn.prepareStatement(preparedStatement);
+        for(int i = 1; i <= searchKeywords.size(); i++) {
+            pstmt.setString(i, "%" + searchKeywords.get(i - 1) + "%");
+        }
+        //end chatgpt direct influence
+        Statement s = conn.createStatement();
+        ResultSet rs = pstmt.executeQuery();
+
+        Set<Course> returnedCourses = new HashSet<>();
+
+        while(rs.next()){
+            String times = rs.getString("times");
+            LinkedHashMap<String, LocalTime[]> dayTimeMap = new LinkedHashMap<>();
+            Scanner sc = new Scanner(times);
+            sc.useDelimiter(";");
+            while(sc.hasNext()){
+                Scanner c = new Scanner(sc.next());
+                String day = c.next();
+                LocalTime start = LocalTime.parse(c.next());
+                LocalTime end = LocalTime.parse(c.next());
+            }
+            //Course c = new Course(rs.getString("subject")+rs.getString("number") + rs.getString("section"), rs.getString("name"), rs.getString("professor"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), rs.getString(""));
+            System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
+        }
+
+        return null;
     }
 
     public boolean applyFilters(){
