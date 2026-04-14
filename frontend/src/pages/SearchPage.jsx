@@ -314,7 +314,7 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
               const hasLongDescription = description.length > DESCRIPTION_PREVIEW_LENGTH;
 
               return (
-                <tr key={index} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: index % 2 === 0 ? "#f9fafb" : "white" }}>
+                <tr key={index} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: index % 2 === 0 ? "#f9fafb" : "white", opacity: course.isOpen ? 1 : .6 }}>
                   <td style={{ padding: "10px" }}><b>{course.courseCode}</b></td>
                   <td style={{ padding: "10px" }}>
                     <div>{course.courseName}</div>
@@ -357,10 +357,11 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
                   <td style={{ padding: "10px" }}>{course.credits}</td>
                   <td style={{ padding: "10px" }}>{course.semester}</td>
                   <td style={{ padding: "10px" }}>
-                    {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
+                    {course.isOpen ?
+                    (schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
                       ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
                       : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
-                    }
+                    ) : null}
                   </td>
                 </tr>
               );
