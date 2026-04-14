@@ -174,4 +174,14 @@ class SearchTest {
 
         assertNotEquals(firstResult, secondResult, "History should reflect the most recent search");
     }
+    @Test
+    void fetchQueryMatchesDatabase() throws Exception{
+        search.fetchQuery(new ArrayList<>(List.of("ACCT")));
+        Set<Course> firstResult = search.getResults();
+
+        search.fetchQueryDatabase(new ArrayList<>(List.of("ACCT")));
+        Set<Course> second = search.getResults();
+
+        assertEquals(firstResult.size(), second.size());
+    }
 }
