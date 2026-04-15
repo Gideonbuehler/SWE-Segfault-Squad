@@ -167,8 +167,8 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
 
     } else {
       toast({ message: "Failed to add course. It may not have been found.", type: "error" });
-      
     }
+
   };
   
   // Removes courses
