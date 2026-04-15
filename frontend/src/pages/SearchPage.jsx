@@ -1,9 +1,12 @@
 import { useEffect } from "react";
+import { useToast } from "../components/useToast.jsx";
 
 function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
   expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester,
   schedule, fetchSchedule, darkMode }) {
   
+  const toast = useToast();
+
   const DESCRIPTION_PREVIEW_LENGTH = 100;
 
   const filteredResults = selectedSemester
@@ -157,14 +160,15 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     });
 
     if (response.ok) {
-      alert(`${courseCode} in ${semester} added to schedule!`);
+      toast({ message: `${courseCode} added to schedule!`, type: "success" });
       await fetchSchedule();
-    } else if (response.status == 500) {
-      alert("Failed to add course. It may conflict with an existing course.");
+    } else if (response.status === 500) {
+      toast({ message: "Failed to add course, it may conflict with an existing course.", type: "error" });
+
+    } else {
+      toast({ message: "Failed to add course. It may not have been found.", type: "error" });
     }
-    else {
-      alert("Failed to add course. It may have not been found");
-    }
+
   };
   
   // Removes courses
@@ -176,11 +180,10 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
     console.log("Course: " + courseCode + ", semester: " + semester)
 
     if (response.ok) {
-      alert(`${courseCode} in ${semester} removed from schedule!`);
+      toast({ message: `${courseCode} removed from schedule.`, type: "info" });
       await fetchSchedule();
-    }
-    else if(response.status == 404) {
-      alert("Failed to remove course. It may have not been found");
+    } else if (response.status === 404) {
+      toast({ message: "Failed to remove course. It may not have been found.", type: "error" });
     }
   };
 

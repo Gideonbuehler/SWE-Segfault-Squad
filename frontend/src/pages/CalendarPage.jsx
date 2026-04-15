@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { useToast } from "../components/useToast.jsx";
 
 function CalendarPage() {
+  const toast = useToast();
   // Variables
   const [events, setEvents] = useState([]);
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -125,11 +127,11 @@ function CalendarPage() {
     );
 
     if (response.ok) {
-      alert(`${selectedCourse.courseCode} in ${selectedCourse.semester} removed from schedule!`);
+      toast({ message: `${selectedCourse.courseCode} removed from schedule.`, type: "info" });
       setSelectedCourse(null);
       await fetchCalendar(selectedSemester);
     } else if (response.status === 404) {
-      alert("Failed to remove course. It may have not been found.");
+      toast({ message: "Failed to remove course. It may not have been found.", type: "error" });
     }
   };
 
