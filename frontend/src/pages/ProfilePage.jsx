@@ -1,52 +1,87 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 
 function ProfilePage({ darkMode, setDarkMode }) {
   const [profile, setProfile] = useState(null);
-  const [major, setMajor] = useState("");
-  const [minor, setMinor] = useState("");
+  const[formData, setFormData] = useState(null);
   const handleSubmit = (e) => {
     e.preventDefault();
   };
 
+   const fetchProfile = async () => {
+    
+    const response = await fetch(`/api/profile/`, { method: "GET" });
+    const data = await response.json();
+    setProfile(data);
+    setFormData(data);
+  };
+
   useEffect(() => {
-    fetch(`/api/profile/`)
-      .then(res => res.json())
-      .then(data => setProfile(data))
-      .catch(err => console.error(err));
+    fetchProfile();
   }, []);
 
-
-  
   return (
     <div>
       <h1>Profile</h1>
       <div className="card">
-      <h2>Major: `${profile.major}`</h2>
+        <h1>Major: {profile?.major}</h1>
+        <h1>Minors: {profile?.minors}</h1>
 
       </div>
       <div className="card">
         <p>User information will appear here.</p>
         <form onSubmit={handleSubmit}>
+          <div padding="200px">
+          <label> Change Year</label>
+          <select
+          value={formData?.year}
+          onChange={(e) => setFormData(prev => ({
+      ...prev,
+      year: e.target.value
+    }))
+  }
+        > 
+          <option value="">Choose a year</option>
+          <option value="FR">FRESHMAN</option>
+          <option value="SO">SOPHOMORE</option>
+          <option value="JR">JUNIOR</option>
+          <option value="SR">SENIOR</option>
+          </select>
+          </div>
+          <br />
+          <div padding="200px">
           <label>Update Major</label>
           <input 
           type="text"
-          value={major}
-          onChange={(e) => setMajor(e.target.value)}
+          value={formData?.major}
+           onChange={(e) => setFormData(prev => ({
+      ...prev,
+      major: e.target.value
+    }))
+  }
           />
+          </div>
+          <br />
           <label> Add Minor</label>
           <input 
           type="text"
-          value={minor}
-          onChange={(e) => setMinor(e.target.value)}
+          value={profile?.minor}
+          onChange={(e) => setFormData(prev => ({
+      ...prev,
+      minor: e.target.value
+    }))
+  }
           />
-          <label> Remove Minor</label>
-          <select 
-          value={minor}
-          onChange={(e) => setMinor(e.target.value)}
-          >
-            <option value="Choose a Minor to Remove"></option>
-
-            </select>
+          {/* Make an add to completed courses on search page? */}
+          {/* <label> Add Completed Course</label>
+          <input 
+          type="text"
+          value={profile?.compltedCourses}
+          onChange={(e) => setFormData(prev => ({
+      ...prev,
+      compltedCourses: e.target.value
+    }))
+  }
+          /> */}
         </form>
           
       </div>
