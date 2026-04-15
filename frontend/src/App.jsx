@@ -4,7 +4,7 @@ import Layout from "./components/Layout";
 import SearchPage from "./pages/SearchPage";
 import CalendarPage from "./pages/CalendarPage";
 import ProfilePage from "./pages/ProfilePage";
-
+import { ToastProvider } from "./components/useToast.jsx";
 function App() {
 
   // Put queries, results, and filters here to ensure they stay even when leaving Schedule page.
@@ -40,6 +40,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastProvider>
       <Layout>
         <Routes>
           <Route
@@ -60,6 +61,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         </Routes>
       </Layout>
+      </ToastProvider>
     </BrowserRouter>
   );
 }
