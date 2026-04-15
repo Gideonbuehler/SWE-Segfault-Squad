@@ -164,8 +164,10 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
       await fetchSchedule();
     } else if (response.status === 500) {
       toast({ message: "Failed to add course, it may conflict with an existing course.", type: "error" });
+
     } else {
       toast({ message: "Failed to add course. It may not have been found.", type: "error" });
+      
     }
   };
   
