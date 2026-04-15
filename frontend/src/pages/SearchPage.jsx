@@ -3,7 +3,7 @@ import { useToast } from "../components/useToast.jsx";
 
 function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
   expandedDescriptions, setExpandedDescriptions, selectedSemester, setSelectedSemester,
-  schedule, fetchSchedule }) {
+  schedule, fetchSchedule, darkMode }) {
   
   const toast = useToast();
 
@@ -294,82 +294,87 @@ function SearchPage({ query, setQuery, results, setResults, filters, setFilters,
       </div>
 
       <div className="card">
-        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-          <thead>
-            <tr style={{ backgroundColor: "#1f2937", color: "white", textAlign: "left" }}>
-              <th style={{ padding: "10px", width: "10%" }}>Code</th>
-              <th style={{ padding: "10px", width: "30%" }}>Name</th>
-              <th style={{ padding: "10px", width: "14%" }}>Professor</th>
-              <th style={{ padding: "10px", width: "8%" }}>Days</th>
-              <th style={{ padding: "10px", width: "14%" }}>Time</th>
-              <th style={{ padding: "10px", width: "8%" }}>Credits</th>
-              <th style={{ padding: "10px", width: "8%" }}>Semester</th>
-              <th style={{ padding: "10px", width: "8%" }}>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredResults.map((course, index) => {
-              const courseKey = `${course.courseCode}-${index}`;
-              const description = getDescription(course);
-              const isExpanded = Boolean(expandedDescriptions[courseKey]);
-              const hasLongDescription = description.length > DESCRIPTION_PREVIEW_LENGTH;
+      <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+        <thead>
+          <tr style={{ backgroundColor: darkMode ? "#374151" : "#1f2937", color: "white", textAlign: "left" }}>
+            <th style={{ padding: "10px", width: "10%" }}>Code</th>
+            <th style={{ padding: "10px", width: "30%" }}>Name</th>
+            <th style={{ padding: "10px", width: "14%" }}>Professor</th>
+            <th style={{ padding: "10px", width: "8%" }}>Days</th>
+            <th style={{ padding: "10px", width: "14%" }}>Time</th>
+            <th style={{ padding: "10px", width: "8%" }}>Credits</th>
+            <th style={{ padding: "10px", width: "8%" }}>Semester</th>
+            <th style={{ padding: "10px", width: "8%" }}>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredResults.map((course, index) => {
+            const courseKey = `${course.courseCode}-${index}`;
+            const description = getDescription(course);
+            const isExpanded = Boolean(expandedDescriptions[courseKey]);
+            const hasLongDescription = description.length > DESCRIPTION_PREVIEW_LENGTH;
 
-              return (
-                <tr key={index} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: index % 2 === 0 ? "#f9fafb" : "white" }}>
-                  <td style={{ padding: "10px" }}><b>{course.courseCode}</b></td>
-                  <td style={{ padding: "10px" }}>
-                    <div>{course.courseName}</div>
-                    <div
+            const rowBg = darkMode
+              ? (index % 2 === 0 ? "#1f2937" : "#111827")
+              : (index % 2 === 0 ? "#f9fafb" : "white");
+            const rowColor = darkMode ? "#f9fafb" : "#111827";
+
+            return (
+              <tr key={index} style={{ borderBottom: "1px solid #374151", backgroundColor: rowBg, color: rowColor }}>
+                <td style={{ padding: "10px" }}><b>{course.courseCode}</b></td>
+                <td style={{ padding: "10px" }}>
+                  <div>{course.courseName}</div>
+                  <div
+                    style={{
+                      marginTop: "4px",
+                      overflowWrap: "anywhere",
+                      ...(isExpanded
+                        ? {}
+                        : {
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden"
+                          })
+                    }}
+                  >
+                    {description || "No description available."}
+                  </div>
+                  {hasLongDescription && (
+                    <button
+                      type="button"
+                      onClick={() => toggleDescription(courseKey)}
                       style={{
                         marginTop: "4px",
-                        overflowWrap: "anywhere",
-                        ...(isExpanded
-                          ? {}
-                          : {
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden"
-                            })
+                        border: "none",
+                        background: "none",
+                        color: "#2563eb",
+                        padding: 0,
+                        cursor: "pointer"
                       }}
                     >
-                      {description || "No description available."}
-                    </div>
-                    {hasLongDescription && (
-                      <button
-                        type="button"
-                        onClick={() => toggleDescription(courseKey)}
-                        style={{
-                          marginTop: "4px",
-                          border: "none",
-                          background: "none",
-                          color: "#2563eb",
-                          padding: 0,
-                          cursor: "pointer"
-                        }}
-                      >
-                        {isExpanded ? "See less" : "See more"}
-                      </button>
-                    )}
-                  </td>
-                  <td style={{ padding: "10px" }}>{course.professor}</td>
-                  <td style={{ padding: "10px" }}>{formatDays(course)}</td>
-                  <td style={{ padding: "10px" }}>{formatMeetingTimes(course)}</td>
-                  <td style={{ padding: "10px" }}>{course.credits}</td>
-                  <td style={{ padding: "10px" }}>{course.semester}</td>
-                  <td style={{ padding: "10px" }}>
-                    {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
-                      ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
-                      : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
-                    }
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                      {isExpanded ? "See less" : "See more"}
+                    </button>
+                  )}
+                </td>
+                <td style={{ padding: "10px" }}>{course.professor}</td>
+                <td style={{ padding: "10px" }}>{formatDays(course)}</td>
+                <td style={{ padding: "10px" }}>{formatMeetingTimes(course)}</td>
+                <td style={{ padding: "10px" }}>{course.credits}</td>
+                <td style={{ padding: "10px" }}>{course.semester}</td>
+                <td style={{ padding: "10px" }}>
+                  {schedule.some(c => c.courseCode === course.courseCode && c.semester === course.semester)
+                    ? <button onClick={() => removeCourse(course.courseCode, course.semester)} style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Remove</button>
+                    : <button onClick={() => addCourse(course.courseCode, course.semester)} style={{ backgroundColor: darkMode ? "#4b5563" : "#1f2937", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}>Add</button>
+                  }
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
+  </div>
   );
 }
 

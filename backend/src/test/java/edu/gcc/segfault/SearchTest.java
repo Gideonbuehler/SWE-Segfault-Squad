@@ -122,16 +122,15 @@ class SearchTest {
         assertNotNull(result, "Single character search should not return null");
     }
 
-//    @Test
-//    void fetchQueryMultipleKeywordsSameField() throws Exception {
-//        ArrayList<String> keywords = new ArrayList<>(List.of("COST", "ACCOUNTING"));
-//        Set<Course> result = search.fetchQuery(keywords);
-//        assertTrue(result.size() >= 1, "Expected at least one course matching 'COST ACCOUNTING'");
-//        assertTrue(result.stream().allMatch(c ->
-//                        c.getCourseName().toUpperCase().contains("COST") ||
-//                                c.getCourseCode().toUpperCase().contains("COST")),
-//                "All results should be relevant to 'COST'");
-//    }
+    @Test
+    void fetchQueryMultipleKeywordsSameField() throws Exception {
+        ArrayList<String> keywords = new ArrayList<>(List.of("COST", "ACCOUNTING"));
+        Set<Course> result = search.fetchQuery(keywords);
+        assertTrue(result.size() >= 1, "Expected at least one course matching 'COST ACCOUNTING'");
+        assertTrue(result.stream().allMatch(c ->
+                        c.getDescription().toUpperCase().contains("COST")),
+                "All results should be relevant to 'COST'");
+    }
 
     @Test
     void fetchQueryKeywordsAcrossFields() throws Exception {
