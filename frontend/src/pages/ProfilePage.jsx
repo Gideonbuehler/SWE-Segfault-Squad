@@ -3,8 +3,18 @@ import { useState, useEffect } from "react";
 function ProfilePage({ darkMode, setDarkMode }) {
   const [profile, setProfile] = useState(null);
   const[formData, setFormData] = useState(null);
+  const[y, setYear] = useState("");
+  const[ma, setMajor] = useState("");
+  const[mi, setMinor] = useState([]);
+  const[cc, setCompletedCourses] = useState([]);
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (formData.major.trim() === "") return;
+
+  setProfile(prev => ({
+    ...prev,
+    major: formData.major
+  }));
   };
 
    const fetchProfile = async () => {
@@ -12,7 +22,7 @@ function ProfilePage({ darkMode, setDarkMode }) {
     const response = await fetch(`/api/profile/`, { method: "GET" });
     const data = await response.json();
     setProfile(data);
-    setFormData(data);
+    setFormData(profile);
   };
 
   useEffect(() => {
@@ -30,10 +40,10 @@ function ProfilePage({ darkMode, setDarkMode }) {
       <div className="card">
         <p>User information will appear here.</p>
         <form onSubmit={handleSubmit}>
-          <div padding="200px">
+          <div style={{marginBottom: "7px"}}>
           <label> Change Year</label>
           <select
-          value={formData?.year}
+          value={formData?.year || ""}
           onChange={(e) => setFormData(prev => ({
       ...prev,
       year: e.target.value
@@ -48,28 +58,38 @@ function ProfilePage({ darkMode, setDarkMode }) {
           </select>
           </div>
           <br />
-          <div padding="200px">
+          <div style={{marginBottom: "7px"}}>
           <label>Update Major</label>
           <input 
           type="text"
-          value={formData?.major}
-           onChange={(e) => setFormData(prev => ({
+          value={formData?.major || ""}
+           onChange={(e) => {
+            
+            
+            
+              setFormData(prev => ({
       ...prev,
-      major: e.target.value
-    }))
+      major: e.target.value.toUpperCase()
+    }));
+  }
+  
   }
           />
           </div>
+        
           <br />
+          <div style={{marginBottom: "7px"}}>
           <label> Add Minor</label>
           <input 
           type="text"
-          value={profile?.minor}
+          value={formData?.minor || ""}
           onChange={(e) => setFormData(prev => ({
       ...prev,
       minor: e.target.value
     }))
+
   }
+
           />
           {/* Make an add to completed courses on search page? */}
           {/* <label> Add Completed Course</label>
@@ -82,6 +102,14 @@ function ProfilePage({ darkMode, setDarkMode }) {
     }))
   }
           /> */}
+          </div>
+          <br />
+           <button type="submit" style={{
+          marginTop: "16px",
+          padding: "8px 16px",
+          borderRadius: "4px",
+          border: "none",
+          cursor: "pointer"}}>Submit</button>
         </form>
           
       </div>
