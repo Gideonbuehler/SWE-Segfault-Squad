@@ -87,6 +87,9 @@ public class Controller {
             String semester = ctx.pathParam("semester");
             ArrayList<Course> allCourses = Main.getCourses();
 
+            // Put logic in user
+            // 1. Easier to test
+            // 2. Easier to translate between Javalin and other backends
             Course toAdd = null;
             for (Course c : allCourses) {
                 if (c.getCourseCode().equalsIgnoreCase(courseCode)
@@ -96,6 +99,7 @@ public class Controller {
                 }
             }
 
+            // Change to enum!!!
             if (toAdd == null) {
                 ctx.status(404);
                 ctx.result("Course not found");
