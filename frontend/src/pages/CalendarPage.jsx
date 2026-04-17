@@ -11,6 +11,9 @@ function CalendarPage() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [semesters, setSemesters] = useState([]);
   const [selectedSemester, setSelectedSemester] = useState("");
+  const totalCredits = [...new Map(
+  events.map(e => [e.extendedProps.course?.courseCode, e.extendedProps.course])
+  ).values()].reduce((sum, course) => sum + (Number(course?.credits) || 0), 0);
 
   const dayToNumber = (day) => {
     const map = { "M": 1, "T": 2, "W": 3, "R": 4, "F": 5 };
@@ -140,20 +143,25 @@ function CalendarPage() {
       <h1>Weekly Schedule</h1>
 
       {/* Semester dropdown */}
-      <div style={{ marginBottom: "16px" }}>
-        <label htmlFor="semester-select" style={{ fontWeight: "bold", marginRight: "10px" }}>
-          Semester:
-        </label>
-        <select
-          id="semester-select"
-          value={selectedSemester}
-          onChange={(e) => setSelectedSemester(e.target.value)}
-          style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
-        >
-          {semesters.map((sem) => (
-            <option key={sem} value={sem}>{sem}</option>
-          ))}
-        </select>
+      <div style={{ marginBottom: "16px", display: "flex", alignItems: "center", gap: "20px" }}>
+        <div>
+          <label htmlFor="semester-select" style={{ fontWeight: "bold", marginRight: "10px" }}>
+            Semester:
+          </label>
+          <select
+            id="semester-select"
+            value={selectedSemester}
+            onChange={(e) => setSelectedSemester(e.target.value)}
+            style={{ padding: "6px 12px", borderRadius: "4px", border: "1px solid #1f2937", fontSize: "14px" }}
+          >
+            {semesters.map((sem) => (
+              <option key={sem} value={sem}>{sem}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ fontWeight: "bold", fontSize: "14px", color: "inherit" }}>
+          Total Credits: <span style={{ color: "#2563eb" }}>{totalCredits}</span>
+        </div>
       </div>
 
       {/* Course info popup */}
