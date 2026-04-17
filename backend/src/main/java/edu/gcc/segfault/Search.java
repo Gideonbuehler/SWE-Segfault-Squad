@@ -18,8 +18,7 @@ public class Search {
         this.history = new Stack<>();
         this.activeFilters = new ArrayList<>();
         this.searchKeywords = new ArrayList<>();
-        Supabase s = new Supabase();
-        conn = s.getConn();
+
     }
     public Search(Connection conn){
         this.originalResults = new HashSet<>();
