@@ -115,6 +115,7 @@ public class Controller {
                 ctx.result("Course conflict");
                 return;
             }
+            //Add specific message for full class?
         });
 
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {

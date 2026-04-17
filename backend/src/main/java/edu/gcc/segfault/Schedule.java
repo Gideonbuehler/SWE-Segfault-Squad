@@ -37,6 +37,8 @@ public class Schedule {
         calendar = new Calendar();
     }
     public boolean addCourse(Course toAdd){
+        //Front end does not give the user an option to
+        //add the class if it is full
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
             calendar.addTimeBlock(toAdd);
