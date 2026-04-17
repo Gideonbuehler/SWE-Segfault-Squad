@@ -1,19 +1,17 @@
 package edu.gcc.segfault;
 
-import net.bytebuddy.asm.Advice;
-
-import javax.security.auth.Subject;
 import java.sql.*;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class Search {
     private Set<Course> originalResults;
     private Stack<Set<Course>> history;
     private ArrayList<Filter> activeFilters;
     private ArrayList<String> searchKeywords;
-    private Connection conn;
+    private Connection conn = null;
 
     public Search(){
         this.originalResults = new HashSet<>();
@@ -22,6 +20,13 @@ public class Search {
         this.searchKeywords = new ArrayList<>();
         Supabase s = new Supabase();
         conn = s.getConn();
+    }
+    public Search(Connection conn){
+        this.originalResults = new HashSet<>();
+        this.history = new Stack<>();
+        this.activeFilters = new ArrayList<>();
+        this.searchKeywords = new ArrayList<>();
+        this.conn = conn;
     }
 
     /**
@@ -104,6 +109,8 @@ public class Search {
         } catch (SQLException e) {
 
         }
+        history.push(returnedCourses);
+        originalResults = returnedCourses;
         return returnedCourses;
 
     }

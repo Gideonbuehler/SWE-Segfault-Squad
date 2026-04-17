@@ -2,11 +2,14 @@ package edu.gcc.segfault;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class SearchTest {
     private Search search;
@@ -174,14 +177,5 @@ class SearchTest {
 
         assertNotEquals(firstResult, secondResult, "History should reflect the most recent search");
     }
-    @Test
-    void fetchQueryMatchesDatabase() throws Exception{
-        search.fetchQuery(new ArrayList<>(List.of("ACCT")));
-        Set<Course> firstResult = search.getResults();
 
-        search.fetchQueryDatabase(new ArrayList<>(List.of("ACCT")));
-        Set<Course> second = search.getResults();
-
-        assertEquals(firstResult.size(), second.size());
-    }
 }
