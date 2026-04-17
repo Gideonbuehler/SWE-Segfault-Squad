@@ -11,11 +11,9 @@ public class Controller {
     public static User user = new User();
 
     static {
-        ArrayList<String> tempMinors = new ArrayList<>();
-        tempMinors.add("Buisiness");
-        user.setProfile(new Profile("Freshman", "Computer Science", tempMinors, null));
-        user.setSchedule(new Schedule("F25"));  // Claude
+        user.setProfile(new Profile("FRESHMAN", "COMPUTER SCIENCE", new ArrayList<>(List.of("BUISINESS")), null));
     }
+
     public static void routeManager (Javalin app){
         // routes for search pages
         app.get("/searchResults", ctx -> ctx.json(user.getLastSearchResults()));
@@ -28,7 +26,12 @@ public class Controller {
 
 
         //routes for profile
-        app.get("/profile", ctx -> ctx.json(user.getProfile()));
+        app.get("/profile", ctx -> {try {
+            ctx.json(user.getProfile());
+        } catch (Exception e) {
+            e.printStackTrace();
+            ctx.status(500).result("JSON ERROR: " + e.getMessage());
+        }});
         //Structure this by a route for each thing to change?
         //allow the user to update their major
         app.post("/profile/major/{major}", ctx -> {
@@ -41,21 +44,38 @@ public class Controller {
             }
         });
         //update minors one at a time
-        app.post("/profile/minors/{minors}", ctx -> {
-            String change = ctx.pathParam("minors");
-            if(user.getProfile().addMinor(change)){
-                ctx.status(201);
-            }
+        app.post("/api/profile/minors/{minors}", ctx -> {
+            try {
+                String change = ctx.pathParam("minors");
 
+                System.out.println("user: " + user);
+                System.out.println("profile: " + (user != null ? user.getProfile() : "user is null"));
+
+                boolean added = user.getProfile().addMinor(change);
+
+                if (added) {
+                    ctx.status(200).json(user.getProfile());
+                } else {
+                    ctx.status(400).result("Minor already exists");
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace(); // 🔥 THIS WILL TELL US EXACTLY
+                ctx.status(500).result("Server Error");
+            }
         });
         app.delete("/profile/minors/{minor}", ctx -> {
             String change = ctx.pathParam("minor");
             if(user.getProfile().deleteMinor(change)){
-                ctx.status(201);
+                System.out.println("deleted " + change);
+                ctx.status(200);
+            }
+            else {
+                ctx.status(404).result("Minor was not removed from the list");
             }
         });
         //update graduation year
-        app.post("/profile/{year}", ctx -> {
+        app.post("/profile/year/{year}", ctx -> {
             String change = ctx.pathParam("year");
             if(user.getProfile().updateYear(change)){
                 ctx.status(201);
@@ -65,7 +85,7 @@ public class Controller {
             }
         });
         //Need to update the completed courses by a list or one at a time?
-        app.post("/profile/{completedCourses}", ctx -> {
+        app.post("/profile/completedCourses/{completedCourses}", ctx -> {
             String change = ctx.pathParam("completedCourses");
             if(user.getProfile().updateYear(change)){
                 ctx.status(201);
@@ -73,6 +93,7 @@ public class Controller {
             else{
                 ctx.status(400);
             }
+            ctx.json(user.getProfile());
         });
 
         //routes for calendar

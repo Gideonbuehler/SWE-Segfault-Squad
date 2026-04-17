@@ -1,72 +1,98 @@
 import { useState, useEffect } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 function ProfilePage({ darkMode, setDarkMode }) {
   const [profile, setProfile] = useState(null);
   const[formData, setFormData] = useState(null);
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!formData) return;
 
-     setProfile(prev => ({
-    ...prev,
-    year: formData.year
-  }));
-    if (formData.major.trim() === "") return;
+  try {
+    let hasChanges = false;
 
+    // Update Major
+    if (formData.major && formData.major.trim() !== "") {
+      const majorValue = formData.major.trim().toUpperCase();
+      const res = await fetch(`/api/profile/major/${encodeURIComponent(majorValue)}`, {
+        method: "POST",
+      });
 
-   
+      if (res.ok) {
+        hasChanges = true;
+      } else {
+        console.error("Major update failed:", await res.text());
+      }
+    }
 
+    // Update Year
+    if (formData.year) {
+      const res = await fetch(`/api/profile/year/${encodeURIComponent(formData.year)}`, {
+        method: "POST",
+      });
 
-  setProfile(prev => ({
-    ...prev,
-    major: formData.major
-  }));
+      if (res.ok) {
+        hasChanges = true;
+      } else {
+        console.error("Year update failed:", await res.text());
+      }
+    }
 
-  setProfile(prev => ({
-    ...prev,
-    minors: formData.minors
-  }));
-  };
+    // Only refresh from backend if we actually tried to make changes
+    if (hasChanges) {
+      await fetchProfile();        // Now safe to refresh
+    }
 
-  //if (formData.minors.trim() === "") return;
-  
-   const fetchProfile = async () => {
-    
+  } catch (error) {
+    console.error("Submit error:", error);
+  }
+};
+
+  const fetchProfile = async () => {
     const response = await fetch(`/api/profile/`, { method: "GET" });
     const data = await response.json();
     setProfile(data);
     setFormData(data);
   };
 
-  const helperForMinors = async (toAddOrDelete) => {
-    const data = null;
-    if(formData.minors.includes(toAddOrDelete)){
-      const response = await fetch(`/api/minors/${toAddOrDelete}`, { method: "DELETE" });
-      data = await response.json();
-    }
-    else{
-      const response = await fetch(`/api/minors/${toAddOrDelete}`, { method: "POST" });
-      data = await response.json();
-    }
-    setProfile(data);
-    fetchProfile();
-  }
-
   useEffect(() => {
     fetchProfile();
   }, []);
-
+  
   return (
     <div>
       <h1>Profile</h1>
       <div className="card">
-        <h1>Major: {profile?.year}</h1>
-        <h1>Major: {profile?.major}</h1>
-        <h1>Minors: {profile?.minors}</h1>
-
+        <h2>Year: {profile?.year}</h2>
+        <h2>Major: {profile?.major}</h2>
+        <h2>Minor: {profile?.minors}</h2>
+        <h2>Completed Courses: {profile?.completedCourses}</h2>
       </div>
       <div className="card">
         <p>User information will appear here.</p>
         <form onSubmit={handleSubmit}>
+          <label>Update Major</label>
+          <input 
+          type="text"
+          value={formData?.major || ""}
+          onChange={(e) => setFormData(prev => ({
+      ...prev,
+      major: e.target.value.toUpperCase()
+    }))
+}
+          />
+          <br />
+          <label>Update Minor</label>
+          <input 
+          type="text"
+          value={formData?.minors || ""}
+          onChange={(e) => setFormData(prev => ({
+      ...prev,
+      minors: e.target.value.toUpperCase()
+    }))
+}
+          />
+          <br />
           <div style={{marginBottom: "7px"}}>
           <label> Change Year</label>
           <select
@@ -84,44 +110,8 @@ function ProfilePage({ darkMode, setDarkMode }) {
           <option value="SENIOR">SENIOR</option>
           </select>
           </div>
-          <br />
-          <div style={{marginBottom: "7px"}}>
-          <label>Update Major</label>
-          <input 
-          type="text"
-          value={formData?.major || ""}
-           onChange={(e) => {
-              setFormData(prev => ({
-      ...prev,
-      major: e.target.value.toUpperCase()
-    }));
-  }}
-          />
-          </div>
-        
-          <br />
-          <div style={{marginBottom: "7px"}}>
-          <label> Edit Minors</label>
-          <input 
-          type="text"
-          value={formData?.minors}
-          onChange={(e) => helperForMinors(e.target.value)
 
-  }
-
-          />
-          {/* Make an add to completed courses on search page? */}
-          {/* <label> Add Completed Course</label>
-          <input 
-          type="text"
-          value={profile?.compltedCourses}
-          onChange={(e) => setFormData(prev => ({
-      ...prev,
-      compltedCourses: e.target.value
-    }))
-  }
-          /> */}
-          </div>
+          
           <br />
            <button type="submit" style={{
           marginTop: "16px",
@@ -129,6 +119,8 @@ function ProfilePage({ darkMode, setDarkMode }) {
           borderRadius: "4px",
           border: "none",
           cursor: "pointer"}}>Submit</button>
+
+          
         </form>
           
       </div>
