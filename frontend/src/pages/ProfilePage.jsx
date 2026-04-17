@@ -4,6 +4,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 function ProfilePage({ darkMode, setDarkMode }) {
   const [profile, setProfile] = useState(null);
   const[formData, setFormData] = useState(null);
+  //I wrote my own logic for handleSubmit, but it was extreamly broken. Started trying
+  //to diagnose it with AI and write my own fix. Eventually just copied the handleSubmit
+  //that AI generated, though based on my origional work.
  const handleSubmit = async (e) => {
   e.preventDefault();
   if (!formData) return;
