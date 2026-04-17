@@ -34,7 +34,9 @@ public class Profile {
      */
     public boolean updateYear(String year) {
         year = year.toUpperCase();
-        this.year = year;
+        if(year.equals("FRESHMAN") || year.equals("SOPHOMORE") || year.equals("JUNIOR") || year.equals("SENIOR") || year.equals("SUPER SENIOR")) {
+            this.year = year;
+        }
         return this.year.equals(year);
     }
 
