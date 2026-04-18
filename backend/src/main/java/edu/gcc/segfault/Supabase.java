@@ -22,33 +22,38 @@ public class Supabase {
     }
 
     public Supabase() {
-
         try {
             conn = connect();
+            setUpTable();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("This is where it's failing");
         }
-        setUpTable();
+
     }
 
     private void setUpTable() {
         //Combines the searching table data into one cell so that we can
         //search for substrings just once.
-        String ps = "ALTER TABLE CourseOfferings\n" +
-                "ADD COLUMN search_text TEXT;";
+        String ps = "ALTER TABLE CourseOfferings2\n" +
+                "ADD COLUMN IF NOT EXISTS search_text TEXT;";
         try {
             PreparedStatement pstmt = conn.prepareStatement(ps);
-            pstmt.executeQuery();
+            pstmt.executeUpdate();
         } catch (SQLException e) {
-
+            e.printStackTrace();
         }
-        String statement = "UPDATE CourseOfferings\n" +
-                "SET search_text = name || ' ' || description || ' ' || professor || ' ' || subject || ' ' || number;";
+        String statement = "UPDATE CourseOfferings2\n" +
+                "SET search_text =\n" +
+                "    COALESCE(name, '') || ' ' ||\n" +
+                "    COALESCE(description, '') || ' ' ||\n" +
+                "    COALESCE(faculty, '') || ' ' ||\n" +
+                "    COALESCE(subject, '') || ' ' ||\n" +
+                "    COALESCE(number::text, '');";
         try {
             PreparedStatement pstmt = conn.prepareStatement(statement);
-            pstmt.executeQuery();
+            pstmt.executeUpdate();
         } catch (SQLException e) {
-
+            e.printStackTrace();
         }
 
     }
@@ -78,15 +83,21 @@ public class Supabase {
     public Connection getConn() {
         return conn;
     }
-
+    //AI Generated
     public static Dotenv loadDotenv() {
         File dir = new File(System.getProperty("user.dir"));
+        System.out.println("Starting dir: " + dir.getAbsolutePath());
 
         while (dir != null) {
+            System.out.println("Checking: " + dir.getAbsolutePath());
             File envFile = new File(dir, ".env");
+
             if (envFile.exists()) {
+                System.out.println("FOUND .env at: " + dir);
                 return Dotenv.configure()
-                        .directory(dir.getAbsolutePath())
+                        .directory(dir.getPath()) // <-- use getPath(), not getAbsolutePath()
+                        .ignoreIfMalformed()
+                        .ignoreIfMissing()
                         .load();
             }
             dir = dir.getParentFile();

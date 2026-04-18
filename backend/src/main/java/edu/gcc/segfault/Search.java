@@ -71,45 +71,52 @@ public class Search {
 
     public Set<Course> fetchQueryDatabase(ArrayList<String> searchKeywords) {
         Set<Course> returnedCourses = new HashSet<>();
-        String preparedStatement = "SELECT * FROM CourseOfferings2 WHERE search_text ILIKE ?";
+        StringBuilder preparedStatement = new StringBuilder("SELECT * FROM courseofferings2 WHERE search_text ILIKE ?");
         //Used chatGPT to optimize and safeten the sql search
         for (int i = 1; i < searchKeywords.size(); i++) {
-            preparedStatement += " OR search_text ILIKE ?";
+            preparedStatement.append(" OR search_text ILIKE ?");
         }
         try {
-            PreparedStatement pstmt = conn.prepareStatement(preparedStatement);
+            PreparedStatement pstmt = conn.prepareStatement(preparedStatement.toString());
             for (int i = 1; i <= searchKeywords.size(); i++) {
                 pstmt.setString(i, "%" + searchKeywords.get(i - 1) + "%");
             }
             //end chatgpt direct influence
             Statement s = conn.createStatement();
             //Get results
+            System.out.println(pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 //fix times to the correct data structure
                 String times = rs.getString("times");
                 LinkedHashMap<String, LocalTime[]> dayTimeMap = new LinkedHashMap<>();
-                Scanner sc = new Scanner(times);
-                sc.useDelimiter(";");
-                while (sc.hasNext()) {
-                    Scanner c = new Scanner(sc.nextLine());
-                    String day = c.next();
-                    LocalTime start = LocalTime.parse(c.next());
-                    LocalTime end = LocalTime.parse(c.next());
-                    LocalTime[] time = new LocalTime[2];
-                    time[0] = start;
-                    time[1] = end;
-                    dayTimeMap.put(day, time);
+                if (times != null && !times.isEmpty()) {
+                    String[] entries = times.split(";");
+
+                    for (String entry : entries) {
+                        String[] parts = entry.trim().split("\\s+");
+
+                        if (parts.length == 3) {
+                            String day = parts[0];
+                            LocalTime start = LocalTime.parse(parts[1]);
+                            LocalTime end = LocalTime.parse(parts[2]);
+
+                            dayTimeMap.put(day, new LocalTime[]{start, end});
+                        }
+                    }
                 }
-                //creat the course from the row of data
-                Course c = new Course(rs.getString("subject") + rs.getString("number") + rs.getString("section"), rs.getString("name"), rs.getString("professor"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), dayTimeMap, rs.getInt("credits"), rs.getBoolean("isOpen"), rs.getBoolean("isLab"), rs.getInt("openSeats"), rs.getInt("totalSeats"), rs.getString("description"));
+                System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
+
+                //create the course from the row of data
+                Course c = new Course(rs.getString("subject") + rs.getString("number") + rs.getString("section"), rs.getString("name"), rs.getString("faculty"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), dayTimeMap, rs.getInt("credits"), rs.getBoolean("is_open"), rs.getBoolean("is_lab"), rs.getInt("open_seats"), rs.getInt("total_seats"), rs.getString("description"));
                 returnedCourses.add(c);
             }
         } catch (SQLException e) {
-
+            e.printStackTrace();
         }
         history.push(returnedCourses);
         originalResults = returnedCourses;
+        System.out.println(returnedCourses);
         return returnedCourses;
 
     }
@@ -186,5 +193,10 @@ public class Search {
 
     public Set<Course> getOriginalResults(){
         return originalResults;
+    }
+
+    public static void main(String[] args) {
+        Search s = new Search((new Supabase()).getConn());
+        s.fetchQueryDatabase(new ArrayList<String>(List.of("TENNIS")));
     }
 }
