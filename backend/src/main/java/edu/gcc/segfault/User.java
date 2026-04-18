@@ -13,7 +13,10 @@ public class User {
 
 
     public User(){
+        profile = new Profile("Freshman", "Computer Science", new ArrayList<>(), new ArrayList<>());
+        lastSearchResults = new Search();
         schedule = new Schedule("F25");
+        userName = "Test";
     }
     public void addCourse(Course toAdd){
 

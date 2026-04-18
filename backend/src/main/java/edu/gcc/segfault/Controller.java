@@ -13,7 +13,7 @@ public class Controller {
 //    static {
 //        user.setProfile(new Profile("FRESHMAN", "COMPUTER SCIENCE", new ArrayList<>(List.of("BUISINESS")), null));
 //    }
-private final UserService userService;
+    private final UserService userService;
 
     public Controller(UserService userService) {
         this.userService = userService;
@@ -24,14 +24,18 @@ private final UserService userService;
 
         app.post("/searchResults/{searchParameters}", ctx -> {
             String results = ctx.pathParam("searchParameters");
-            ctx.json(userService.getUser().searchCourses(results));
+            if(userService.getUser() !=null) {
+                ctx.json(userService.getUser().searchCourses(results));
+            }
             ctx.status(201);
         });
 
 
         //routes for profile
         app.get("/profile", ctx -> {try {
-            ctx.json(userService.getUser().getProfile());
+            if(userService.getUser() != null) {
+                ctx.json(userService.getUser().getProfile());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             ctx.status(500).result("JSON ERROR: " + e.getMessage());
@@ -48,12 +52,30 @@ private final UserService userService;
             }
         });
         app.post("/profile/minor/{minor}", ctx -> {
-            String change = ctx.pathParam("minor");
-            if(userService.getUser().getProfile().updateMinor(change)){
-                ctx.status(201);
-            }
-            else{
-                ctx.status(400);
+            try {
+                System.out.println("Route hit");
+
+                var user = userService.getUser();
+                System.out.println("User: " + user);
+
+                var profile = user.getProfile();
+                System.out.println("Profile: " + profile);
+
+                String change = ctx.pathParam("minor");
+                System.out.println("Minor: " + change);
+
+                boolean updated = profile.updateMinor(change);
+                System.out.println("Updated: " + updated);
+
+                if (updated) {
+                    ctx.status(201).json(Map.of("message", "ok"));
+                } else {
+                    ctx.status(400).json(Map.of("error", "invalid"));
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace(); // 👈 THIS IS THE GOLD
+                ctx.status(500).json(Map.of("error", "server crash"));
             }
         });
         //update minors one at a time
