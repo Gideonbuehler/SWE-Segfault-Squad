@@ -10,6 +10,7 @@ import java.io.File;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Scanner;
 
 public class Main {
     private static ArrayList<Course> courses;
@@ -93,9 +94,13 @@ public class Main {
                     dayTimeMap.put(day, new LocalTime[]{start, end});
                 }
             }
+            String pre;
+            JsonNode prereqs = node.get("prerequisites");
+            pre = prereqs.get(0).asText();
+
 
             return new Course(courseCode, courseName, professor, department,
-                    location, semester, dayTimeMap, credits, isOpen, isLab, openSeats, totalSeats, description);
+                    location, semester, dayTimeMap, credits, isOpen, isLab, openSeats, totalSeats, description, pre);
 
         } catch (Exception e) {
             System.err.println("Failed to parse course: " + node.toString());
