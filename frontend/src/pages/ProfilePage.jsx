@@ -28,6 +28,20 @@ function ProfilePage({ darkMode, setDarkMode }) {
       }
     }
 
+
+     if (formData.minor) {
+        const res = await fetch(`/api/profile/minor/${encodeURIComponent(formData.minor)}`, {
+        method: "POST",
+      });
+
+      if (res.ok) {
+        hasChanges = true;
+      } else {
+        console.error("Minor update failed:", await res.text());
+      }
+    }
+
+
     // Update Year
     if (formData.year) {
       const res = await fetch(`/api/profile/year/${encodeURIComponent(formData.year)}`, {
@@ -68,7 +82,7 @@ function ProfilePage({ darkMode, setDarkMode }) {
       <div className="card">
         <h2>Year: {profile?.year}</h2>
         <h2>Major: {profile?.major}</h2>
-        <h2>Minor: {profile?.minors}</h2>
+        <h2>Minor: {profile?.minor}</h2>
         <h2>Completed Courses: {profile?.completedCourses}</h2>
       </div>
       <div className="card">
@@ -85,15 +99,17 @@ function ProfilePage({ darkMode, setDarkMode }) {
 }
           />
           <br />
-          <label>Update Minor</label>
+           <label>Update Minor</label>
           <input 
           type="text"
-          value={formData?.minors || ""}
+          value={formData?.minor || ""}
           onChange={(e) => setFormData(prev => ({
       ...prev,
-      minors: e.target.value.toUpperCase()
+      minor: e.target.value.toUpperCase()
     }))
 }
+
+
           />
           <br />
           <div style={{marginBottom: "7px"}}>

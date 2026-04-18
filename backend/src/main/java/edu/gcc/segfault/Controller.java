@@ -8,26 +8,30 @@ import java.time.LocalTime;
 import java.util.*;
 
 public class Controller {
-    public static User user = new User();
+//    public static User user = new User();
+//
+//    static {
+//        user.setProfile(new Profile("FRESHMAN", "COMPUTER SCIENCE", new ArrayList<>(List.of("BUISINESS")), null));
+//    }
+private final UserService userService;
 
-    static {
-        user.setProfile(new Profile("FRESHMAN", "COMPUTER SCIENCE", new ArrayList<>(List.of("BUISINESS")), null));
+    public Controller(UserService userService) {
+        this.userService = userService;
     }
-
-    public static void routeManager (Javalin app){
+    public void routeManager (Javalin app){
         // routes for search pages
-        app.get("/searchResults", ctx -> ctx.json(user.getLastSearchResults()));
+        app.get("/searchResults", ctx -> ctx.json(userService.getUser().getLastSearchResults()));
 
         app.post("/searchResults/{searchParameters}", ctx -> {
             String results = ctx.pathParam("searchParameters");
-            ctx.json(user.searchCourses(results));
+            ctx.json(userService.getUser().searchCourses(results));
             ctx.status(201);
         });
 
 
         //routes for profile
         app.get("/profile", ctx -> {try {
-            ctx.json(user.getProfile());
+            ctx.json(userService.getUser().getProfile());
         } catch (Exception e) {
             e.printStackTrace();
             ctx.status(500).result("JSON ERROR: " + e.getMessage());
@@ -36,7 +40,16 @@ public class Controller {
         //allow the user to update their major
         app.post("/profile/major/{major}", ctx -> {
             String change = ctx.pathParam("major");
-            if(user.getProfile().updateMajor(change)){
+            if(userService.getUser().getProfile().updateMajor(change)){
+                ctx.status(201);
+            }
+            else{
+                ctx.status(400);
+            }
+        });
+        app.post("/profile/minor/{minor}", ctx -> {
+            String change = ctx.pathParam("minor");
+            if(userService.getUser().getProfile().updateMinor(change)){
                 ctx.status(201);
             }
             else{
@@ -44,29 +57,30 @@ public class Controller {
             }
         });
         //update minors one at a time
+        //AI to debug
         app.post("/api/profile/minors/{minors}", ctx -> {
             try {
                 String change = ctx.pathParam("minors");
 
-                System.out.println("user: " + user);
-                System.out.println("profile: " + (user != null ? user.getProfile() : "user is null"));
+                System.out.println("user: " + userService.getUser());
+                System.out.println("profile: " + (userService.getUser() != null ? userService.getUser().getProfile() : "user is null"));
 
-                boolean added = user.getProfile().addMinor(change);
+                boolean added = userService.getUser().getProfile().addMinor(change);
 
                 if (added) {
-                    ctx.status(200).json(user.getProfile());
+                    ctx.status(200).json(userService.getUser().getProfile());
                 } else {
                     ctx.status(400).result("Minor already exists");
                 }
 
             } catch (Exception e) {
-                e.printStackTrace(); // 🔥 THIS WILL TELL US EXACTLY
+                e.printStackTrace();
                 ctx.status(500).result("Server Error");
             }
         });
         app.delete("/profile/minors/{minor}", ctx -> {
             String change = ctx.pathParam("minor");
-            if(user.getProfile().deleteMinor(change)){
+            if(userService.getUser().getProfile().deleteMinor(change)){
                 System.out.println("deleted " + change);
                 ctx.status(200);
             }
@@ -77,7 +91,7 @@ public class Controller {
         //update graduation year
         app.post("/profile/year/{year}", ctx -> {
             String change = ctx.pathParam("year");
-            if(user.getProfile().updateYear(change)){
+            if(userService.getUser().getProfile().updateYear(change)){
                 ctx.status(201);
             }
             else{
@@ -87,22 +101,25 @@ public class Controller {
         //Need to update the completed courses by a list or one at a time?
         app.post("/profile/completedCourses/{completedCourses}", ctx -> {
             String change = ctx.pathParam("completedCourses");
-            if(user.getProfile().updateYear(change)){
+            if(userService.getUser().getProfile().updateYear(change)){
                 ctx.status(201);
             }
             else{
                 ctx.status(400);
             }
-            ctx.json(user.getProfile());
+            ctx.json(userService.getUser().getProfile());
         });
 
         //routes for calendar
         //Need to get the calendar from the schedule?
-        app.get("/calendar", ctx -> ctx.json(user.getSchedule().getCalendar()));
+        app.get("/calendar", ctx -> ctx.json(userService.getUser().getSchedule().getCalendar()));
 
         //routes for schedule
-        app.get("/mySchedule", ctx -> ctx.json(user.getSchedule()));
-
+        app.get("/mySchedule", ctx -> {
+            User user = new User();
+            var schedule = user.getSchedule();
+            ctx.json(schedule != null ? schedule : Collections.emptyList());
+        });
         app.post("/mySchedule/add/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
@@ -123,7 +140,7 @@ public class Controller {
                 return;
             }
 
-            if (user.getSchedule().addCourse(toAdd)) {
+            if (userService.getUser().getSchedule().addCourse(toAdd)) {
                 ctx.status(201);
                 ctx.result("Course added");
                 return;
@@ -137,7 +154,7 @@ public class Controller {
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
-            ArrayList<Course> courses = user.getSchedule().getCourses();
+            ArrayList<Course> courses = userService.getUser().getSchedule().getCourses();
             System.out.println("Current courses: " + courses);
             Course toRemove = null;
             for (Course c : courses) {
@@ -154,14 +171,14 @@ public class Controller {
                 return;
             }
 
-            user.getSchedule().removeCourse(toRemove);
+            userService.getUser().getSchedule().removeCourse(toRemove);
             ctx.status(200);
             ctx.result("Course removed");
         });
 
         app.post("/searchResults/{searchParameters}/filter", ctx -> {
 
-            if (user.getLastSearchResults() == null) {
+            if (userService.getUser().getLastSearchResults() == null) {
                 ctx.status(400);
                 ctx.result("No search results to filter");
                 return;
@@ -192,27 +209,27 @@ public class Controller {
             if (description != null && !description.isEmpty())
                 filter.setDescriptionKeywords(new String[]{description});
 
-            user.getLastSearchResults().addFilter(filter);
-            user.getLastSearchResults().applyFilters();
-            ctx.json(user.getLastSearchResults().getResults());
+            userService.getUser().getLastSearchResults().addFilter(filter);
+            userService.getUser().getLastSearchResults().applyFilters();
+            ctx.json(userService.getUser().getLastSearchResults().getResults());
 
 
             ctx.status(200);
         });
 
         app.get("/noFilters", ctx -> {
-            if (user.getLastSearchResults() == null) {
+            if (userService.getUser().getLastSearchResults() == null) {
                 ctx.status(400);
                 ctx.result("No search results to filter");
                 return;
             }
 
-            ctx.json(user.getLastSearchResults().getOriginalResults());
+            ctx.json(userService.getUser().getLastSearchResults().getOriginalResults());
             ctx.status(200);
         });
 
         app.post("/filterResults/{searchParameters}/filter", ctx -> {
-            if (user.getLastSearchResults() == null) {
+            if (userService.getUser().getLastSearchResults() == null) {
                 ctx.status(400);
                 ctx.result("No search results to filter");
                 return;
@@ -248,11 +265,11 @@ public class Controller {
                 filter.setEndTimes(new LocalTime[]{LocalTime.parse(endTime)});
 
 
-            user.getLastSearchResults().clearFilters();
-            user.getLastSearchResults().getActiveFilters().clear();
-            user.getLastSearchResults().addFilter(filter);
-            user.getLastSearchResults().applyFilters();
-            ctx.json(user.getLastSearchResults().getResults());
+            userService.getUser().getLastSearchResults().clearFilters();
+            userService.getUser().getLastSearchResults().getActiveFilters().clear();
+            userService.getUser().getLastSearchResults().addFilter(filter);
+            userService.getUser().getLastSearchResults().applyFilters();
+            ctx.json(userService.getUser().getLastSearchResults().getResults());
 
             ctx.status(200);
         });
@@ -260,7 +277,7 @@ public class Controller {
 
         app.get("/mySchedule/pdf", ctx -> {
             try {
-                user.getSchedule().makePDF();
+                userService.getUser().getSchedule().makePDF();
                 File pdfFile = new File("Schedule.pdf");
                 ctx.contentType("application/pdf");
                 ctx.header("Content-Disposition", "attachment; filename=Schedule.pdf");

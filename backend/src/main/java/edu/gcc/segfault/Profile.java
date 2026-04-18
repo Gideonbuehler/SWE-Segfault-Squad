@@ -12,6 +12,8 @@ public class Profile {
     private String major;
     //minors are standardized in capital letters to make it easier to check them
     private ArrayList<String> minors;
+    //Only allowing the user to prioritize one minor
+    private String minor;
     private ArrayList<Course> completedCourses;
 
 
@@ -22,6 +24,7 @@ public class Profile {
         for(String m : minors){
             this.minors.add(m.toUpperCase());
         }
+        minor = "BUSINESS";
         completedCourses = courses;
     }
 
@@ -74,6 +77,12 @@ public class Profile {
             return true;
         }
         return false;
+    }
+
+    public boolean updateMinor(String m){
+        m = m.toUpperCase();
+        this.minor = m;
+        return true;
     }
 
     public boolean addCompletedCourses(ArrayList<Course> completedCourses) {

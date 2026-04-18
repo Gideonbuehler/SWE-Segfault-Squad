@@ -12,6 +12,9 @@ public class User {
     private Set<Course> originalResults;
 
 
+    public User(){
+        schedule = new Schedule("F25");
+    }
     public void addCourse(Course toAdd){
 
     }
