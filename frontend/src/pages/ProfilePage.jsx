@@ -28,11 +28,13 @@ function ProfilePage({ darkMode, setDarkMode }) {
       }
     }
 
-
-     if (formData.minor) {
+    
+     if (formData.minor && formData.minor.trim() !== "") {
         const res = await fetch(`/api/profile/minor/${encodeURIComponent(formData.minor)}`, {
         method: "POST",
       });
+      console.log(res.ok);
+    
 
       if (res.ok) {
         hasChanges = true;
@@ -76,6 +78,12 @@ function ProfilePage({ darkMode, setDarkMode }) {
     fetchProfile();
   }, []);
   
+  useEffect(() => {
+  if (profile) {
+    setFormData(profile);
+  }
+}, [profile]);
+
   return (
     <div>
       <h1>Profile</h1>
@@ -107,10 +115,8 @@ function ProfilePage({ darkMode, setDarkMode }) {
       ...prev,
       minor: e.target.value.toUpperCase()
     }))
-}
-
-
-          />
+}/>
+          
           <br />
           <div style={{marginBottom: "7px"}}>
           <label> Change Year</label>
