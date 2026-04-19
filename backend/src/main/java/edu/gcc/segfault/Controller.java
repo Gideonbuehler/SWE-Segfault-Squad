@@ -65,13 +65,16 @@ public class Controller {
                 System.out.println("Minor: " + change);
 
                 boolean updated = profile.updateMinor(change);
+                System.out.println("Printing minor:" + user.getProfile().getMinor());
                 System.out.println("Updated: " + updated);
+                System.out.println("I can print after updated");
 
                 if (updated) {
                     ctx.status(201).json(Map.of("message", "ok"));
                 } else {
                     ctx.status(400).json(Map.of("error", "invalid"));
                 }
+
 
             } catch (Exception e) {
                 e.printStackTrace(); // 👈 THIS IS THE GOLD

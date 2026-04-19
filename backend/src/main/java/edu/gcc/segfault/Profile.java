@@ -120,5 +120,12 @@ public class Profile {
         return completedCourses;
     }
 
+    public String getMinor() {
+        return minor;
+    }
+
+    public void setMinor(String minor) {
+        this.minor = minor;
+    }
 }
 
