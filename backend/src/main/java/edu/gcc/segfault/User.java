@@ -20,6 +20,7 @@ public class User {
 
     }
 
+
     public Search searchCourses(String search) {
         //Search s = new Search();
             Search s = new Search((new Supabase()).getConn());
