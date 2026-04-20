@@ -37,3 +37,55 @@ html.dark select {
   color: #f9fafb;
   border-color: #374151;
 }
+
+/* Search results table */
+html.dark tbody tr:nth-child(even) {
+  background-color: #1f2937;
+  color: #f9fafb;
+}
+
+html.dark tbody tr:nth-child(odd) {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+html.dark td {
+  color: #f9fafb;
+}
+
+/* Calendar event popup card */
+html.dark .card {
+  background-color: #1f2937;
+  color: #f9fafb;
+  border-color: #374151;
+}
+
+/* Inline popup in CalendarPage (the selectedCourse card with explicit bg) */
+html.dark [style*="background-color: rgb(240, 244, 255)"],
+html.dark [style*="background-color: #f0f4ff"] {
+  background-color: #1f2937 !important;
+  color: #f9fafb !important;
+  border-color: #374151 !important;
+}
+
+/* Table header */
+html.dark table thead tr {
+  background-color: #374151;
+}
+
+/* FullCalendar overrides */
+html.dark .fc {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+html.dark .fc-col-header-cell,
+html.dark .fc-timegrid-slot,
+html.dark .fc-scrollgrid {
+  border-color: #374151 !important;
+}
+
+html.dark .fc-col-header-cell-cushion,
+html.dark .fc-timegrid-slot-label-cushion {
+  color: #f9fafb;
+}

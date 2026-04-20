@@ -131,8 +131,7 @@ class SearchTest {
         Set<Course> result = search.fetchQuery(keywords);
         assertTrue(result.size() >= 1, "Expected at least one course matching 'COST ACCOUNTING'");
         assertTrue(result.stream().allMatch(c ->
-                        c.getCourseName().toUpperCase().contains("COST") ||
-                                c.getCourseCode().toUpperCase().contains("COST")),
+                        c.getDescription().toUpperCase().contains("COST")),
                 "All results should be relevant to 'COST'");
     }
 

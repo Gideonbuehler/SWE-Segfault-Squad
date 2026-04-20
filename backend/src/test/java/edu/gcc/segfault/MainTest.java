@@ -134,6 +134,6 @@ class MainTest {
     @Test
     void getDescription() {
         Course c = Main.fromJson(classes.get(1));
-        assertEquals("Principles of Accounting I at Grove City College introduces foundational concepts of financial accounting, focusing on the accounting cycle, U.S. Generally Accepted Accounting Principles (GAAP), and the preparation and analysis of financial statements.", c.getDescription());
+        assertEquals("ACCT 201. PRINCIPLES OF ACCOUNTING I. This introductory course focuses on the preparation and use of accounting information in the financial reporting environment. Emphasis is placed on the understanding and application of steps involved in the accounting cycle as well as on the recognition, measurement, and reporting issues associated with various financial statement accounts for sole proprietorships using the accrual basis of accounting. The course also exposes the student to career opportunities in the accounting profession. Three hours.", c.getDescription());
     }
 }

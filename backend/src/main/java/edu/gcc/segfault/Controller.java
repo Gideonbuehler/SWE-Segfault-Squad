@@ -100,6 +100,7 @@ public class Controller {
                 }
             }
 
+            // Change to enum!!!
             if (toAdd == null) {
                 ctx.status(404);
                 ctx.result("Course not found");
@@ -115,6 +116,7 @@ public class Controller {
                 ctx.result("Course conflict");
                 return;
             }
+            //Add specific message for full class?
         });
 
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
