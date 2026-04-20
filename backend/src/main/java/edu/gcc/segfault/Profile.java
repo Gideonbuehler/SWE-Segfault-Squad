@@ -15,6 +15,7 @@ public class Profile {
     //Only allowing the user to prioritize one minor
     private String minor;
     private ArrayList<Course> completedCourses;
+    private ArrayList<String> comp;
 
 
     public Profile(String schoolYear, String major, ArrayList<String> minors, ArrayList<Course> courses){
@@ -101,6 +102,16 @@ public class Profile {
             }
         }
         return true;
+    }
+    public boolean setCompletedCourses(ArrayList<Course> completed){
+        comp.clear();
+        for(Course c: completed){
+            String courseCode = c.getCourseCode().substring(0, c.getCourseCode().length() - 2);
+            if(!comp.contains(courseCode)){
+                comp.add(courseCode);
+            }
+        }
+        return false;
     }
 
     //Getters

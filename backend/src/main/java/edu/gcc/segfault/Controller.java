@@ -166,6 +166,7 @@ public class Controller {
             }
 
             if (userService.getUser().getSchedule().addCourse(toAdd)) {
+                userService.getUser().onScheduleChange();
                 ctx.status(201);
                 ctx.result("Course added");
                 return;
@@ -197,6 +198,7 @@ public class Controller {
             }
 
             userService.getUser().getSchedule().removeCourse(toRemove);
+            userService.getUser().onScheduleChange();
             ctx.status(200);
             ctx.result("Course removed");
         });

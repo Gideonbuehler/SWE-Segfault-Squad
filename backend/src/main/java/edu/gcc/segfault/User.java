@@ -79,4 +79,8 @@ public class User {
     public void setUserName(String userName) {
         this.userName = userName;
     }
+
+    public void onScheduleChange(){
+        profile.setCompletedCourses(schedule.getCourses());
+    }
 }
