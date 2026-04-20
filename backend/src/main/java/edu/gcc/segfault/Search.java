@@ -1,19 +1,31 @@
 package edu.gcc.segfault;
 
+import java.sql.*;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 public class Search {
     private Set<Course> originalResults;
     private Stack<Set<Course>> history;
     private ArrayList<Filter> activeFilters;
     private ArrayList<String> searchKeywords;
+    private Connection conn = null;
 
     public Search(){
         this.originalResults = new HashSet<>();
         this.history = new Stack<>();
         this.activeFilters = new ArrayList<>();
         this.searchKeywords = new ArrayList<>();
+
+    }
+    public Search(Connection conn){
+        this.originalResults = new HashSet<>();
+        this.history = new Stack<>();
+        this.activeFilters = new ArrayList<>();
+        this.searchKeywords = new ArrayList<>();
+        this.conn = conn;
     }
 
     /**
@@ -55,6 +67,58 @@ public class Search {
         history.push(query);
         originalResults = query;
         return query;
+    }
+
+    public Set<Course> fetchQueryDatabase(ArrayList<String> searchKeywords) {
+        Set<Course> returnedCourses = new HashSet<>();
+        StringBuilder preparedStatement = new StringBuilder("SELECT * FROM courseofferings2 WHERE search_text ILIKE ?");
+        //Used chatGPT to optimize and safeten the sql search
+        for (int i = 1; i < searchKeywords.size(); i++) {
+            preparedStatement.append(" OR search_text ILIKE ?");
+        }
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(preparedStatement.toString());
+            for (int i = 1; i <= searchKeywords.size(); i++) {
+                pstmt.setString(i, "%" + searchKeywords.get(i - 1) + "%");
+            }
+            //end chatgpt direct influence
+            Statement s = conn.createStatement();
+            //Get results
+            System.out.println(pstmt.toString());
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                //fix times to the correct data structure
+                String times = rs.getString("times");
+                LinkedHashMap<String, LocalTime[]> dayTimeMap = new LinkedHashMap<>();
+                if (times != null && !times.isEmpty()) {
+                    String[] entries = times.split(";");
+
+                    for (String entry : entries) {
+                        String[] parts = entry.trim().split("\\s+");
+
+                        if (parts.length == 3) {
+                            String day = parts[0];
+                            LocalTime start = LocalTime.parse(parts[1]);
+                            LocalTime end = LocalTime.parse(parts[2]);
+
+                            dayTimeMap.put(day, new LocalTime[]{start, end});
+                        }
+                    }
+                }
+                System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
+
+                //create the course from the row of data
+                Course c = new Course(rs.getString("subject") + rs.getString("number") + rs.getString("section"), rs.getString("name"), rs.getString("faculty"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), dayTimeMap, rs.getInt("credits"), rs.getBoolean("is_open"), rs.getBoolean("is_lab"), rs.getInt("open_seats"), rs.getInt("total_seats"), rs.getString("description"));
+                returnedCourses.add(c);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        history.push(returnedCourses);
+        originalResults = returnedCourses;
+        System.out.println(returnedCourses);
+        return returnedCourses;
+
     }
 
     public boolean applyFilters(){
@@ -129,5 +193,10 @@ public class Search {
 
     public Set<Course> getOriginalResults(){
         return originalResults;
+    }
+
+    public static void main(String[] args) {
+        Search s = new Search((new Supabase()).getConn());
+        s.fetchQueryDatabase(new ArrayList<String>(List.of("TENNIS")));
     }
 }
