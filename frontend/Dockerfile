@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 node:20-alpine
+FROM node:20-alpine
 
 
 WORKDIR /app
@@ -11,4 +11,4 @@ COPY . .
 
 EXPOSE 5173
 
-CMD sh -c "node_modules/.bin/vite --host --mode docker"
+CMD ["node_modules/.bin/vite", "--host", "--mode", "docker"]
