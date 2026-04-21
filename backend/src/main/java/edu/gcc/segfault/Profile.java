@@ -12,7 +12,11 @@ public class Profile {
     private String major;
     //minors are standardized in capital letters to make it easier to check them
     private ArrayList<String> minors;
+    //Only allowing the user to prioritize one minor
+    private String minor;
     private ArrayList<Course> completedCourses;
+    private ArrayList<String> comp;
+    private String omg;
 
 
     public Profile(String schoolYear, String major, ArrayList<String> minors, ArrayList<Course> courses){
@@ -22,7 +26,11 @@ public class Profile {
         for(String m : minors){
             this.minors.add(m.toUpperCase());
         }
+        minor = "BUSINESS";
         completedCourses = courses;
+        comp = new ArrayList<>();
+        comp.add("No completed courses yet");
+        omg = "No completed courses yet";
     }
 
     /**
@@ -34,7 +42,9 @@ public class Profile {
      */
     public boolean updateYear(String year) {
         year = year.toUpperCase();
-        this.year = year;
+        if(year.equals("FRESHMAN") || year.equals("SOPHOMORE") || year.equals("JUNIOR") || year.equals("SENIOR") || year.equals("SUPER SENIOR")) {
+            this.year = year;
+        }
         return this.year.equals(year);
     }
 
@@ -44,7 +54,13 @@ public class Profile {
      * @return - true if the major updated
      */
     public boolean updateMajor(String major) {
+        for(int j = 0; j < major.length(); j++){
+            if(Character.isDigit(major.charAt(j))){
+                return false;
+            }
+        }
         this.major = major.toUpperCase();
+
         return this.major.equals(major.toUpperCase());
     }
 
@@ -55,6 +71,11 @@ public class Profile {
      * list already contained that minor
      */
     public boolean addMinor(String minor){
+        for(int j = 0; j < minor.length(); j++){
+            if(Character.isDigit(minor.charAt(j))){
+                return false;
+            }
+        }
         minor = minor.toUpperCase();
         if(!minors.contains(minor)){
             minors.add(minor);
@@ -74,6 +95,17 @@ public class Profile {
         return false;
     }
 
+    public boolean updateMinor(String m){
+        for(int j = 0; j < m.length(); j++){
+            if(Character.isDigit(m.charAt(j))){
+                return false;
+            }
+        }
+        m = m.toUpperCase();
+        this.minor = m;
+        return true;
+    }
+
     public boolean addCompletedCourses(ArrayList<Course> completedCourses) {
         for(Course c : completedCourses){
             if(!this.completedCourses.contains(c)){
@@ -89,6 +121,18 @@ public class Profile {
                 completedCourses.remove(c);
             }
         }
+        return true;
+    }
+    public boolean setCompletedCourses(ArrayList<Course> completed){
+        StringBuilder str = new StringBuilder();
+        for(int i = 0; i < completed.size() - 1; i++){
+            String temp = completed.get(i).getCourseCode();
+            str.append(temp, 0, temp.length() - 2).append(", ");
+        }
+        str.append(completed.getLast().getCourseCode().substring(0, completed.getLast().getCourseCode().length() - 2));
+        omg = str.toString();
+
+
         return true;
     }
 
@@ -109,5 +153,16 @@ public class Profile {
         return completedCourses;
     }
 
+    public String getMinor() {
+        return minor;
+    }
+
+    public void setMinor(String minor) {
+        this.minor = minor;
+    }
+
+    public String getOmg() {
+        return omg;
+    }
 }
 
