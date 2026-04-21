@@ -95,9 +95,11 @@ public class Main {
                     dayTimeMap.put(day, new LocalTime[]{start, end});
                 }
             }
-            String pre;
-            JsonNode prereqs = node.get("prerequisites");
-            pre = prereqs.get(0).asText();
+
+
+            String pre = node.has("prerequisites")
+                    ? node.get("prerequisites").asText()
+                    : "";
 
 
             return new Course(courseCode, courseName, professor, department,
