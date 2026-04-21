@@ -61,7 +61,7 @@ function App() {
             />
             }
           />
-          <Route path="/calendar" element={<CalendarPage />} />
+          <Route path="/calendar" element={<CalendarPage darkMode={darkMode} />} />
           <Route path="/profile" element={<ProfilePage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         </Routes>
       </Layout>
