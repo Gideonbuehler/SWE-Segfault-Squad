@@ -1,3 +1,7 @@
 node_modules
 dist
 .env
+.gradle
+build
+schedules
+data_wolfe.json
