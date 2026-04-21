@@ -170,7 +170,8 @@ public class Controller {
                 ctx.status(201);
                 ctx.result("Course added");
                 return;
-            } else {
+            }
+            else {
                 ctx.status(500);
                 ctx.result("Course conflict");
                 return;

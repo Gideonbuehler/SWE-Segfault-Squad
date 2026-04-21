@@ -16,6 +16,7 @@ public class Profile {
     private String minor;
     private ArrayList<Course> completedCourses;
     private ArrayList<String> comp;
+    private String omg;
 
 
     public Profile(String schoolYear, String major, ArrayList<String> minors, ArrayList<Course> courses){
@@ -27,6 +28,9 @@ public class Profile {
         }
         minor = "BUSINESS";
         completedCourses = courses;
+        comp = new ArrayList<>();
+        comp.add("No completed courses yet");
+        omg = "No completed courses yet";
     }
 
     /**
@@ -104,13 +108,15 @@ public class Profile {
         return true;
     }
     public boolean setCompletedCourses(ArrayList<Course> completed){
-        comp.clear();
-        for(Course c: completed){
-            String courseCode = c.getCourseCode().substring(0, c.getCourseCode().length() - 2);
-            if(!comp.contains(courseCode)){
-                comp.add(courseCode);
-            }
+        StringBuilder str = new StringBuilder();
+        for(int i = 0; i < completed.size() - 1; i++){
+            String temp = completed.get(i).getCourseCode();
+            str.append(temp, 0, temp.length() - 2).append(", ");
         }
+        str.append(completed.getLast().getCourseCode().substring(0, completed.getLast().getCourseCode().length() - 2));
+        omg = str.toString();
+
+
         return false;
     }
 
@@ -137,6 +143,10 @@ public class Profile {
 
     public void setMinor(String minor) {
         this.minor = minor;
+    }
+
+    public String getOmg() {
+        return omg;
     }
 }
 
