@@ -143,9 +143,7 @@ public class Controller {
 
         //routes for schedule
         app.get("/mySchedule", ctx -> {
-            User user = new User();
-            var schedule = user.getSchedule();
-            ctx.json(schedule != null ? schedule : Collections.emptyList());
+            ctx.json(userService.getUser().getSchedule());
         });
         app.post("/mySchedule/add/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
