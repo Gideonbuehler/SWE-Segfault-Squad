@@ -133,7 +133,7 @@ public class Profile {
         omg = str.toString();
 
 
-        return false;
+        return true;
     }
 
     //Getters

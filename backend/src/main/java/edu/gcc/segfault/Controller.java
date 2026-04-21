@@ -22,13 +22,13 @@ public class Controller {
         // routes for search pages
         app.get("/searchResults", ctx -> {
             System.out.println("HIT BACKEND");
-            ctx.json(user.getLastSearchResults());
+            ctx.json(userService.getUser().getLastSearchResults());
         });
 
         app.post("/searchResults/{searchParameters}", ctx -> {
             String results = ctx.pathParam("searchParameters");
             System.out.println("HIT BACKEND");
-            ctx.json(user.searchCourses(results));
+            ctx.json(userService.getUser().searchCourses(results));
             ctx.status(201);
         });
 
@@ -185,7 +185,7 @@ public class Controller {
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
-            ArrayList<Course> courses = user.getSchedule().getCourses();
+            ArrayList<Course> courses = userService.getUser().getSchedule().getCourses();
             Course toRemove = null;
             for (Course c : courses) {
                 if (c.getCourseCode().equalsIgnoreCase(courseCode)
