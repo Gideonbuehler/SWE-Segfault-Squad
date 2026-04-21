@@ -4,7 +4,7 @@ import Layout from "./components/Layout";
 import SearchPage from "./pages/SearchPage";
 import CalendarPage from "./pages/CalendarPage";
 import ProfilePage from "./pages/ProfilePage";
-
+import { ToastProvider } from "./components/useToast.jsx";
 function App() {
 
   // Put queries, results, and filters here to ensure they stay even when leaving Schedule page.
@@ -21,6 +21,10 @@ function App() {
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [selectedSemester, setSelectedSemester] = useState("");
   const [schedule, setSchedule] = useState([]);
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("darkMode") === "true";
+  });
+
 
   const fetchSchedule = async () => {
     const response = await fetch("/api/mySchedule");
@@ -28,10 +32,9 @@ function App() {
     setSchedule(data.courses ?? []);
   };
 
-  const [darkMode, setDarkMode] = useState(false);
-
   useEffect(() => {
-  document.documentElement.classList.toggle("dark", darkMode);
+    document.documentElement.classList.toggle("dark", darkMode);
+    localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
   useEffect(() => {
@@ -40,6 +43,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastProvider>
       <Layout>
         <Routes>
           <Route
@@ -53,6 +57,7 @@ function App() {
                 expandedDescriptions={expandedDescriptions} setExpandedDescriptions={setExpandedDescriptions}
                 selectedSemester={selectedSemester} setSelectedSemester={setSelectedSemester}
                 schedule={schedule} fetchSchedule={fetchSchedule}
+                darkMode={darkMode}
             />
             }
           />
@@ -60,6 +65,7 @@ function App() {
           <Route path="/profile" element={<ProfilePage darkMode={darkMode} setDarkMode={setDarkMode} />} />
         </Routes>
       </Layout>
+      </ToastProvider>
     </BrowserRouter>
   );
 }

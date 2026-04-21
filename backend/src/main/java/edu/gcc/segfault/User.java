@@ -26,9 +26,11 @@ public class User {
 
     }
 
+
     public Search searchCourses(String search) {
-        Search s = new Search();
-        try {
+        //Search s = new Search();
+            Search s = new Search((new Supabase()).getConn());
+            try {
             ArrayList<String> keywords = new ArrayList<>();
             //clean the search words
             String[] searchSplit = search.split(" ");
@@ -36,7 +38,8 @@ public class User {
                 searchSplit[i] = searchSplit[i].replaceAll("\\p{Punct}", "");
             }
             keywords.addAll(List.of(searchSplit));
-            s.fetchQuery(keywords);  // this populates the history stack
+            //s.fetchQuery(keywords);  //this populates the history stack
+            s.fetchQueryDatabase(keywords);
         } catch (Exception e) {
             e.printStackTrace();
         }
