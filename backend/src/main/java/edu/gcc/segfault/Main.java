@@ -23,7 +23,8 @@ public class Main {
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());  // tell Javalin to use it
         }).start(7000);
-        Controller.routeManager(app);
+        Controller controller = new Controller(new UserService());
+        controller.routeManager(app);
 
         Main main = new Main();
         main.run();
