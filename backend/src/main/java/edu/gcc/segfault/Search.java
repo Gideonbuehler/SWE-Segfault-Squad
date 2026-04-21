@@ -118,6 +118,79 @@ public class Search {
 
     }
 
+    public Set<Course> fetchCoursesInSlot(String day, String startTime, String endTime,
+                                          String semester, String keyword) {
+        Set<Course> returnedCourses = new HashSet<>();
+
+        // Match the day-time format from your DB: "M 09:00 09:50; W 09:00 09:50; ..."
+        // We want courses whose meeting on `day` starts >= startTime and ends <= endTime.
+        // SQL regex/LIKE makes this awkward, so we filter in Java after a semester-based query.
+        String sql = "SELECT * FROM courseofferings2 WHERE semester = ?";
+        if (keyword != null && !keyword.isBlank()) {
+            sql += " AND search_text ILIKE ?";
+        }
+
+        try {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, semester);
+            if (keyword != null && !keyword.isBlank()) {
+                pstmt.setString(2, "%" + keyword + "%");
+            }
+
+            ResultSet rs = pstmt.executeQuery();
+            LocalTime slotStart = LocalTime.parse(startTime);
+            LocalTime slotEnd = LocalTime.parse(endTime);
+
+            while (rs.next()) {
+                String times = rs.getString("times");
+                LinkedHashMap<String, LocalTime[]> dayTimeMap = new LinkedHashMap<>();
+                boolean fitsSlot = false;
+
+                if (times != null && !times.isEmpty()) {
+                    for (String entry : times.split(";")) {
+                        String[] parts = entry.trim().split("\\s+");
+                        if (parts.length == 3) {
+                            String d = parts[0];
+                            LocalTime start = LocalTime.parse(parts[1]);
+                            LocalTime end = LocalTime.parse(parts[2]);
+                            dayTimeMap.put(d, new LocalTime[]{start, end});
+
+                            // Check if this meeting fits in the slot
+                            if (d.equals(day)
+                                    && !start.isBefore(slotStart)
+                                    && !end.isAfter(slotEnd)) {
+                                fitsSlot = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!fitsSlot) continue;
+
+                Course c = new Course(
+                        rs.getString("subject") + "-" + rs.getString("number") + "-" + rs.getString("section"),
+                        rs.getString("name"),
+                        rs.getString("faculty"),
+                        rs.getString("subject"),
+                        rs.getString("location"),
+                        rs.getString("semester"),
+                        dayTimeMap,
+                        rs.getInt("credits"),
+                        rs.getBoolean("is_open"),
+                        rs.getBoolean("is_lab"),
+                        rs.getInt("open_seats"),
+                        rs.getInt("total_seats"),
+                        rs.getString("description")
+                );
+                returnedCourses.add(c);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return returnedCourses;
+    }
+
     public boolean applyFilters(){
         if (activeFilters.isEmpty() || history.isEmpty()) {
             return false;

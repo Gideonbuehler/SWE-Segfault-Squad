@@ -60,6 +60,14 @@ function CalendarPage() {
      */
     const [selectedSemester, setSelectedSemester] = useState("");
 
+    /**
+     Slot-picker state (for adding a class to an open timeslot)
+      */
+    const [slotSelection, setSlotSelection] = useState(null); // { day, startTime, endTime }
+    const [slotQuery, setSlotQuery] = useState("");
+    const [slotResults, setSlotResults] = useState([]);
+    const [slotLoading, setSlotLoading] = useState(false);
+
     /* =========================================================
        DERIVED STATE
     ========================================================= */
@@ -109,6 +117,14 @@ function CalendarPage() {
         };
         return map[day];
     };
+
+    /**
+     * Reverse of dayToNumber — turns FullCalendar's day index back into M/T/W/R/F
+     */
+    const numberToDay = (num) => {
+        const map = { 1: "M", 2: "T", 3: "W", 4: "R", 5: "F" };
+        return map[num];
+    };    
 
     /**
      * Converts time → human readable format
@@ -273,6 +289,17 @@ function CalendarPage() {
         fetchCalendar(selectedSemester);
     }, [selectedSemester]);
 
+    /**
+     * Re-run the slot search 300ms after the query/slot changes
+     */
+    useEffect(() => {
+        if (!slotSelection) return;
+        const t = setTimeout(() => {
+            searchForSlot(slotQuery);
+        }, 300);
+        return () => clearTimeout(t);
+    }, [slotQuery, slotSelection]);
+
     /* =========================================================
        EVENT HANDLERS
     ========================================================= */
@@ -321,6 +348,93 @@ function CalendarPage() {
                 type: "error"
             });
         }
+    };
+
+    /**
+     * When the user drags on an empty area of the calendar:
+     * - Capture the day + start/end times
+     * - Open the slot-picker modal
+     */
+    const handleSlotSelect = (info) => {
+        if (!selectedSemester) {
+            toast({ message: "Semester not loaded yet — try again in a moment.", type: "error" });
+            return;
+        }
+        const startDate = info.start;
+        const endDate = info.end;
+        const dayLetter = numberToDay(startDate.getDay());
+
+        if (!dayLetter) {
+            toast({ message: "Please select a weekday (Mon–Fri).", type: "error" });
+            return;
+        }
+
+        const pad = (n) => n.toString().padStart(2, "0");
+        const startStr = `${pad(startDate.getHours())}:${pad(startDate.getMinutes())}`;
+        const endStr = `${pad(endDate.getHours())}:${pad(endDate.getMinutes())}`;
+
+        setSlotSelection({ day: dayLetter, startTime: startStr, endTime: endStr });
+        setSlotQuery("");
+        setSlotResults([]);
+    };
+
+    /**
+     * Search the course catalog and filter to courses that fit the slot.
+     */
+    const searchForSlot = async (q) => {
+    if (!slotSelection) return;
+    if (!selectedSemester) {
+        setSlotResults([]);
+        return;
+    }
+
+    setSlotLoading(true);
+    try {
+        const params = new URLSearchParams({
+            day: slotSelection.day,
+            startTime: slotSelection.startTime,
+            endTime: slotSelection.endTime,
+            semester: selectedSemester,
+        });
+        if (q.trim()) params.append("keyword", q.trim());
+
+        const response = await fetch(`/api/coursesInSlot?${params}`, { method: "GET" });
+        if (!response.ok) { setSlotResults([]); return; }
+        const data = await response.json();
+
+        const sorted = Array.from(data ?? [])
+            .sort((a, b) => a.courseCode.localeCompare(b.courseCode));
+
+        setSlotResults(sorted);
+          } finally {
+              setSlotLoading(false);
+        }
+    };
+
+    /**
+     * Add the chosen course to the schedule and refresh the calendar.
+     */
+    const addCourseToSlot = async (course) => {
+        const response = await fetch(
+            `/api/mySchedule/add/${course.courseCode}/${course.semester}`,
+            { method: "POST" }
+        );
+
+        if (response.ok) {
+            toast({ message: `${course.courseCode} added to schedule!`, type: "success" });
+            closeSlotPicker();
+            await fetchCalendar(selectedSemester);
+        } else if (response.status === 500) {
+            toast({ message: "Failed to add course, it may conflict with an existing course.", type: "error" });
+        } else {
+            toast({ message: "Failed to add course. It may not have been found.", type: "error" });
+        }
+    };
+
+    const closeSlotPicker = () => {
+        setSlotSelection(null);
+        setSlotQuery("");
+        setSlotResults([]);
     };
 
     /**
@@ -402,6 +516,98 @@ function CalendarPage() {
                 </div>
             )}
 
+            {/* ================= SLOT PICKER MODAL ================= */}
+            {slotSelection && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        backgroundColor: "rgba(0,0,0,0.5)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 1000
+                    }}
+                    onClick={closeSlotPicker}
+                >
+                    <div
+                        className="card"
+                        style={{
+                            width: "min(600px, 90vw)",
+                            maxHeight: "80vh",
+                            display: "flex",
+                            flexDirection: "column",
+                            backgroundColor: "white",
+                            color: "#111827",
+                            padding: "20px",
+                            borderRadius: "8px"
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: "12px"
+                        }}>
+                            <h3 style={{ margin: 0 }}>
+                                Add a class — {slotSelection.day}, {formatTime(slotSelection.startTime)} – {formatTime(slotSelection.endTime)}
+                            </h3>
+                            <button onClick={closeSlotPicker}>Close</button>
+                        </div>
+
+                        <input
+                            type="text"
+                            placeholder="Search courses that fit this slot..."
+                            value={slotQuery}
+                            onChange={(e) => setSlotQuery(e.target.value)}
+                            autoFocus
+                            style={{ padding: "8px", marginBottom: "12px" }}
+                        />
+
+                        <div style={{ overflowY: "auto", flex: 1 }}>
+                            {slotLoading && <p>Searching...</p>}
+
+                            {!slotLoading && slotResults.length === 0 && (
+                                <p>
+                                    No courses in <b>{selectedSemester}</b> fit this timeslot
+                                    {slotQuery ? <> matching "<b>{slotQuery}</b>"</> : null}.
+                                </p>
+                            )}
+
+                            {!slotLoading && slotResults.map((course) => {
+                                const days = Object.keys(course.dayTimeMap ?? {}).join(", ");
+                                const firstRange = Object.values(course.dayTimeMap ?? {})[0];
+                                const timeLabel = Array.isArray(firstRange)
+                                    ? `${formatTime(firstRange[0])} – ${formatTime(firstRange[1])}`
+                                    : "TBA";
+
+                                return (
+                                    <div
+                                        key={`${course.courseCode}-${course.semester}`}
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            padding: "10px",
+                                            borderBottom: "1px solid #e5e7eb"
+                                        }}
+                                    >
+                                        <div>
+                                            <div><b>{course.courseCode}</b> — {course.courseName}</div>
+                                            <div style={{ fontSize: "13px", color: "#4b5563" }}>
+                                                {course.professor} • {days} • {timeLabel} • {course.credits} cr
+                                            </div>
+                                        </div>
+                                        <button onClick={() => addCourseToSlot(course)}>Add</button>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* ================= PDF BUTTON ================= */}
             <button onClick={downloadPDF}>
                 Download Schedule PDF
@@ -414,6 +620,10 @@ function CalendarPage() {
                     initialView="timeGridWeek"
                     events={events}
                     eventClick={handleEventClick}
+                    selectable={true}
+                    selectMirror={true}
+                    selectOverlap={false}
+                    select={handleSlotSelect}
                 />
             </div>
         </div>
