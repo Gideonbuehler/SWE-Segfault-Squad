@@ -12,7 +12,7 @@ services:
   frontend:
     build:
       context: ./frontend
-    command: npm vite --mode docker
+    command: sh -c "node_modules/.bin/vite --host --mode docker"
     ports:
       - "5173:5173"
     depends_on:
