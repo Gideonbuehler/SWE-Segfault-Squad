@@ -1,6 +1,5 @@
-FROM node:25.6.1
+FROM --platform=linux/amd64 node:20-alpine
 
-# 25.6.1-alpine?
 
 WORKDIR /app
 
