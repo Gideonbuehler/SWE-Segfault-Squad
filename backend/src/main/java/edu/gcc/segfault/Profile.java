@@ -54,7 +54,13 @@ public class Profile {
      * @return - true if the major updated
      */
     public boolean updateMajor(String major) {
+        for(int j = 0; j < major.length(); j++){
+            if(Character.isDigit(major.charAt(j))){
+                return false;
+            }
+        }
         this.major = major.toUpperCase();
+
         return this.major.equals(major.toUpperCase());
     }
 
@@ -65,6 +71,11 @@ public class Profile {
      * list already contained that minor
      */
     public boolean addMinor(String minor){
+        for(int j = 0; j < minor.length(); j++){
+            if(Character.isDigit(minor.charAt(j))){
+                return false;
+            }
+        }
         minor = minor.toUpperCase();
         if(!minors.contains(minor)){
             minors.add(minor);
@@ -85,6 +96,11 @@ public class Profile {
     }
 
     public boolean updateMinor(String m){
+        for(int j = 0; j < m.length(); j++){
+            if(Character.isDigit(m.charAt(j))){
+                return false;
+            }
+        }
         m = m.toUpperCase();
         this.minor = m;
         return true;

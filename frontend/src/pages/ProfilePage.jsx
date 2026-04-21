@@ -91,7 +91,7 @@ function ProfilePage({ darkMode, setDarkMode }) {
         <h2>Year: {profile?.year}</h2>
         <h2>Major: {profile?.major}</h2>
         <h2>Minor: {profile?.minor}</h2>
-        <h2>Completed Courses: {profile?.comp}</h2>
+        <h2>Completed Courses: {profile?.omg}</h2>
       </div>
       <div className="card">
         <p>User information will appear here.</p>
