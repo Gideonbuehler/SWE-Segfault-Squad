@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Controller {
 //    public static User user = new User();
@@ -317,6 +319,39 @@ public class Controller {
                 e.printStackTrace();
                 ctx.status(500);
                 ctx.result("Failed to generate PDF");
+            }
+        });
+
+        app.get("/coursesInSlot", ctx -> {
+            String day = ctx.queryParam("day");
+            String startTime = ctx.queryParam("startTime");
+            String endTime = ctx.queryParam("endTime");
+            String semester = ctx.queryParam("semester");
+            String keyword = ctx.queryParam("keyword");
+
+            if (day == null || startTime == null || endTime == null || semester == null) {
+                ctx.status(400);
+                ctx.result("Missing required params");
+                return;
+            }
+
+            try {
+                Search s = new Search((new Supabase()).getConn());
+                Set<Course> results = s.fetchCoursesInSlot(day, startTime, endTime, semester, keyword);
+
+                Set<Course> noConflicts = new HashSet<>();
+                for (Course c : results) {
+                    if (userService.getUser().getSchedule().checkConflicts(c)) {
+                        noConflicts.add(c);
+                    }
+                }
+
+                ctx.json(noConflicts);
+                ctx.status(200);
+            } catch (Exception e) {
+                e.printStackTrace();
+                ctx.status(500);
+                ctx.result("Search failed");
             }
         });
     }
