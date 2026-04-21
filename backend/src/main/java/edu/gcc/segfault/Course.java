@@ -48,7 +48,7 @@ public class Course {
         this.openSeats   = openSeats;
         this.totalSeats  = totalSeats;
         this.description = description;
-        this.prereqs = null;
+        this.prereqs = "";
     }
     public Course(String courseCode, String courseName, String professor, String department,
                   String location, String semester, LinkedHashMap<String, LocalTime[]> dayTimeMap, int credits, boolean isOpen, boolean isLab,
@@ -123,6 +123,9 @@ public class Course {
     public String getDescription() {
         return description;
     }
+    public String getPrereqs(){
+        return prereqs;
+    }
 
 
     // Equals and hashCode overriden to ease comparison of Blocks
@@ -148,7 +151,8 @@ public class Course {
                 ", semester='" + semester + '\'' +
                 ", professor='" + professor + '\'' +
                 ", dayTimeMap=" + dayTimeMap + '\'' +
-                ", description=" + description +
+                ", description=" + description + '\'' +
+                ", prereqs=" + prereqs +
                 '}';
     }
 }
