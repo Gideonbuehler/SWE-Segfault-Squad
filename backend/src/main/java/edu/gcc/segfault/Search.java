@@ -84,7 +84,6 @@ public class Search {
             //end chatgpt direct influence
             Statement s = conn.createStatement();
             //Get results
-            System.out.println(pstmt.toString());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 //fix times to the correct data structure
@@ -105,10 +104,9 @@ public class Search {
                         }
                     }
                 }
-                System.out.println("code: " + rs.getString("subject") + rs.getString("number") + " course name: " + rs.getString("name"));
 
                 //create the course from the row of data
-                Course c = new Course(rs.getString("subject") + rs.getString("number") + rs.getString("section"), rs.getString("name"), rs.getString("faculty"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), dayTimeMap, rs.getInt("credits"), rs.getBoolean("is_open"), rs.getBoolean("is_lab"), rs.getInt("open_seats"), rs.getInt("total_seats"), rs.getString("description"));
+                Course c = new Course(rs.getString("subject") + "-" + rs.getString("number") + "-" +  rs.getString("section"), rs.getString("name"), rs.getString("faculty"), rs.getString("subject"), rs.getString("location"), rs.getString("semester"), dayTimeMap, rs.getInt("credits"), rs.getBoolean("is_open"), rs.getBoolean("is_lab"), rs.getInt("open_seats"), rs.getInt("total_seats"), rs.getString("description"));
                 returnedCourses.add(c);
             }
         } catch (SQLException e) {
@@ -116,7 +114,6 @@ public class Search {
         }
         history.push(returnedCourses);
         originalResults = returnedCourses;
-        System.out.println(returnedCourses);
         return returnedCourses;
 
     }

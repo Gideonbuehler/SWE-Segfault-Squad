@@ -18,10 +18,14 @@ public class Controller {
     }
     public static void routeManager (Javalin app){
         // routes for search pages
-        app.get("/searchResults", ctx -> ctx.json(user.getLastSearchResults()));
+        app.get("/searchResults", ctx -> {
+            System.out.println("HIT BACKEND");
+            ctx.json(user.getLastSearchResults());
+        });
 
         app.post("/searchResults/{searchParameters}", ctx -> {
             String results = ctx.pathParam("searchParameters");
+            System.out.println("HIT BACKEND");
             ctx.json(user.searchCourses(results));
             ctx.status(201);
         });
@@ -86,10 +90,7 @@ public class Controller {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
             ArrayList<Course> allCourses = Main.getCourses();
-
-            // Put logic in user
-            // 1. Easier to test
-            // 2. Easier to translate between Javalin and other backends
+            System.out.println("HIT BACKEND");
             Course toAdd = null;
             for (Course c : allCourses) {
                 if (c.getCourseCode().equalsIgnoreCase(courseCode)
@@ -122,7 +123,6 @@ public class Controller {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
             ArrayList<Course> courses = user.getSchedule().getCourses();
-            System.out.println("Current courses: " + courses);
             Course toRemove = null;
             for (Course c : courses) {
                 if (c.getCourseCode().equalsIgnoreCase(courseCode)
