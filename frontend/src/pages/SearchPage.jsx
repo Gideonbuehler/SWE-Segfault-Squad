@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "../components/useToast.jsx";
 
 /**
@@ -34,6 +34,13 @@ function SearchPage({
        - Custom hook used to show notifications instead of alert()
     ========================================================= */
     const toast = useToast();
+
+    /* =========================================================
+       RATE MY PROFESSOR DATA
+       - Fetched once on mount from /api/professors
+       - Stored as a map: "Lastname, Firstname" → { avgRating, avgDifficulty }
+    ========================================================= */
+    const [professorMap, setProfessorMap] = useState({});
 
     /* =========================================================
        CONSTANTS
@@ -269,6 +276,47 @@ function SearchPage({
     /* =========================================================
        EFFECTS (REACTIVE LOGIC)
     ========================================================= */
+
+    /**
+     * Fetches RateMyProfessor data once on mount.
+     * Builds a lookup map keyed by "Lastname, Firstname" to match
+     * the course.professor field format from the backend.
+     */
+    useEffect(() => {
+        const fetchProfessors = async () => {
+            try {
+                const res = await fetch("/api/professors");
+                if (!res.ok) return;
+                const edges = await res.json(); // Array of { cursor, node: { firstName, lastName, avgRating, avgDifficulty, ... } }
+                const map = {};
+                for (const edge of edges) {
+                    const { firstName, lastName, avgRating, avgDifficulty, numRatings } = edge.node ?? {};
+                    if (!lastName) continue;
+                    // Key: "Lastname, Firstname" — matches backend professor field
+                    const key = `${lastName}, ${firstName}`.toLowerCase();
+                    map[key] = { avgRating, avgDifficulty, numRatings };
+                }
+                setProfessorMap(map);
+            } catch (e) {
+                // RMP data is non-critical; silently fail
+            }
+        };
+        fetchProfessors();
+    }, []);
+
+    /**
+     * Looks up RMP data for a professor name string.
+     * Tries full "Lastname, Firstname" match, then last-name-only fallback.
+     */
+    const getRmpData = (professorName) => {
+        if (!professorName) return null;
+        const key = professorName.toLowerCase();
+        if (professorMap[key]) return professorMap[key];
+        // Fallback: match by last name only (first word before comma)
+        const lastName = key.split(",")[0].trim();
+        const fallback = Object.keys(professorMap).find(k => k.startsWith(lastName + ","));
+        return fallback ? professorMap[fallback] : null;
+    };
 
     /**
      * Runs search when query changes (debounced)
@@ -713,7 +761,52 @@ function SearchPage({
                                     </td>
 
                                     <td style={{ padding: "10px" }}>
-                                        {course.professor}
+                                        {(() => {
+                                            const rmp = getRmpData(course.professor);
+                                            return (
+                                                <>
+                                                    <div>{course.professor ?? "TBA"}</div>
+                                                    {rmp && rmp.numRatings > 0 && (
+                                                        <div style={{ display: "flex", gap: "6px", marginTop: "5px", flexWrap: "wrap" }}>
+                                                            <span
+                                                                title="Quality rating from RateMyProfessors"
+                                                                style={{
+                                                                    display: "inline-flex",
+                                                                    alignItems: "center",
+                                                                    gap: "3px",
+                                                                    fontSize: "11px",
+                                                                    fontWeight: 600,
+                                                                    padding: "2px 6px",
+                                                                    borderRadius: "4px",
+                                                                    backgroundColor: rmp.avgRating >= 4 ? "#dcfce7" : rmp.avgRating >= 3 ? "#fef9c3" : "#fee2e2",
+                                                                    color: rmp.avgRating >= 4 ? "#166534" : rmp.avgRating >= 3 ? "#854d0e" : "#991b1b",
+                                                                    border: `1px solid ${rmp.avgRating >= 4 ? "#86efac" : rmp.avgRating >= 3 ? "#fde047" : "#fca5a5"}`
+                                                                }}
+                                                            >
+                                                                Quality: {rmp.avgRating?.toFixed(1) ?? "—"} /5.0
+                                                            </span>
+                                                            <span
+                                                                title="Difficulty rating from RateMyProfessor"
+                                                                style={{
+                                                                    display: "inline-flex",
+                                                                    alignItems: "center",
+                                                                    gap: "3px",
+                                                                    fontSize: "11px",
+                                                                    fontWeight: 600,
+                                                                    padding: "2px 6px",
+                                                                    borderRadius: "4px",
+                                                                    backgroundColor: rmp.avgDifficulty <= 2.5 ? "#dcfce7" : rmp.avgDifficulty <= 3.5 ? "#fef9c3" : "#fee2e2",
+                                                                    color: rmp.avgDifficulty <= 2.5 ? "#166534" : rmp.avgDifficulty <= 3.5 ? "#854d0e" : "#991b1b",
+                                                                    border: `1px solid ${rmp.avgDifficulty <= 2.5 ? "#86efac" : rmp.avgDifficulty <= 3.5 ? "#fde047" : "#fca5a5"}`
+                                                                }}
+                                                            >
+                                                                Difficulty: {rmp.avgDifficulty?.toFixed(1) ?? "—"} /5.0
+                                                            </span>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
                                     </td>
 
                                     <td style={{ padding: "10px" }}>
