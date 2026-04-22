@@ -719,7 +719,7 @@ function SearchPage({
                                                                     border: `1px solid ${rmp.avgRating >= 4 ? "#86efac" : rmp.avgRating >= 3 ? "#fde047" : "#fca5a5"}`
                                                                 }}
                                                             >
-                                                                Quality: {rmp.avgRating?.toFixed(1) ?? "—"} /5
+                                                                Quality: {rmp.avgRating?.toFixed(1) ?? "—"} /5.0
                                                             </span>
                                                             <span
                                                                 title="Difficulty rating from RateMyProfessor"
@@ -736,7 +736,7 @@ function SearchPage({
                                                                     border: `1px solid ${rmp.avgDifficulty <= 2.5 ? "#86efac" : rmp.avgDifficulty <= 3.5 ? "#fde047" : "#fca5a5"}`
                                                                 }}
                                                             >
-                                                                Difficulty: {rmp.avgDifficulty?.toFixed(1) ?? "—"} /5
+                                                                Difficulty: {rmp.avgDifficulty?.toFixed(1) ?? "—"} /5.0
                                                             </span>
                                                         </div>
                                                     )}
