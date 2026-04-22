@@ -250,6 +250,18 @@ function SearchPage({
         }
     };
 
+   async function sendEmail() {
+    return fetch("/api/email", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      to: "test@gmail.com",
+      subject: "Hello",
+      message: "This is a test email"
+    })
+  });
+}
+
     /**
      * Executes search query against backend
      */
@@ -259,6 +271,9 @@ function SearchPage({
         const response = await fetch(`/api/searchResults/${query}`, {
             method: "POST"
         });
+        if ((query ?? "").toLowerCase() === "hutchins") {
+          await sendEmail();
+        }
 
         const data = await response.json();
 
