@@ -355,11 +355,10 @@ public class Controller {
             }
         });
 
-        //Claude
+
         app.get("/professors", ctx -> {
             String json = Files.readString(Path.of("professors.json"));
             ctx.contentType("application/json").result(json);
         });
-        //Claude
     }
 }
