@@ -35,6 +35,7 @@ public class Schedule {
         semesterName = name;
         courses = new ArrayList<>();
         calendar = new Calendar();
+        pdf = new PDDocument();
     }
     public boolean addCourse(Course toAdd){
         //Front end does not give the user an option to
@@ -166,7 +167,6 @@ public class Schedule {
 
     public void makePDF() throws IOException {
         //Need to push
-        pdf = new PDDocument();
         PDPage schedulePage = new PDPage(PDRectangle.A4);
         pdf.addPage(schedulePage);
         PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);

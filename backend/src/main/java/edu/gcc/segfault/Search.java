@@ -260,9 +260,4 @@ public class Search {
     public Set<Course> getOriginalResults(){
         return originalResults;
     }
-
-    public static void main(String[] args) {
-        Search s = new Search((new Supabase()).getConn());
-        s.fetchQueryDatabase(new ArrayList<String>(List.of("TENNIS")));
-    }
 }

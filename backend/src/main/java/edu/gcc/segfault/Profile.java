@@ -129,7 +129,9 @@ public class Profile {
             String temp = completed.get(i).getCourseCode();
             str.append(temp, 0, temp.length() - 2).append(", ");
         }
-        str.append(completed.getLast().getCourseCode().substring(0, completed.getLast().getCourseCode().length() - 2));
+        if(!completed.isEmpty()) {
+            str.append(completed.getLast().getCourseCode().substring(0, completed.getLast().getCourseCode().length() - 2));
+        }
         omg = str.toString();
 
 
