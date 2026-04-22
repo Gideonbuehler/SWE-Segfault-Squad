@@ -387,6 +387,8 @@ function SearchPage({
         alert("All options conflicted.");
     };
 
+    const totalCredits = schedule.reduce((sum, c) => sum + (Number(c.credits) || 0), 0);
+
     /* =========================================================
        RENDER (UI)
     ========================================================= */
@@ -394,6 +396,68 @@ function SearchPage({
     return (
         <div>
             <h1>Search</h1>
+
+            {/* ── MY SCHEDULE ── */}
+            <div className="card" style={{ marginBottom: "20px" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                    <h2 style={{ margin: 0 }}>My Schedule</h2>
+                    {schedule.length > 0 && (
+                        <span style={{ backgroundColor: "#1d54a1", color: "white", padding: "4px 12px", borderRadius: "12px", fontSize: "13px", fontWeight: "bold" }}>
+                            {totalCredits} credit{totalCredits !== 1 ? "s" : ""}
+                        </span>
+                    )}
+                </div>
+
+                {schedule.length === 0 ? (
+                    <p style={{ color: "#6b7280", fontStyle: "italic", margin: 0 }}>
+                        No courses added yet. Use the search below to build your schedule.
+                    </p>
+                ) : (
+                    <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
+                        <thead>
+                            <tr style={{ backgroundColor: "#1d54a1", color: "white", textAlign: "left" }}>
+                                <th style={{ padding: "10px", width: "10%" }}>Code</th>
+                                <th style={{ padding: "10px", width: "30%" }}>Name</th>
+                                <th style={{ padding: "10px", width: "14%" }}>Professor</th>
+                                <th style={{ padding: "10px", width: "8%" }}>Days</th>
+                                <th style={{ padding: "10px", width: "14%" }}>Time</th>
+                                <th style={{ padding: "10px", width: "8%" }}>Credits</th>
+                                <th style={{ padding: "10px", width: "8%" }}>Semester</th>
+                                <th style={{ padding: "10px", width: "8%" }}>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sortByCourseCode(schedule).map((course, index) => {
+                                const rowBg = darkMode
+                                    ? (index % 2 === 0 ? "#1f2937" : "#111827")
+                                    : (index % 2 === 0 ? "#f9fafb" : "white");
+                                const rowColor = darkMode ? "#f9fafb" : "#111827";
+                                return (
+                                    <tr key={`${course.courseCode}-${course.semester}`} style={{ borderBottom: "1px solid #e5e7eb", backgroundColor: rowBg, color: rowColor }}>
+                                        <td style={{ padding: "10px" }}><b>{course.courseCode}</b></td>
+                                        <td style={{ padding: "10px" }}>{course.courseName}</td>
+                                        <td style={{ padding: "10px" }}>{course.professor}</td>
+                                        <td style={{ padding: "10px" }}>{formatDays(course)}</td>
+                                        <td style={{ padding: "10px" }}>{formatMeetingTimes(course)}</td>
+                                        <td style={{ padding: "10px" }}>{course.credits}</td>
+                                        <td style={{ padding: "10px" }}>{course.semester}</td>
+                                        <td style={{ padding: "10px" }}>
+                                            <button
+                                                onClick={() => removeCourse(course.courseCode, course.semester)}
+                                                style={{ backgroundColor: "#dc2626", color: "white", border: "none", padding: "6px 12px", borderRadius: "4px", cursor: "pointer" }}
+                                            >
+                                                Remove
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                )}
+            </div>
+
+            {/* ── SEARCH + FILTERS ── */}
 
             <input
                 type="text"
