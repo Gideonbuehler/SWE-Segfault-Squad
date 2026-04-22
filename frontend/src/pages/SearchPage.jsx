@@ -177,10 +177,10 @@ function SearchPage({
      * { "COMP101-0": true }
      */
     const toggleDescription = (courseKey) => {
-        setExpandedDescriptions(prev => ({
-            ...prev,
-            [courseKey]: !prev[courseKey]
-        }));
+        setExpandedDescriptions({
+            ...expandedDescriptions,
+            [courseKey]: !expandedDescriptions[courseKey]
+        });
     };
 
     /* =========================================================
@@ -206,10 +206,8 @@ function SearchPage({
                 endTime: ""
             });
 
-            setExpandedDescriptions({});
             setResults(sortByCourseCode(Array.from(data ?? [])));
         } else {
-            setExpandedDescriptions({});
             setResults([]);
         }
     };
@@ -265,10 +263,8 @@ function SearchPage({
         const data = await response.json();
 
         if (response.ok) {
-            setExpandedDescriptions({});
             setResults(sortByCourseCode(Array.from(data.results ?? [])));
         } else {
-            setExpandedDescriptions({});
             setResults([]);
         }
     };
@@ -730,14 +726,15 @@ function SearchPage({
                                         <div
                                             style={{
                                                 marginTop: "4px",
-                                                border: "none",
-                                                background: "none",
-                                                color: "#2563eb",
-                                                padding: 0,
-                                                cursor: "pointer"
+                                                fontSize: "0.875rem",
+                                                color: "inherit"
                                             }}
                                         >
-                                            {description || "No description available."}
+                                            {description
+                                                ? (isExpanded || !hasLongDescription
+                                                    ? description
+                                                    : description.slice(0, DESCRIPTION_PREVIEW_LENGTH) + "…")
+                                                : "No description available."}
                                         </div>
 
                                         {hasLongDescription && (
