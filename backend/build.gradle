@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'  // From Claude
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 group = 'org.example'
@@ -50,3 +51,17 @@ java {
 test {
     useJUnitPlatform()
 }
+
+shadowJar {
+    archiveBaseName = 'backend'
+    archiveClassifier = ''
+    archiveVersion = '1.0-SNAPSHOT'
+    manifest {
+        attributes 'Main-Class': 'edu.gcc.segfault.Main'
+    }
+}
+
+distZip.dependsOn shadowJar
+distTar.dependsOn shadowJar
+startScripts.dependsOn shadowJar
+startShadowScripts.dependsOn jar
