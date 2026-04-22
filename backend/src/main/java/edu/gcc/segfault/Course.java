@@ -23,6 +23,7 @@ public class Course {
     private int openSeats;
     private int totalSeats;
     private String description;
+    private String prereqs;
 
     //Default constructor for tests
     public Course() {
@@ -47,7 +48,28 @@ public class Course {
         this.openSeats   = openSeats;
         this.totalSeats  = totalSeats;
         this.description = description;
+        this.prereqs = "";
     }
+    public Course(String courseCode, String courseName, String professor, String department,
+                  String location, String semester, LinkedHashMap<String, LocalTime[]> dayTimeMap, int credits, boolean isOpen, boolean isLab,
+                  int openSeats, int totalSeats, String description, String prereqs) {
+
+        this.courseCode  = courseCode;
+        this.courseName  = courseName;
+        this.professor   = professor;
+        this.department  = department;
+        this.location    = location;
+        this.semester    = semester;
+        this.dayTimeMap  = dayTimeMap;
+        this.credits     = credits;
+        this.isOpen      = isOpen;
+        this.isLab       = isLab;
+        this.openSeats   = openSeats;
+        this.totalSeats  = totalSeats;
+        this.description = description;
+        this.prereqs = prereqs;
+    }
+
 
     // Getters
     public String getCourseCode() {
@@ -101,6 +123,9 @@ public class Course {
     public String getDescription() {
         return description;
     }
+    public String getPrereqs(){
+        return prereqs;
+    }
 
 
     // Equals and hashCode overriden to ease comparison of Blocks
@@ -126,7 +151,8 @@ public class Course {
                 ", semester='" + semester + '\'' +
                 ", professor='" + professor + '\'' +
                 ", dayTimeMap=" + dayTimeMap + '\'' +
-                ", description=" + description +
+                ", description=" + description + '\'' +
+                ", prereqs=" + prereqs +
                 '}';
     }
 }
