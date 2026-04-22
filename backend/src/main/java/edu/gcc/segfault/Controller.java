@@ -4,6 +4,8 @@ import io.javalin.Javalin;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.HashSet;
@@ -352,5 +354,12 @@ public class Controller {
                 ctx.result("Search failed");
             }
         });
+
+        //Claude
+        app.get("/professors", ctx -> {
+            String json = Files.readString(Path.of("professors.json"));
+            ctx.contentType("application/json").result(json);
+        });
+        //Claude
     }
 }
