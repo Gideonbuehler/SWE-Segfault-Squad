@@ -20,6 +20,9 @@ public class Main {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());  // ADD THIS
 
+        RateMyProfessorClient rmp = new RateMyProfessorClient();
+        rmp.exportAllProfessorsToJson("professors.json");
+
         Javalin app = Javalin.create(config -> {
             config.jsonMapper(new JavalinJackson());  // tell Javalin to use it
         }).start(7000);
