@@ -249,7 +249,7 @@ function CalendarPage({darkMode}) {
                 if (dayNum === undefined || !start || !end) continue;
 
                 mapped.push({
-                    title: course.courseName,
+                    title: `${course.courseCode} - ${course.location}`,
                     daysOfWeek: [dayNum],
                     startTime: start,
                     endTime: end,
