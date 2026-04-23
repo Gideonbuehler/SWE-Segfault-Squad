@@ -1,5 +1,6 @@
 package edu.gcc.segfault;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import io.javalin.Javalin;
 
 import java.io.File;
@@ -10,6 +11,14 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.HashSet;
 import java.util.Set;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import io.javalin.Javalin;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 
 public class Controller {
 //    public static User user = new User();
@@ -17,6 +26,8 @@ public class Controller {
 //    static {
 //        user.setProfile(new Profile("FRESHMAN", "COMPUTER SCIENCE", new ArrayList<>(List.of("BUISINESS")), null));
 //    }
+    Dotenv dotenv = Supabase.dotenv;
+    String apiKey = dotenv.get("RESEND_API_KEY");
     private final UserService userService;
 
     public Controller(UserService userService) {
@@ -359,6 +370,45 @@ public class Controller {
         app.get("/professors", ctx -> {
             String json = Files.readString(Path.of("professors.json"));
             ctx.contentType("application/json").result(json);
+        });
+        app.post("/email", ctx -> {
+            System.out.println("Hit email backed");
+            try {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode body = mapper.readTree(ctx.body());
+
+                String to = "marriottja21@gcc.edu";
+
+                String subject = "Another student searched for you class";
+
+                String message = "A student wants to take one of your classes, Dr. Hutchins!";
+
+                String json = """
+                {
+                  "from": "onboarding@resend.dev",
+                  "to": "%s",
+                  "subject": "%s",
+                  "html": "<p>%s</p>"
+                }
+                """.formatted(to, subject, message);
+                System.out.println(apiKey);
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("https://api.resend.com/emails"))
+                        .header("Authorization", "Bearer " + apiKey)
+                        .header("Content-Type", "application/json")
+                        .POST(HttpRequest.BodyPublishers.ofString(json))
+                        .build();
+
+                HttpClient client = HttpClient.newHttpClient();
+                HttpResponse<String> response =
+                        client.send(request, HttpResponse.BodyHandlers.ofString());
+
+                ctx.status(response.statusCode()).result(response.body());
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                ctx.status(500).json("{\"error\":\"" + e.getMessage() + "\"}");
+            }
         });
     }
 }
