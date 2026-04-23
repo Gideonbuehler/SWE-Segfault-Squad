@@ -166,6 +166,15 @@ function SearchPage({
     const getDescription = (course) =>
         (course.description ?? "").trim();
 
+    const availableProfessors = [
+        ...new Set(
+            results
+                .filter(c => !selectedSemester || c.semester === selectedSemester)
+                .map(c => c.professor)
+                .filter(Boolean)
+        )
+    ].sort();
+
     /* =========================================================
        UI STATE HANDLERS
     ========================================================= */
@@ -424,7 +433,7 @@ function SearchPage({
         );
 
         if (!notAdded.length) {
-            alert("No available courses!");
+            toast({ message: "No available courses", type: "error" });
             return;
         }
 
@@ -438,12 +447,12 @@ function SearchPage({
 
             if (res.ok) {
                 await fetchSchedule();
-                alert(`Added ${candidate.courseCode}`);
+                 toast({ message: `${candidate.courseCode} added to schedule!`, type: "success" });
                 return;
             }
         }
 
-        alert("All options conflicted.");
+         toast({ message: "All options conflict with your schedule", type: "error" });
     };
 
     const totalCredits = schedule.reduce((sum, c) => sum + (Number(c.credits) || 0), 0);
@@ -579,15 +588,18 @@ function SearchPage({
 
                     <label>
                         Professor:
-                        <input
-                            type="text"
-                            placeholder="e.g. Wolfe"
+                        <select
                             value={filters.professor}
-                            onChange={(e) =>
-                                setFilters({ ...filters, professor: e.target.value })
-                            }
+                            onChange={(e) => setFilters({ ...filters, professor: e.target.value })}
                             style={{ marginLeft: "8px" }}
-                        />
+                        >
+                            <option value="">Any</option>
+                            {availableProfessors.map((prof) => (
+                                <option key={prof} value={prof}>
+                                    {prof}
+                                </option>
+                            ))}
+                        </select>
                     </label>
 
                     <label>

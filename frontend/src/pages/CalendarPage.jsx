@@ -249,7 +249,7 @@ function CalendarPage({darkMode}) {
                 if (dayNum === undefined || !start || !end) continue;
 
                 mapped.push({
-                    title: course.courseName,
+                    title: `${course.courseCode} - ${course.location}`,
                     daysOfWeek: [dayNum],
                     startTime: start,
                     endTime: end,
@@ -463,13 +463,32 @@ function CalendarPage({darkMode}) {
                         {formatTime(selectedCourse.endTime)}
                     </p>
 
-                    <button onClick={removeCourse}>
-                        Remove Course
+                    <button
+                        onClick={() =>
+                            removeCourse()
+                        }
+                        style={{
+                            backgroundColor: "#dc2626",
+                            color: "white",
+                            border: "none",
+                            padding: "6px 12px",
+                            borderRadius: "4px",
+                            cursor: "pointer"
+                        }}
+                    >
+                        Remove
                     </button>
-
                     <button onClick={() =>
                         setSelectedCourse(null)
-                    }>
+                    }
+                    style={{
+                            backgroundColor: "#2651dc",
+                            color: "white",
+                            border: "none",
+                            padding: "6px 12px",
+                            borderRadius: "4px",
+                            cursor: "pointer"
+                        }}>
                         Close
                     </button>
                 </div>
@@ -564,7 +583,15 @@ function CalendarPage({darkMode}) {
             )}
 
             {/* ================= PDF BUTTON ================= */}
-            <button onClick={downloadPDF}>
+            <button onClick={downloadPDF}
+                style={{
+                    backgroundColor: "#2651dc",
+                    color: "white",
+                    border: "none",
+                    padding: "6px 12px",
+                    borderRadius: "4px",
+                    cursor: "pointer"
+                }}>
                 Download Schedule PDF
             </button>
 
@@ -573,12 +600,20 @@ function CalendarPage({darkMode}) {
                 <FullCalendar
                     plugins={[timeGridPlugin, interactionPlugin]}
                     initialView="timeGridWeek"
+                    headerToolbar={false}
+                    dayHeaderFormat={{ weekday: "short" }}
+                    weekends={false}
+                    slotMinTime="06:00:00"
+                    slotMaxTime="22:00:00"
+                    allDaySlot={false}
                     events={events}
                     eventClick={handleEventClick}
                     selectable={true}
                     selectMirror={true}
                     selectOverlap={false}
                     select={handleSlotSelect}
+                    height="auto"
+                    expandRows={true}
                 />
             </div>
         </div>
