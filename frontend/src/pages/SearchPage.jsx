@@ -166,6 +166,15 @@ function SearchPage({
     const getDescription = (course) =>
         (course.description ?? "").trim();
 
+    const availableProfessors = [
+        ...new Set(
+            results
+                .filter(c => !selectedSemester || c.semester === selectedSemester)
+                .map(c => c.professor)
+                .filter(Boolean)
+        )
+    ].sort();
+
     /* =========================================================
        UI STATE HANDLERS
     ========================================================= */
@@ -564,15 +573,18 @@ function SearchPage({
 
                     <label>
                         Professor:
-                        <input
-                            type="text"
-                            placeholder="e.g. Wolfe"
+                        <select
                             value={filters.professor}
-                            onChange={(e) =>
-                                setFilters({ ...filters, professor: e.target.value })
-                            }
+                            onChange={(e) => setFilters({ ...filters, professor: e.target.value })}
                             style={{ marginLeft: "8px" }}
-                        />
+                        >
+                            <option value="">Any</option>
+                            {availableProfessors.map((prof) => (
+                                <option key={prof} value={prof}>
+                                    {prof}
+                                </option>
+                            ))}
+                        </select>
                     </label>
 
                     <label>
