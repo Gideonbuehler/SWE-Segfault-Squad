@@ -57,6 +57,7 @@ public class Controller {
             e.printStackTrace();
             ctx.status(500).result("JSON ERROR: " + e.getMessage());
         }});
+
         //Structure this by a route for each thing to change?
         //allow the user to update their major
         app.post("/profile/major/{major}", ctx -> {
@@ -160,105 +161,54 @@ public class Controller {
         app.get("/mySchedule", ctx -> {
             ctx.json(userService.getUser().getSchedule());
         });
+
         app.post("/mySchedule/add/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
-            ArrayList<Course> allCourses = Main.getCourses();
-            System.out.println("HIT BACKEND");
-            Course toAdd = null;
-            for (Course c : allCourses) {
-                if (c.getCourseCode().equalsIgnoreCase(courseCode)
-                        && c.getSemester().equalsIgnoreCase(semester)) {
-                    toAdd = c;
-                    break;
-                }
-            }
 
-            // Change to enum!!!
-            if (toAdd == null) {
-                ctx.status(404);
-                ctx.result("Course not found");
-                return;
-            }
+            Course toAdd = userService.getUser().getSchedule()
+                    .findCourse(Main.getCourses(), courseCode, semester);
+
+            if (toAdd == null) { ctx.status(404).result("Course not found"); return; }
 
             if (userService.getUser().getSchedule().addCourse(toAdd)) {
                 userService.getUser().onScheduleChange();
-                ctx.status(201);
-                ctx.result("Course added");
-                return;
+                ctx.status(201).result("Course added");
+            } else {
+                ctx.status(500).result("Course conflict");
             }
-            else {
-                ctx.status(500);
-                ctx.result("Course conflict");
-                return;
-            }
-            //Add specific message for full class?
         });
 
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
             String courseCode = ctx.pathParam("courseCode");
             String semester = ctx.pathParam("semester");
-            ArrayList<Course> courses = userService.getUser().getSchedule().getCourses();
-            Course toRemove = null;
-            for (Course c : courses) {
-                if (c.getCourseCode().equalsIgnoreCase(courseCode)
-                        && c.getSemester().equalsIgnoreCase(semester)) {
-                    toRemove = c;
-                    break;
-                }
-            }
 
-            if (toRemove == null) {
-                ctx.status(404);
-                ctx.result("Course not found in schedule");
-                return;
-            }
+            boolean removed = userService.getUser().getSchedule().removeCourseByCode(courseCode, semester);
+            if (!removed) { ctx.status(404).result("Course not found in schedule"); return; }
 
-            userService.getUser().getSchedule().removeCourse(toRemove);
             userService.getUser().onScheduleChange();
-            ctx.status(200);
-            ctx.result("Course removed");
+            ctx.status(200).result("Course removed");
         });
 
         app.post("/searchResults/{searchParameters}/filter", ctx -> {
-
             if (userService.getUser().getLastSearchResults() == null) {
-                ctx.status(400);
-                ctx.result("No search results to filter");
+                ctx.status(400).result("No search results to filter");
                 return;
             }
 
-            Filter filter = new Filter();
+            Filter filter = Filter.fromParams(
+                    ctx.queryParam("department"),
+                    ctx.queryParam("professor"),
+                    ctx.queryParam("credits"),
+                    ctx.queryParam("days"),
+                    null, // no startTime in this route
+                    null  // no endTime in this route
+            );
 
-            String department = ctx.queryParam("department");
-            String professor = ctx.queryParam("professor");
-            String credits = ctx.queryParam("credits");
-            String days = ctx.queryParam("days");
-            String description = ctx.queryParam("description");
-
-            if (department != null && !department.isEmpty())
-                filter.setDepartmentNames(new String[]{department});
-
-            if (professor != null && !professor.isEmpty())
-                filter.setProfessorNames(new String[]{professor});
-
-            if (credits != null && !credits.isEmpty())
-                filter.setCredits(new int[]{Integer.parseInt(credits)});
-
-            if (days != null && !days.isEmpty()) {
-                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
-                filter.setDays(dayList);
-            }
-
-            if (description != null && !description.isEmpty())
-                filter.setDescriptionKeywords(new String[]{description});
-
-            userService.getUser().getLastSearchResults().addFilter(filter);
-            userService.getUser().getLastSearchResults().applyFilters();
-            ctx.json(userService.getUser().getLastSearchResults().getResults());
-
-
-            ctx.status(200);
+            var results = userService.getUser().getLastSearchResults();
+            results.addFilter(filter);
+            results.applyFilters();
+            ctx.json(results.getResults()).status(200);
         });
 
         app.get("/noFilters", ctx -> {
@@ -274,48 +224,25 @@ public class Controller {
 
         app.post("/filterResults/{searchParameters}/filter", ctx -> {
             if (userService.getUser().getLastSearchResults() == null) {
-                ctx.status(400);
-                ctx.result("No search results to filter");
+                ctx.status(400).result("No search results to filter");
                 return;
             }
 
-            Filter filter = new Filter();
+            Filter filter = Filter.fromParams(
+                    ctx.queryParam("department"),
+                    ctx.queryParam("professor"),
+                    ctx.queryParam("credits"),
+                    ctx.queryParam("days"),
+                    ctx.queryParam("startTime"),
+                    ctx.queryParam("endTime")
+            );
 
-            String department = ctx.queryParam("department");
-            String professor = ctx.queryParam("professor");
-            String credits = ctx.queryParam("credits");
-            String days = ctx.queryParam("days");
-            String startTime = ctx.queryParam("startTime");
-            String endTime = ctx.queryParam("endTime");
+            var results = userService.getUser().getLastSearchResults();
+            results.resetFilters();
+            results.addFilter(filter);
+            results.applyFilters();
 
-            if (department != null && !department.isEmpty())
-                filter.setDepartmentNames(new String[]{department});
-
-            if (professor != null && !professor.isEmpty())
-                filter.setProfessorNames(new String[]{professor});
-
-            if (credits != null && !credits.isEmpty())
-                filter.setCredits(new int[]{Integer.parseInt(credits)});
-
-            if (days != null && !days.isEmpty()) {
-                ArrayList<String> dayList = new ArrayList<>(Arrays.asList(days.split(",")));
-                filter.setDays(dayList);
-            }
-
-            if (startTime != null && !startTime.isEmpty())
-                filter.setStartTimes(new LocalTime[]{LocalTime.parse(startTime)});
-
-            if (endTime != null && !endTime.isEmpty())
-                filter.setEndTimes(new LocalTime[]{LocalTime.parse(endTime)});
-
-
-            userService.getUser().getLastSearchResults().clearFilters();
-            userService.getUser().getLastSearchResults().getActiveFilters().clear();
-            userService.getUser().getLastSearchResults().addFilter(filter);
-            userService.getUser().getLastSearchResults().applyFilters();
-            ctx.json(userService.getUser().getLastSearchResults().getResults());
-
-            ctx.status(200);
+            ctx.json(results.getResults()).status(200);
         });
 
 
@@ -349,16 +276,8 @@ public class Controller {
             try {
                 Search s = new Search((new Supabase()).getConn());
                 Set<Course> results = s.fetchCoursesInSlot(day, startTime, endTime, semester, keyword);
-
-                Set<Course> noConflicts = new HashSet<>();
-                for (Course c : results) {
-                    if (userService.getUser().getSchedule().checkConflicts(c)) {
-                        noConflicts.add(c);
-                    }
-                }
-
-                ctx.json(noConflicts);
-                ctx.status(200);
+                Set<Course> noConflicts = userService.getUser().getSchedule().filterConflicts(results);
+                ctx.json(noConflicts).status(200);
             } catch (Exception e) {
                 e.printStackTrace();
                 ctx.status(500);
@@ -371,6 +290,7 @@ public class Controller {
             String json = Files.readString(Path.of("professors.json"));
             ctx.contentType("application/json").result(json);
         });
+
         app.post("/email", ctx -> {
             System.out.println("Hit email backed");
             try {
