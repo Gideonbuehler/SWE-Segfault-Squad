@@ -13,6 +13,31 @@ public class Filter {
     private Map<String, List<String>> dayTimeMap;
     private String[] descriptionKeywords;
 
+    public static Filter fromParams(String department, String professor,
+                                    String credits, String days,
+                                    String startTime, String endTime) {
+        Filter filter = new Filter();
+
+        if (department != null && !department.isEmpty())
+            filter.setDepartmentNames(new String[]{department});
+
+        if (professor != null && !professor.isEmpty())
+            filter.setProfessorNames(new String[]{professor});
+
+        if (credits != null && !credits.isEmpty())
+            filter.setCredits(new int[]{Integer.parseInt(credits)});
+
+        if (days != null && !days.isEmpty())
+            filter.setDays(new ArrayList<>(Arrays.asList(days.split(","))));
+
+        if (startTime != null && !startTime.isEmpty())
+            filter.setStartTimes(new LocalTime[]{LocalTime.parse(startTime)});
+
+        if (endTime != null && !endTime.isEmpty())
+            filter.setEndTimes(new LocalTime[]{LocalTime.parse(endTime)});
+
+        return filter;
+    }
 
     /**
      * Applies all active filters to a set of courses and returns the filtered results.
@@ -29,6 +54,7 @@ public class Filter {
         // Removes a course from the list if it does not match at least one name provided.
         if (professorNames != null && professorNames.length > 0) {
             filtered.removeIf(course -> {
+                if (course.getProfessor() == null) return true;
                 String courseProf = course.getProfessor().toLowerCase();
                 return Arrays.stream(professorNames)
                         .map(String::toLowerCase)
@@ -39,6 +65,7 @@ public class Filter {
         // Removes a course from the list if it does not match at least one dept provided.
         if (departmentNames != null && departmentNames.length > 0) {
             filtered.removeIf(course -> {
+                if (course.getDepartment() == null) return true;
                 String courseDept = course.getDepartment().toLowerCase();
                 return Arrays.stream(departmentNames)
                         .map(String::toLowerCase)

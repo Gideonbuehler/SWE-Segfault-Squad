@@ -239,6 +239,11 @@ public class Search {
         history.push(originalResults);
     }
 
+    public void resetFilters() {
+        clearFilters();
+        getActiveFilters().clear();
+    }
+
     /**
      * @return The top of the history stack, which is the most recent list of courses.
      */

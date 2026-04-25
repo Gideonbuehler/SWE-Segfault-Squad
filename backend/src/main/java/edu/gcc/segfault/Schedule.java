@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
@@ -56,6 +57,32 @@ public class Schedule {
         calendar.removeTimeBlock(toRemove);
         System.out.println(courses.toString());
         saveSchedule();
+    }
+
+    public Course findCourse(ArrayList<Course> allCourses, String courseCode, String semester) {
+        return allCourses.stream()
+                .filter(c -> c.getCourseCode().equalsIgnoreCase(courseCode)
+                        && c.getSemester().equalsIgnoreCase(semester))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public boolean removeCourseByCode(String courseCode, String semester) {
+        Course toRemove = courses.stream()
+                .filter(c -> c.getCourseCode().equalsIgnoreCase(courseCode)
+                        && c.getSemester().equalsIgnoreCase(semester))
+                .findFirst()
+                .orElse(null);
+
+        if (toRemove == null) return false;
+        removeCourse(toRemove);
+        return true;
+    }
+
+    public Set<Course> filterConflicts(Set<Course> candidates) {
+        return candidates.stream()
+                .filter(this::checkConflicts)
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
     public boolean checkConflicts(Course toCheck) {
