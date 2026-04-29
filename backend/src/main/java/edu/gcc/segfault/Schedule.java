@@ -193,7 +193,7 @@ public class Schedule {
     }
 
     public void makePDF() throws IOException {
-        //Need to push
+        pdf = new PDDocument();
         PDPage schedulePage = new PDPage(PDRectangle.A4);
         pdf.addPage(schedulePage);
         PDPageContentStream write = new PDPageContentStream(pdf, schedulePage);
