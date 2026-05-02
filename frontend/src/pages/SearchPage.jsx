@@ -643,7 +643,7 @@ function SearchPage({
                             onChange={(e) =>
                                 setFilters({ ...filters, startTime: e.target.value })
                             }
-                            style={{ marginLeft: "8px", width: "80px" }}
+                            style={{ marginLeft: "8px", width: "100px" }}
                         />
                     </label>
 
@@ -655,7 +655,7 @@ function SearchPage({
                             onChange={(e) =>
                                 setFilters({ ...filters, endTime: e.target.value })
                             }
-                            style={{ marginLeft: "8px", width: "80px" }}
+                            style={{ marginLeft: "8px", width: "100px" }}
                         />
                     </label>
                 </div>
