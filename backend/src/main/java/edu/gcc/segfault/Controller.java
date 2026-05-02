@@ -7,15 +7,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.HashSet;
 import java.util.Set;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import io.javalin.Javalin;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -177,6 +175,23 @@ public class Controller {
             } else {
                 ctx.status(500).result("Course conflict");
             }
+        });
+
+        app.post("/mySchedule/lucky", ctx -> {
+            String semester = ctx.queryParam("semester");
+            User user = userService.getUser();
+
+
+            Optional<Course> lucky = user.getSchedule().findRandomCourse(Main.getCourses(), semester);
+
+            if (lucky.isEmpty()) {
+                ctx.status(409).result("No available courses without conflicts");
+                return;
+            }
+
+            user.getSchedule().addCourse(lucky.get());
+            user.onScheduleChange();
+            ctx.status(201).json(lucky.get());
         });
 
         app.delete("/mySchedule/remove/{courseCode}/{semester}", ctx -> {
