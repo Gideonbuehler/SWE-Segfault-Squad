@@ -43,8 +43,12 @@ public class Schedule {
         //add the class if it is full
         if(checkConflicts(toAdd)) {
             courses.add(toAdd);
-            calendar.addTimeBlock(toAdd);
-            System.out.println(courses.toString());
+
+            if(!toAdd.getDayTimeMap().isEmpty()) {
+                calendar.addTimeBlock(toAdd);
+            }
+
+//            System.out.println(courses.toString());
             saveSchedule();
             return true;
         }
@@ -54,8 +58,12 @@ public class Schedule {
 
     public void removeCourse(Course toRemove){
         courses.remove(toRemove);
-        calendar.removeTimeBlock(toRemove);
-        System.out.println(courses.toString());
+
+        if(!toRemove.getDayTimeMap().isEmpty()) {
+            calendar.removeTimeBlock(toRemove);
+        }
+
+//        System.out.println(courses.toString());
         saveSchedule();
     }
 
