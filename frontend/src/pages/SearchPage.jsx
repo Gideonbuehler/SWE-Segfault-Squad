@@ -415,44 +415,22 @@ function SearchPage({
     /**
      * Random course picker with conflict avoidance
      */
-    const feelingLucky = async () => {
-        const response = await fetch("/api/noFilters");
-        if (!response.ok) return;
+   const feelingLucky = async () => {
+        const url = selectedSemester
+            ? `/api/mySchedule/lucky?semester=${selectedSemester}`
+            : `/api/mySchedule/lucky`;
 
-        const data = await response.json();
+const res = await fetch(url, { method: "POST" });
 
-        const pool = selectedSemester
-            ? data.filter(c => c.semester === selectedSemester)
-            : data;
-
-        const notAdded = pool.filter(
-            c => !schedule.some(s =>
-                s.courseCode === c.courseCode &&
-                s.semester === c.semester
-            )
-        );
-
-        if (!notAdded.length) {
+        if (res.status === 201) {
+            const course = await res.json();
+            await fetchSchedule();
+            toast({ message: `${course.courseCode} added to schedule!`, type: "success" });
+        } else if (res.status === 404) {
             toast({ message: "No available courses", type: "error" });
-            return;
+        } else if (res.status === 409) {
+            toast({ message: "All options conflict with your schedule", type: "error" });
         }
-
-        const shuffled = [...notAdded].sort(() => Math.random() - 0.5);
-
-        for (const candidate of shuffled) {
-            const res = await fetch(
-                `/api/mySchedule/add/${candidate.courseCode}/${candidate.semester}`,
-                { method: "POST" }
-            );
-
-            if (res.ok) {
-                await fetchSchedule();
-                 toast({ message: `${candidate.courseCode} added to schedule!`, type: "success" });
-                return;
-            }
-        }
-
-         toast({ message: "All options conflict with your schedule", type: "error" });
     };
 
     const totalCredits = schedule.reduce((sum, c) => sum + (Number(c.credits) || 0), 0);

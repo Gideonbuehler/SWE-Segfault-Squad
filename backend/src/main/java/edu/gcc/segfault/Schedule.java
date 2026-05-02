@@ -6,14 +6,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import net.bytebuddy.asm.Advice;
 import org.apache.pdfbox.pdmodel.*;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
@@ -91,6 +88,23 @@ public class Schedule {
         return candidates.stream()
                 .filter(this::checkConflicts)
                 .collect(Collectors.toCollection(HashSet::new));
+    }
+
+    public Optional<Course> findRandomCourse(List<Course> allCourses, String semester) {
+        List<Course> pool = allCourses.stream()
+                .filter(c -> semester == null || c.getSemester().equalsIgnoreCase(semester))
+                .filter(c -> courses.stream()
+                        .noneMatch(s -> s.getCourseCode().equalsIgnoreCase(c.getCourseCode())
+                                && s.getSemester().equalsIgnoreCase(c.getSemester())))
+                .collect(Collectors.toList());
+
+        if (pool.isEmpty()) return Optional.empty();
+
+        Collections.shuffle(pool);
+
+        return pool.stream()
+                .filter(this::checkConflicts)
+                .findFirst();
     }
 
     public boolean checkConflicts(Course toCheck) {
