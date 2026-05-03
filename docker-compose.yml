@@ -1,9 +1,10 @@
 services:
   backend:
     env_file:
-      - ./backend/.env
+      - .env
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "7000:7000"
     networks:
