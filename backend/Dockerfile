@@ -3,7 +3,7 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY backend/ .
 COPY .env .env
 
 RUN apt-get update && apt-get install -y dos2unix
