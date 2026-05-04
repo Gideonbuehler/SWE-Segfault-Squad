@@ -1,6 +1,6 @@
 # Install/Build/Run Instructions
 
-## Steps:
+## Steps without docker:
 
 1. Clone from github repository
 
@@ -11,3 +11,11 @@
 4. On the backend terminal, run ./gradlew run
 
 5. On the frontend terminal, run npm run dev
+
+## Steps with docker: 
+
+1. Clone from github repository
+
+2. Open a terminal and navigate to the project folder
+   
+4. Run 'docker compose up -d --build'
